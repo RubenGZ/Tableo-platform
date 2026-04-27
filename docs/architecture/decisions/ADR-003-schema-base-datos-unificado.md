@@ -31,7 +31,11 @@ CREATE TABLE businesses (
   slug        text UNIQUE NOT NULL,       -- para URLs públicas (/book/mi-salon)
   sector_type text NOT NULL               -- 'beauty' | 'restaurant' | 'real_estate'
     CHECK (sector_type IN ('beauty', 'restaurant', 'real_estate')),
-  config      jsonb NOT NULL DEFAULT '{}', -- horarios globales, timezone, configuración
+  timezone_id text NOT NULL DEFAULT 'Europe/Madrid',
+  -- Ejemplos: 'Atlantic/Canary' | 'Europe/Lisbon' | 'America/Mexico_City'
+  -- CRÍTICO: todas las fechas en bookings se almacenan en UTC.
+  -- timezone_id se usa SOLO para mostrar hora local al usuario.
+  config      jsonb NOT NULL DEFAULT '{}',
   owner_id    uuid NOT NULL REFERENCES auth.users,
   created_at  timestamptz DEFAULT now()
 );
@@ -198,12 +202,14 @@ El JSONB sacrifica la validación a nivel de base de datos a cambio de schema in
 - ✅ Schema no cambia al añadir V2 (restaurantes) — solo se crea un nuevo adaptador
 - ✅ Las políticas RLS se escriben una vez y aplican a todos los sectores
 - ✅ Los índices sobre `(resource_id, start_at, end_at)` garantizan queries de disponibilidad <50ms
+- ✅ `timezone_id` por negocio permite soporte multi-zona sin ambigüedad en las fechas
 - ⚠️ El `metadata jsonb` debe ser documentado por sector — crear un tipo TypeScript discriminado por `sectorType`
 - ⚠️ Si un campo de `metadata` necesita ser consultado frecuentemente, añadir índice GIN específico
+- ⚠️ Regla absoluta: nunca almacenar fechas en hora local — siempre `timestamptz` (UTC) en Postgres
 
 ## Action Items
 
-1. [ ] Crear migraciones Supabase en `supabase/migrations/` con el schema completo
+1. [ ] Crear migraciones Supabase en `supabase/migrations/` con el schema completo incluyendo `timezone_id`
 2. [ ] Activar RLS en todas las tablas desde la primera migración
 3. [ ] Configurar `pg_cron` para limpieza de reservas temporales
 4. [ ] Crear tipos TypeScript que reflejen el schema con `metadata` discriminado por sector

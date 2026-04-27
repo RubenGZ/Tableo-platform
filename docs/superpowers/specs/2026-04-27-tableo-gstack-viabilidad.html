@@ -408,6 +408,7 @@
   <a class="toc-item" href="#costs"><span class="toc-letter" style="background:var(--red)">C</span>Costs</a>
   <a class="toc-item" href="#kpis"><span class="toc-letter" style="background:#a855f7">K</span>KPIs</a>
   <a class="toc-item" href="#risks">⚠ Riesgos Críticos</a>
+  <a class="toc-item" href="#auditoria">🔍 Auditoría</a>
   <a class="toc-item" href="#verdict">✓ Veredicto</a>
 </nav>
 
@@ -1180,6 +1181,142 @@ src/
       </div>
     </div>
   </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- AUDITORÍA -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="auditoria" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background: linear-gradient(135deg, #f97316, #fb923c)">🔍</div>
+    <div class="pillar-title-block">
+      <h2>Auditoría — 3 Puntos Críticos a Corregir</h2>
+      <p>Revisión externa del plan original. Correcciones incorporadas al diseño.</p>
+    </div>
+  </div>
+
+  <!-- PUNTO A -->
+  <div class="risk-card" style="margin-bottom:20px;">
+    <div class="risk-header">
+      <div class="risk-number" style="background:rgba(249,115,22,0.15);color:#f97316;">A</div>
+      <div>
+        <div class="risk-title">El "Veneno" de la Generalización Temprana en la UI</div>
+        <div style="color:var(--text2);font-size:13px;margin-top:3px;">Backend unificado ≠ UI genérica</div>
+      </div>
+      <div class="risk-severity"><span class="badge badge-yellow">Corrección incorporada</span></div>
+    </div>
+    <div class="risk-body">
+      <div class="risk-section">
+        <div class="risk-label">El problema</div>
+        <p>El schema de base de datos es correctamente unificado, pero si el formulario de reserva es el mismo para una peluquería y para una inmobiliaria, el resultado es una interfaz confusa y sin personalidad. Un cliente que reserva una visita a un piso necesita ver campos completamente distintos al que reserva un corte de pelo.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Corrección — UI Components específicos por sector</div>
+        <p>Aunque todos los adaptadores del Motor de Disponibilidad comparten la misma interfaz de backend, cada sector tiene sus propios <strong>componentes de UI</strong> específicos. El formulario de reserva de belleza muestra "Elige servicio + profesional". El de restaurante muestra "Número de comensales + ocasión". El de inmobiliaria muestra "Tipo de visita + nombre del agente". Misma API, experiencia completamente diferente.</p>
+      </div>
+      <div class="code-block" style="font-size:12px;">
+<span class="c">// src/app/(booking)/[slug]/page.tsx</span>
+<span class="c">// El componente de reserva se selecciona por sectorType — nunca es genérico</span>
+
+<span class="k">import</span> { BeautyBookingForm }     <span class="k">from</span> <span class="s">'@/modules/booking/ui/beauty'</span>
+<span class="k">import</span> { RestaurantBookingForm } <span class="k">from</span> <span class="s">'@/modules/booking/ui/restaurant'</span>
+
+<span class="k">const</span> BOOKING_FORMS = {
+  beauty:      BeautyBookingForm,
+  restaurant:  RestaurantBookingForm,
+  real_estate: RealEstateBookingForm,
+}
+
+<span class="k">export default function</span> <span class="n">BookingPage</span>({ business }) {
+  <span class="k">const</span> Form = BOOKING_FORMS[business.sector_type]
+  <span class="k">return</span> &lt;Form business={business} /&gt;  <span class="c">// UI 100% específica por sector</span>
+}
+      </div>
+    </div>
+  </div>
+
+  <!-- PUNTO B -->
+  <div class="risk-card" style="margin-bottom:20px;">
+    <div class="risk-header">
+      <div class="risk-number" style="background:rgba(249,115,22,0.15);color:#f97316;">B</div>
+      <div>
+        <div class="risk-title">El Problema de las Zonas Horarias</div>
+        <div style="color:var(--text2);font-size:13px;margin-top:3px;">Fallo catastrófico no mencionado en el análisis original</div>
+      </div>
+      <div class="risk-severity"><span class="badge badge-red">Riesgo crítico añadido</span></div>
+    </div>
+    <div class="risk-body">
+      <div class="risk-section">
+        <div class="risk-label">El problema</div>
+        <p>El análisis original no mencionó las zonas horarias. Si un negocio está en Canarias (UTC+0 en invierno) y el servidor procesa la reserva asumiendo Madrid (UTC+1), <strong>todas las citas se desplazan una hora</strong>. Para un sistema de reservas esto es un fallo catastrófico: el cliente llega una hora antes o una hora después. Especialmente crítico al escalar a Portugal, Latinoamérica o cualquier zona fuera de Madrid.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Corrección — UTC en DB + timezone_id por negocio</div>
+        <p>Regla absoluta: <strong>todas las fechas se almacenan en UTC</strong> en la base de datos. Nunca en hora local. El campo <code>timezone_id</code> en la tabla <code>businesses</code> (ej. <code>'Europe/Madrid'</code>, <code>'Atlantic/Canary'</code>) se usa para convertir UTC a hora local <em>solo en el momento de mostrar al usuario</em>. El Motor de Disponibilidad opera siempre en UTC internamente.</p>
+      </div>
+      <div class="code-block" style="font-size:12px;">
+<span class="c">-- businesses ahora incluye timezone_id (ADR-003 actualizado)</span>
+<span class="k">ALTER TABLE</span> <span class="n">businesses</span> <span class="k">ADD COLUMN</span>
+  timezone_id text <span class="k">NOT NULL DEFAULT</span> <span class="s">'Europe/Madrid'</span>;
+  <span class="c">-- Ejemplos: 'Atlantic/Canary' | 'America/Mexico_City' | 'Europe/Lisbon'</span>
+
+<span class="c">-- Todas las fechas en bookings son timestamptz (UTC automático en Postgres)</span>
+<span class="c">-- La conversión a hora local ocurre SOLO en la capa de presentación:</span>
+
+<span class="c">// src/lib/dates.ts</span>
+<span class="k">export function</span> <span class="n">toLocalTime</span>(utcDate: Date, timezoneId: string): string {
+  <span class="k">return</span> utcDate.toLocaleString(<span class="s">'es-ES'</span>, { timeZone: timezoneId })
+}
+      </div>
+    </div>
+  </div>
+
+  <!-- PUNTO C -->
+  <div class="risk-card">
+    <div class="risk-header">
+      <div class="risk-number" style="background:rgba(249,115,22,0.15);color:#f97316;">C</div>
+      <div>
+        <div class="risk-title">Google Calendar — De Fase 2 a Skill Central del Motor</div>
+        <div style="color:var(--text2);font-size:13px;margin-top:3px;">Prioridad mal asignada en el plan original</div>
+      </div>
+      <div class="risk-severity"><span class="badge badge-yellow">Prioridad reclasificada</span></div>
+    </div>
+    <div class="risk-body">
+      <div class="risk-section">
+        <div class="risk-label">El problema</div>
+        <p>El análisis original relegó la sincronización con Google Calendar a "Fase 2". Esto es un error estratégico: los dueños de negocios pequeños <strong>no mirarán el dashboard de Tableo</strong>, mirarán su teléfono. Si una cita confirmada en Tableo no aparece en su Google Calendar, el negocio gestionará su agenda manualmente en paralelo — y habrá overbooking. Para hostelería e inmobiliaria esto no es una mejora, es un requisito de día 1.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Corrección — Google Calendar como Skill del Motor de Disponibilidad</div>
+        <p>La sincronización bidireccional con Google Calendar (y Outlook) pasa a ser una <strong>capability integrada en el Motor de Disponibilidad</strong>, no un módulo externo opcional. Cuando el Motor confirma una reserva, dispara automáticamente la sincronización con el calendario externo del negocio. Cuando se detecta un evento en Google Calendar que colisiona con un slot disponible, el Motor lo bloquea automáticamente. Esto se implementa en el MVP de V1 para el vertical de Belleza.</p>
+      </div>
+      <div class="code-block" style="font-size:12px;">
+<span class="c">// src/availability/adapters/beauty.adapter.ts</span>
+<span class="c">// Tras confirmar una reserva, el adaptador dispara la sync</span>
+
+<span class="k">async</span> confirmBooking(bookingId: string): <span class="k">Promise</span>&lt;void&gt; {
+  <span class="k">await</span> db.bookings.update({ status: <span class="s">'confirmed'</span> }, bookingId)
+
+  <span class="c">// Sync bidireccional — no es opcional, es parte del confirm</span>
+  <span class="k">await</span> calendarSync.pushEvent({
+    bookingId,
+    calendarId: business.googleCalendarId,
+    title: <span class="s">`Reserva: ${service.name} — ${customer.name}`</span>,
+    start: booking.start_at,
+    end:   booking.end_at,
+    timezone: business.timezone_id  <span class="c">// punto B aplicado aquí también</span>
+  })
+}
+      </div>
+      <div class="callout callout-info" style="margin-top:16px;">
+        <span class="callout-icon">📋</span>
+        <div class="callout-body"><strong>Impacto en el roadmap:</strong> Google Calendar API (OAuth 2.0) se añade al MVP de V1. Outlook Calendar en V2. La integración requiere que el negocio conecte su cuenta de Google durante el onboarding — esto se convierte en un paso del wizard de alta, no en una feature opcional.</div>
+      </div>
+    </div>
+  </div>
+
 </div>
 </section>
 

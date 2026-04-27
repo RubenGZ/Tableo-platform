@@ -9,6 +9,7 @@
 | [ADR-003](decisions/ADR-003-schema-base-datos-unificado.md) | Schema de Base de Datos Unificado | Accepted |
 | [ADR-004](decisions/ADR-004-control-concurrencia-two-phase-booking.md) | Control de Concurrencia — Two-Phase Booking | Accepted |
 | [ADR-005](decisions/ADR-005-multitenancy-rls.md) | Multi-tenancy via Row Level Security | Accepted |
+| [ADR-006](decisions/ADR-006-timezones-y-ui-por-sector.md) | Zonas Horarias + UI Components por Sector | Accepted |
 
 ## Diagrama de Capas
 
