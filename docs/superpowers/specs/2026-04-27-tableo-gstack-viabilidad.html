@@ -811,7 +811,7 @@ src/
 │   ├── <span class="n">(dashboard)/</span>              <span class="c">panel del negocio (auth required)</span>
 │   ├── <span class="n">(booking)/[slug]/</span>         <span class="c">página pública de reserva (no auth)</span>
 │   └── <span class="n">api/</span>
-│       └── <span class="n">availability/</span>         <span class="c">API route — llama al engine</span>
+│       └── <span class="n">webhooks/</span>             <span class="c">solo para Google Calendar y Stripe — el resto son Server Actions</span>
 │
 ├── <span class="highlight">availability/</span>                 <span class="c">EL MOTOR — núcleo del sistema</span>
 │   ├── <span class="highlight">engine.ts</span>               <span class="c">interfaz + factory — NUNCA importa adapters directamente</span>
@@ -835,6 +835,47 @@ src/
   <div class="callout callout-good">
     <span class="callout-icon">✅</span>
     <div class="callout-body"><strong>Por qué esta estructura es AI-friendly:</strong> Claude Code puede editar <code>beauty.adapter.ts</code> sin tocar el engine. Puede añadir <code>restaurant.adapter.ts</code> sin romper nada existente. Cada archivo tiene una responsabilidad clara que cabe en el contexto de un prompt. Sin this, Claude empieza a cometer errores al editar archivos de 500+ líneas con lógica mezclada.</div>
+  </div>
+
+  <h3 style="margin-bottom:16px; margin-top:32px; font-size:18px;">Stack técnico cerrado — ADR-008</h3>
+
+  <div class="grid-2" style="margin-bottom:24px;">
+    <div class="card">
+      <h3>🔑 Autenticación: Google OAuth</h3>
+      <ul>
+        <li>Login del dueño <strong>y</strong> token de Google Calendar con un solo OAuth</li>
+        <li>Supabase Auth gestiona los tokens automáticamente</li>
+        <li>Scopes requeridos: <code>openid email profile calendar</code></li>
+        <li>Clientes finales: sin cuenta — flujo anónimo con <code>app.session_id</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>⚡ Capa de datos: Server Actions</h3>
+      <ul>
+        <li>Todas las mutations van por Server Actions (<code>'use server'</code>)</li>
+        <li>Type-safety de extremo a extremo sin boilerplate</li>
+        <li>Validación con Zod antes de llegar al motor</li>
+        <li>API Routes solo para webhooks externos (Google Calendar, Stripe)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🧪 Testing: Vitest + jest-axe</h3>
+      <ul>
+        <li><strong>pnpm</strong> como package manager (3× más rápido que npm)</li>
+        <li>Vitest: misma API que Jest, 10–20× más rápido</li>
+        <li>jest-axe como gate de CI para WCAG 2.1 AA</li>
+        <li>Tailwind v3 + shadcn/ui (v4 aún inestable)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>📦 Dependencias clave</h3>
+      <ul>
+        <li><code>react-hook-form</code> + <code>zod</code> para formularios</li>
+        <li><code>date-fns</code> + <code>@date-fns/tz</code> para UTC (ADR-006)</li>
+        <li><code>@dnd-kit/core</code> para calendario táctil (ADR-007)</li>
+        <li>Zustand: solo si Context API no alcanza (YAGNI)</li>
+      </ul>
+    </div>
   </div>
 
   <h3 style="margin-bottom:16px; margin-top:32px; font-size:18px;">Reglas de oro del Monolito Modular</h3>

@@ -827,6 +827,50 @@
 </section>
 
 <!-- ══════════════════════════════════════════ -->
+<!-- 9. STACK TÉCNICO -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num" style="background:rgba(77,166,255,0.15); color:var(--blue)">9</div>
+  <h2>Stack técnico y autenticación</h2>
+  <p class="section-intro">Las herramientas exactas con las que está construido Tableo. Cada elección tiene una razón concreta — no se usó lo último porque sí.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🔑</div>
+      <h3>Google OAuth — una sola autenticación</h3>
+      <p>El dueño del negocio entra con su cuenta de Google. Ese mismo login da acceso a Tableo <em>y</em> a su Google Calendar. Un clic. No hay contraseña que recordar.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h3>Server Actions — sin APIs intermedias</h3>
+      <p>Las operaciones (crear reserva, liberar slot) van directamente del formulario al motor, sin pasar por una API intermedia. Menos código, menos puntos de fallo, detección de errores en tiempo de compilación.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧪</div>
+      <h3>Vitest — tests en milisegundos</h3>
+      <p>El mismo API que Jest pero 10–20× más rápido. Un test suite que tarda 2 segundos en vez de 40 se ejecuta en cada guardado. La accesibilidad se verifica automáticamente — si falla ARIA, el PR no se mergea.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎨</div>
+      <h3>Tailwind v3 + shadcn/ui</h3>
+      <p>shadcn/ui copia los componentes directamente al repo — sin bundle propio, sin actualizaciones que rompan. Tailwind v4 está aún inestable; v3 es sólido y shadcn lo requiere.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <span class="callout-icon">🔒</span>
+    <p><strong>Por qué Google OAuth y no email+contraseña:</strong> Google Calendar es parte del MVP — el token de OAuth sirve para <em>ambas cosas</em>. Con email+contraseña habría que hacer el OAuth de Google de todos modos en un segundo paso. Un solo flujo resuelve las dos necesidades: login del dueño + sincronización de calendario.</p>
+  </div>
+
+  <div class="callout" style="background:rgba(77,166,255,0.07);border:1px solid rgba(77,166,255,0.25);">
+    <span class="callout-icon">📦</span>
+    <p><strong>pnpm como gestor de paquetes:</strong> Hasta 3× más rápido que npm en instalaciones. El lockfile es determinista — dos máquinas distintas instalan exactamente las mismas versiones. En un proyecto con muchas dependencias (Next.js, Supabase, dnd-kit, date-fns…) la diferencia es notable desde el primer día.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
 <!-- RESUMEN FINAL -->
 <!-- ══════════════════════════════════════════ -->
 <section class="section" style="border-bottom:none">
@@ -862,6 +906,10 @@
     <div class="summary-card">
       <h4>📱 Mobile-first</h4>
       <p>Calendario táctil, branding dinámico, countdown de bloqueo, skeleton screens y ARIA desde el primer commit.</p>
+    </div>
+    <div class="summary-card">
+      <h4>🔑 Google OAuth + Server Actions</h4>
+      <p>Un login que da acceso a Tableo y al Google Calendar del negocio. Las operaciones van del formulario al motor sin APIs intermedias.</p>
     </div>
   </div>
 </div>

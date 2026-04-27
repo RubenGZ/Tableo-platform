@@ -11,6 +11,7 @@
 | [ADR-005](decisions/ADR-005-multitenancy-rls.md) | Multi-tenancy via Row Level Security | Accepted |
 | [ADR-006](decisions/ADR-006-timezones-y-ui-por-sector.md) | Zonas Horarias + UI Components por Sector | Accepted |
 | [ADR-007](decisions/ADR-007-ux-mobile-first-accesibilidad.md) | UX Mobile-First, Branding Dinámico, Feedback y A11y | Accepted |
+| [ADR-008](decisions/ADR-008-stack-auth-data-layer.md) | Stack Técnico, Autenticación y Capa de Datos | Accepted |
 
 ## Diagrama de Capas
 
