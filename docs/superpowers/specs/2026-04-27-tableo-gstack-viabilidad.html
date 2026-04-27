@@ -408,7 +408,8 @@
   <a class="toc-item" href="#costs"><span class="toc-letter" style="background:var(--red)">C</span>Costs</a>
   <a class="toc-item" href="#kpis"><span class="toc-letter" style="background:#a855f7">K</span>KPIs</a>
   <a class="toc-item" href="#risks">⚠ Riesgos Críticos</a>
-  <a class="toc-item" href="#auditoria">🔍 Auditoría</a>
+  <a class="toc-item" href="#auditoria">🔍 Auditoría Técnica</a>
+  <a class="toc-item" href="#auditoria-ux">📱 Auditoría UX</a>
   <a class="toc-item" href="#verdict">✓ Veredicto</a>
 </nav>
 
@@ -1313,6 +1314,223 @@ src/
       <div class="callout callout-info" style="margin-top:16px;">
         <span class="callout-icon">📋</span>
         <div class="callout-body"><strong>Impacto en el roadmap:</strong> Google Calendar API (OAuth 2.0) se añade al MVP de V1. Outlook Calendar en V2. La integración requiere que el negocio conecte su cuenta de Google durante el onboarding — esto se convierte en un paso del wizard de alta, no en una feature opcional.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- AUDITORÍA UX -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="auditoria-ux" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background: linear-gradient(135deg, #ec4899, #f472b6)">📱</div>
+    <div class="pillar-title-block">
+      <h2>Auditoría UX — 4 Requisitos Antes de Escribir Código</h2>
+      <p>Revisión de la capa de interfaz. Correcciones que afectan el modelo de datos y la arquitectura de componentes.</p>
+    </div>
+  </div>
+
+  <!-- A: MOBILE-FIRST -->
+  <div class="risk-card" style="margin-bottom:20px;">
+    <div class="risk-header">
+      <div class="risk-number" style="background:rgba(236,72,153,0.15);color:#ec4899;">A</div>
+      <div>
+        <div class="risk-title">Mobile-First — El Dashboard Debe Funcionar con los Dedos</div>
+        <div style="color:var(--text2);font-size:13px;margin-top:3px;">El 90% de los dueños gestionan su negocio desde el móvil mientras trabajan</div>
+      </div>
+      <div class="risk-severity"><span class="badge badge-red">Requisito MVP</span></div>
+    </div>
+    <div class="risk-body">
+      <div class="risk-section">
+        <div class="risk-label">El problema</div>
+        <p>Un peluquero no abre un portátil entre cliente y cliente. Saca el móvil 30 segundos para ver si tiene hueco a las 5. Si el dashboard no es operable con el pulgar, Tableo pierde frente a Booksy, que lleva años optimizando su app nativa. El calendario de gestión debe soportar <strong>gestos táctiles</strong>: deslizar para cambiar de semana, pulsar y mantener para mover una cita, pellizcar para cambiar la granularidad de la vista.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Corrección — Componentes táctiles desde el día 1</div>
+        <p>La arquitectura de componentes del dashboard define explícitamente dos modos: <strong>desktop</strong> (hover, click, drag-and-drop con ratón) y <strong>touch</strong> (tap, swipe, long-press). El hook <code>usePointerType()</code> detecta el dispositivo y renderiza la variante apropiada del calendario sin cambiar la lógica de datos subyacente.</p>
+      </div>
+      <div class="code-block" style="font-size:12px;">
+<span class="c">// src/modules/dashboard/ui/Calendar/index.tsx</span>
+<span class="c">// El componente detecta el tipo de dispositivo y carga la variante correcta</span>
+
+<span class="k">import</span> { usePointerType } <span class="k">from</span> <span class="s">'@/lib/hooks/use-pointer-type'</span>
+<span class="k">import</span> { CalendarDesktop } <span class="k">from</span> <span class="s">'./CalendarDesktop'</span>  <span class="c">// drag &amp; drop con ratón</span>
+<span class="k">import</span> { CalendarMobile }  <span class="k">from</span> <span class="s">'./CalendarMobile'</span>   <span class="c">// swipe + long-press táctil</span>
+
+<span class="k">export function</span> <span class="n">Calendar</span>(props) {
+  <span class="k">const</span> isTouchDevice = usePointerType() === <span class="s">'touch'</span>
+  <span class="k">return</span> isTouchDevice
+    ? &lt;CalendarMobile  {...props} /&gt;   <span class="c">// arrastrar citas con el dedo</span>
+    : &lt;CalendarDesktop {...props} /&gt;   <span class="c">// drag &amp; drop estándar</span>
+}
+
+<span class="c">// CalendarMobile usa @dnd-kit/core con sensores táctiles</span>
+<span class="c">// CalendarDesktop usa PointerSensor estándar</span>
+<span class="c">// Ambos actualizan el mismo endpoint: PATCH /api/bookings/:id/reschedule</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- B: BRANDING -->
+  <div class="risk-card" style="margin-bottom:20px;">
+    <div class="risk-header">
+      <div class="risk-number" style="background:rgba(236,72,153,0.15);color:#ec4899;">B</div>
+      <div>
+        <div class="risk-title">Identidad de Marca por Negocio — Branding Dinámico</div>
+        <div style="color:var(--text2);font-size:13px;margin-top:3px;">La página de reserva debe sentirse del negocio, no de Tableo</div>
+      </div>
+      <div class="risk-severity"><span class="badge badge-yellow">Corrección en schema</span></div>
+    </div>
+    <div class="risk-body">
+      <div class="risk-section">
+        <div class="risk-label">El problema</div>
+        <p>Si todas las páginas de reserva se ven iguales, los negocios sienten que pierden su identidad. La peluquería "Salon Luna" quiere que sus clientes vean su rosa característico, no el morado genérico de Tableo. Este detalle es la diferencia entre una herramienta SaaS anónima y una extensión de la marca del negocio.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Corrección — Branding en <code>businesses.config</code></div>
+        <p>El campo <code>config jsonb</code> de la tabla <code>businesses</code> ya existe en el schema. Se define la subestructura de branding dentro de él. La página pública de reserva carga estos valores como CSS custom properties — sin procesamiento en el servidor, sin reconstruir el bundle.</p>
+      </div>
+      <div class="code-block" style="font-size:12px;">
+<span class="c">-- businesses.config incluye la subestructura de branding:</span>
+{
+  <span class="s">"branding"</span>: {
+    <span class="s">"logo_url"</span>:     <span class="s">"https://cdn.tableo.app/logos/salon-luna.png"</span>,
+    <span class="s">"accent_color"</span>: <span class="s">"#e91e8c"</span>,   <span class="c">// color del botón "Reservar"</span>
+    <span class="s">"accent_dark"</span>:  <span class="s">"#c2185b"</span>,   <span class="c">// hover / estado activo</span>
+    <span class="s">"cover_url"</span>:    <span class="s">"https://cdn.tableo.app/covers/salon-luna.jpg"</span>
+  },
+  <span class="s">"booking"</span>: {
+    <span class="s">"min_advance_hours"</span>: 2,
+    <span class="s">"max_advance_days"</span>:  30,
+    <span class="s">"cancellation_hours"</span>: 24
+  }
+}
+
+<span class="c">// src/app/(booking)/[slug]/layout.tsx</span>
+<span class="c">// Los colores se inyectan como CSS variables — cero JS en el cliente</span>
+<span class="k">export default function</span> <span class="n">BookingLayout</span>({ business, children }) {
+  <span class="k">const</span> { accent_color, accent_dark } = business.config.branding ?? {}
+  <span class="k">return</span> (
+    &lt;div style={{
+      <span class="s">'--color-accent'</span>: accent_color ?? <span class="s">'#7c6dff'</span>,
+      <span class="s">'--color-accent-dark'</span>: accent_dark ?? <span class="s">'#5a4fe0'</span>
+    } <span class="k">as</span> React.CSSProperties}&gt;
+      {children}
+    &lt;/div&gt;
+  )
+}
+      </div>
+    </div>
+  </div>
+
+  <!-- C: COUNTDOWN + SKELETON -->
+  <div class="risk-card" style="margin-bottom:20px;">
+    <div class="risk-header">
+      <div class="risk-number" style="background:rgba(236,72,153,0.15);color:#ec4899;">C</div>
+      <div>
+        <div class="risk-title">Feedback de Bloqueo — Countdown + Skeleton Screens</div>
+        <div style="color:var(--text2);font-size:13px;margin-top:3px;">El usuario debe saber qué está pasando en todo momento</div>
+      </div>
+      <div class="risk-severity"><span class="badge badge-yellow">Componente definido</span></div>
+    </div>
+    <div class="risk-body">
+      <div class="risk-section">
+        <div class="risk-label">El problema</div>
+        <p>El sistema de reserva tiene un bloqueo temporal de 5 minutos (two-phase booking). Sin feedback visual, el usuario no sabe que hay un reloj corriendo — y si expira sin que lo sepa, verá un error confuso. Además, mientras el Motor de Disponibilidad consulta la base de datos, el calendario tarda 100-300ms en cargar: sin estado de carga, la página parece rota.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Corrección — Dos componentes de feedback obligatorios</div>
+        <p><strong>1. BookingCountdown:</strong> Al reservar un slot, se muestra un contador regresivo visible ("<em>Tienes 4:32 para completar tu reserva</em>"). A los 60 segundos restantes cambia a rojo y pulsa. Si expira, el componente llama automáticamente a <code>releaseSlot()</code> y refresca el calendario sin recargar la página.<br><br><strong>2. Skeleton Screens:</strong> Mientras el calendario carga, se muestran bloques grises animados con la forma exacta de los slots — el usuario sabe dónde mirar antes de que aparezca el contenido real. Percepción de velocidad &gt; velocidad real.</p>
+      </div>
+      <div class="code-block" style="font-size:12px;">
+<span class="c">// src/modules/booking/ui/BookingCountdown.tsx</span>
+<span class="k">export function</span> <span class="n">BookingCountdown</span>({ reservedUntil, onExpire }) {
+  <span class="k">const</span> secondsLeft = useCountdown(reservedUntil)
+
+  <span class="k">if</span> (secondsLeft &lt;= 0) {
+    onExpire()          <span class="c">// libera el slot y refresca la disponibilidad</span>
+    <span class="k">return</span> &lt;SlotExpiredBanner /&gt;
+  }
+
+  <span class="k">return</span> (
+    &lt;div className={secondsLeft &lt; 60 ? <span class="s">'countdown urgent'</span> : <span class="s">'countdown'</span>}&gt;
+      ⏱ Tienes {formatTime(secondsLeft)} para completar tu reserva
+    &lt;/div&gt;
+  )
+}
+
+<span class="c">// src/modules/booking/ui/CalendarSkeleton.tsx</span>
+<span class="c">// Mientras carga: bloques animados con la forma del calendario</span>
+<span class="k">export function</span> <span class="n">CalendarSkeleton</span>() {
+  <span class="k">return</span> (
+    &lt;div className=<span class="s">"skeleton-grid"</span>&gt;
+      {Array.from({ length: 12 }).map((_, i) =&gt;
+        &lt;div key={i} className=<span class="s">"skeleton-slot animate-pulse"</span> /&gt;
+      )}
+    &lt;/div&gt;
+  )
+}
+      </div>
+    </div>
+  </div>
+
+  <!-- D: ACCESIBILIDAD -->
+  <div class="risk-card">
+    <div class="risk-header">
+      <div class="risk-number" style="background:rgba(236,72,153,0.15);color:#ec4899;">D</div>
+      <div>
+        <div class="risk-title">Accesibilidad (A11y) — ARIA desde el Día 1</div>
+        <div style="color:var(--text2);font-size:13px;margin-top:3px;">Los calendarios son las pesadillas de accesibilidad más comunes</div>
+      </div>
+      <div class="risk-severity"><span class="badge badge-blue">Requisito no negociable</span></div>
+    </div>
+    <div class="risk-body">
+      <div class="risk-section">
+        <div class="risk-label">El problema</div>
+        <p>Los calendarios de selección de fecha son sistemáticamente inaccesibles: sin etiquetas ARIA, un usuario con lector de pantalla no puede entender qué botón corresponde a qué fecha ni qué slots están disponibles o no. En España, la accesibilidad web es un requisito legal (WCAG 2.1 nivel AA) para servicios públicos y cualquier plataforma con más de 10.000 usuarios. Empezar accesible es infinitamente más barato que retrofittear.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Corrección — Estándar ARIA para calendarios (WAI-ARIA 1.1)</div>
+        <p>El componente de selección de fecha implementa el patrón <strong>ARIA Grid</strong> con roles explícitos, estados y propiedades que los lectores de pantalla entienden. Los slots disponibles se anuncian con su hora y estado. El contador de bloqueo usa <code>aria-live="polite"</code> para anunciar los cambios de tiempo sin interrumpir al usuario.</p>
+      </div>
+      <div class="code-block" style="font-size:12px;">
+<span class="c">// src/modules/booking/ui/SlotPicker.tsx — patrón ARIA Grid</span>
+&lt;div
+  role=<span class="s">"grid"</span>
+  aria-label=<span class="s">"Selecciona un horario disponible"</span>
+  aria-describedby=<span class="s">"slot-picker-instructions"</span>
+&gt;
+  &lt;p id=<span class="s">"slot-picker-instructions"</span> className=<span class="s">"sr-only"</span>&gt;
+    Usa las teclas de flecha para navegar entre horarios.
+    Pulsa Enter para seleccionar.
+  &lt;/p&gt;
+
+  {slots.map(slot =&gt; (
+    &lt;button
+      key={slot.id}
+      role=<span class="s">"gridcell"</span>
+      aria-label={<span class="s">`${formatTime(slot.startAt)}, disponible`</span>}
+      aria-selected={selectedSlot?.id === slot.id}
+      aria-disabled={slot.status !== <span class="s">'available'</span>}
+      disabled={slot.status !== <span class="s">'available'</span>}
+    &gt;
+      {formatTime(slot.startAt)}
+    &lt;/button&gt;
+  ))}
+&lt;/div&gt;
+
+<span class="c">// Countdown accesible — anuncia cambios sin interrumpir</span>
+&lt;div aria-live=<span class="s">"polite"</span> aria-atomic=<span class="s">"true"</span>&gt;
+  Tienes {formatTime(secondsLeft)} para completar tu reserva
+&lt;/div&gt;
+      </div>
+      <div class="callout callout-info" style="margin-top:16px;">
+        <span class="callout-icon">📋</span>
+        <div class="callout-body"><strong>Herramienta de verificación:</strong> Integrar <code>jest-axe</code> en los tests del componente <code>SlotPicker</code>. Si hay violaciones ARIA, el test falla en CI antes de llegar a producción. Accesibilidad como parte del pipeline, no como auditoría manual.</div>
       </div>
     </div>
   </div>
