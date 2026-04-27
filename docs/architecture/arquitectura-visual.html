@@ -539,6 +539,11 @@
     <p><strong>¿Qué pasa si dos personas pulsan el mismo slot a la vez?</strong> La base de datos tiene un sistema de locks que garantiza que exactamente uno de los dos obtiene la reserva. El otro recibe un mensaje de "Este horario acaba de reservarse" al instante. Cero dobles reservas, garantizado matemáticamente.</p>
   </div>
 
+  <div class="callout" style="background:rgba(245,200,66,0.07);border:1px solid rgba(245,200,66,0.25);">
+    <span class="callout-icon">⏱</span>
+    <p><strong>Countdown visible durante el bloqueo:</strong> Una vez bloqueado el slot, el cliente ve un contador regresivo en pantalla — "Tienes 4:32 para completar tu reserva". Si el tiempo expira, el slot se libera automáticamente y el calendario se refresca sin recargar la página. Mientras el calendario carga, se muestran bloques animados (skeleton screens) para que la experiencia parezca instantánea.</p>
+  </div>
+
   <div class="cards">
     <div class="card">
       <div class="card-icon">⏱️</div>
@@ -554,6 +559,11 @@
       <div class="card-icon">💨</div>
       <h3>Sin cuenta obligatoria</h3>
       <p>El cliente final reserva con nombre y teléfono. Sin registro, sin contraseña, sin fricción.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📅</div>
+      <h3>Google Calendar incluido</h3>
+      <p>Al confirmar una reserva, aparece automáticamente en el Google Calendar del negocio. Sin pasos manuales.</p>
     </div>
   </div>
 </div>
@@ -577,7 +587,8 @@
         <div class="field"><span class="field-name">name</span><span class="field-type">text</span></div>
         <div class="field"><span class="field-name">slug</span><span class="field-type">text</span></div>
         <div class="field"><span class="field-name">sector_type</span><span class="field-type">beauty…</span></div>
-        <div class="field"><span class="field-name field-json">config</span><span class="field-type">jsonb</span></div>
+        <div class="field"><span class="field-name" style="color:var(--blue)">timezone_id</span><span class="field-type">text ⏰</span></div>
+        <div class="field"><span class="field-name field-json">config</span><span class="field-type">jsonb 🎨</span></div>
         <div class="field"><span class="field-name field-fk">owner_id</span><span class="field-type">FK users</span></div>
       </div>
     </div>
@@ -634,6 +645,16 @@
   <div class="callout callout-yellow">
     <span class="callout-icon">★</span>
     <p><strong>¿Qué es el campo <code>metadata</code>?</strong> Es un campo flexible que guarda información diferente según el sector. Para una peluquería guarda el servicio y el precio. Para un restaurante guardará el tamaño de la mesa. El schema no cambia — solo cambia lo que va dentro de ese campo.</p>
+  </div>
+
+  <div class="callout" style="background:rgba(77,166,255,0.07);border:1px solid rgba(77,166,255,0.25);">
+    <span class="callout-icon">⏰</span>
+    <p><strong><code>timezone_id</code> — todas las fechas en UTC, sin excepción.</strong> Este campo indica la zona horaria del negocio (ej. <code>Europe/Madrid</code>, <code>Atlantic/Canary</code>). Todas las fechas se guardan en UTC en la base de datos y solo se convierten a hora local en el momento de mostrarlas. Sin esto, un negocio en Canarias tendría sus citas desplazadas una hora.</p>
+  </div>
+
+  <div class="callout" style="background:rgba(236,72,153,0.07);border:1px solid rgba(236,72,153,0.25);">
+    <span class="callout-icon">🎨</span>
+    <p><strong><code>config.branding</code> — la identidad visual del negocio.</strong> Dentro del campo <code>config</code> vive la personalización: logo, color de acento (<code>"#e91e8c"</code> para el rosa de una peluquería, <code>"#2e7d32"</code> para el verde de un restaurante ecológico). Los botones de la página de reserva adoptan ese color automáticamente sin reconstruir nada.</p>
   </div>
 </div>
 </section>
@@ -746,6 +767,10 @@
       <div class="rule-item"><span>✓</span><span>Toda tabla nueva tiene RLS activado</span></div>
       <div class="rule-item"><span>✓</span><span>Two-phase booking para toda reserva</span></div>
       <div class="rule-item"><span>✓</span><span>Tests por cada adaptador del motor</span></div>
+      <div class="rule-item"><span>✓</span><span>Fechas siempre en UTC — conversión solo en la UI</span></div>
+      <div class="rule-item"><span>✓</span><span>UI de booking específica por sector (nunca genérica)</span></div>
+      <div class="rule-item"><span>✓</span><span>ARIA correcto en todos los componentes de calendario</span></div>
+      <div class="rule-item"><span>✓</span><span>Google Calendar sincronizado al confirmar — no es opcional</span></div>
     </div>
     <div class="rule-no">
       <h4>❌ Nunca hacemos esto</h4>
@@ -755,7 +780,48 @@
       <div class="rule-item"><span>✗</span><span>Tablas separadas por sector en la DB</span></div>
       <div class="rule-item"><span>✗</span><span>INSERT directo en bookings sin el sistema de locks</span></div>
       <div class="rule-item"><span>✗</span><span>Añadir V2 antes de que V1 tenga clientes reales</span></div>
+      <div class="rule-item"><span>✗</span><span>Guardar fechas en hora local en la base de datos</span></div>
+      <div class="rule-item"><span>✗</span><span>Un formulario de reserva igual para todos los sectores</span></div>
     </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- 8. UX: MOBILE, BRANDING, A11Y -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num" style="background:rgba(236,72,153,0.15); color:#ec4899">8</div>
+  <h2>UX — Mobile, Branding y Accesibilidad</h2>
+  <p class="section-intro">El 80% de los clientes reservan desde el móvil. El 90% de los dueños gestionan su negocio desde el teléfono. La interfaz tiene que funcionar perfectamente con los dedos.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">👆</div>
+      <h3>Calendario táctil</h3>
+      <p>El dashboard detecta si el dispositivo es táctil o de escritorio y carga la variante correcta. En móvil: deslizar para cambiar de semana, mantener pulsado para mover una cita con el dedo.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎨</div>
+      <h3>Identidad de marca</h3>
+      <p>Cada página de reserva tiene el logo, el color de botones y la imagen del negocio. Una peluquería ve su rosa, un restaurante su verde. Los colores se cargan desde la base de datos, sin reconstruir nada.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">♿</div>
+      <h3>Accesible por defecto</h3>
+      <p>Los calendarios son las peores implementaciones de accesibilidad en la web. Tableo usa etiquetas ARIA correctas desde el primer componente. Si falla la accesibilidad, el test de CI falla — no llega a producción.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📅</div>
+      <h3>Google Calendar en el MVP</h3>
+      <p>No es una feature extra: es parte del proceso de confirmación. Al confirmar una reserva en Tableo, aparece automáticamente en el Google Calendar del negocio. Sin esto, los dueños mantienen dos agendas en paralelo y hay overbooking.</p>
+    </div>
+  </div>
+
+  <div class="callout" style="background:rgba(236,72,153,0.07);border:1px solid rgba(236,72,153,0.25);">
+    <span class="callout-icon">📱</span>
+    <p><strong>La UI es sector-específica aunque el backend sea universal.</strong> El formulario de reserva de una peluquería ("elige servicio + profesional") es completamente distinto al de un restaurante ("número de comensales + turno"). Misma API por debajo, experiencia 100% adaptada arriba. Un formulario genérico para todos los sectores haría que la plataforma pareciera mediocre en todos ellos.</p>
   </div>
 </div>
 </section>
@@ -766,20 +832,20 @@
 <section class="section" style="border-bottom:none">
 <div class="wrap">
   <h2 style="text-align:center; margin-bottom:8px;">En resumen</h2>
-  <p class="section-intro" style="text-align:center; margin:0 auto 40px;">Cinco decisiones técnicas que hacen de Tableo una plataforma sólida desde el día 1.</p>
+  <p class="section-intro" style="text-align:center; margin:0 auto 40px;">Las decisiones técnicas que hacen de Tableo una plataforma sólida desde el día 1.</p>
 
   <div class="summary-grid">
     <div class="summary-card">
       <h4>🏗️ Monolito Modular</h4>
-      <p>Un solo proyecto, bien organizado por dentro. Rápido de construir, fácil de mantener para un equipo de 2 + Claude Code.</p>
+      <p>Un solo proyecto, bien organizado por dentro. Rápido de construir, fácil de mantener para un equipo de 2.</p>
     </div>
     <div class="summary-card">
       <h4>⚙️ Motor Polimórfico</h4>
-      <p>Añadir un nuevo sector (restaurantes, inmobiliaria) es crear un archivo nuevo. Cero impacto en lo que ya funciona.</p>
+      <p>Añadir un nuevo sector es crear un archivo nuevo. Cero impacto en lo que ya funciona.</p>
     </div>
     <div class="summary-card">
       <h4>🗄️ Schema Unificado</h4>
-      <p>5 tablas para todos los sectores. El campo <code>metadata</code> absorbe las diferencias. Sin migraciones al expandir.</p>
+      <p>5 tablas para todos los sectores. <code>timezone_id</code> + <code>config.branding</code> incorporados desde el inicio.</p>
     </div>
     <div class="summary-card">
       <h4>🔒 Locks Postgres</h4>
@@ -788,6 +854,14 @@
     <div class="summary-card">
       <h4>🛡️ RLS en DB</h4>
       <p>El aislamiento entre negocios vive en la base de datos. Un bug en el código no puede filtrar datos de otro negocio.</p>
+    </div>
+    <div class="summary-card">
+      <h4>⏰ UTC obligatorio</h4>
+      <p>Todas las fechas en UTC. La zona horaria del negocio solo se usa para mostrar la hora local al usuario.</p>
+    </div>
+    <div class="summary-card">
+      <h4>📱 Mobile-first</h4>
+      <p>Calendario táctil, branding dinámico, countdown de bloqueo, skeleton screens y ARIA desde el primer commit.</p>
     </div>
   </div>
 </div>
