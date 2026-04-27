@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableo — Auditoría Pre-Desarrollo</title>
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --bg2: #13131a;
+    --bg3: #1a1a24;
+    --border: #252530;
+    --text: #e8e8f0;
+    --text2: #8888aa;
+    --green: #22c97a;
+    --yellow: #f5c842;
+    --red: #ff5566;
+    --blue: #4da6ff;
+    --purple: #9d7dff;
+    --orange: #ff8c42;
+    --pink: #ec4899;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.7; }
+
+  .hero {
+    padding: 64px 24px 48px;
+    text-align: center;
+    background: radial-gradient(ellipse 70% 50% at 50% -5%, rgba(255,85,102,0.12) 0%, transparent 70%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-tag { display: inline-block; background: rgba(255,85,102,0.1); border: 1px solid rgba(255,85,102,0.3); color: #ff8899; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 14px; border-radius: 99px; margin-bottom: 20px; }
+  .hero h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 10px; }
+  .hero-sub { color: var(--text2); font-size: 16px; max-width: 520px; margin: 0 auto 24px; }
+  .hero-meta { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; font-size: 13px; color: var(--text2); }
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+  /* SCORE BANNER */
+  .score-banner { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 32px 24px; background: var(--bg2); border-bottom: 1px solid var(--border); max-width: 100%; }
+  .score-item { text-align: center; padding: 20px 16px; border-radius: 12px; border: 1px solid var(--border); }
+  .score-num { font-size: 36px; font-weight: 900; letter-spacing: -2px; }
+  .score-label { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+  @media (max-width: 600px) { .score-banner { grid-template-columns: 1fr 1fr; } }
+
+  .section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+  .section h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .section-sub { color: var(--text2); font-size: 14px; margin-bottom: 32px; }
+
+  /* FINDING CARDS */
+  .finding { border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 14px; }
+  .finding-header { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .finding-badge { font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; flex-shrink: 0; }
+  .badge-blocker  { background: rgba(255,85,102,0.15); color: var(--red); }
+  .badge-gap      { background: rgba(245,200,66,0.15); color: var(--yellow); }
+  .badge-ok       { background: rgba(34,201,122,0.15); color: var(--green); }
+  .badge-minor    { background: rgba(77,166,255,0.12); color: var(--blue); }
+  .finding-title  { font-size: 15px; font-weight: 700; flex: 1; }
+  .finding-body   { padding: 16px 20px; }
+  .finding-body p { font-size: 13.5px; color: var(--text2); line-height: 1.65; margin-bottom: 10px; }
+  .finding-body p:last-child { margin-bottom: 0; }
+  .finding-body strong { color: var(--text); }
+  .finding-body code { background: rgba(255,255,255,0.06); border-radius: 4px; padding: 1px 5px; font-size: 12px; font-family: monospace; }
+
+  /* EVIDENCE TABLE */
+  .evidence { overflow-x: auto; margin: 16px 0 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { background: var(--bg3); color: var(--text2); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 8px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text2); vertical-align: top; }
+  td strong { color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  .check { color: var(--green); }
+  .cross { color: var(--red); }
+  .warn  { color: var(--yellow); }
+
+  /* VERDICT */
+  .verdict { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 36px; margin: 48px 0 0; text-align: center; }
+  .verdict h2 { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
+  .verdict p { color: var(--text2); font-size: 14px; max-width: 580px; margin: 0 auto 24px; }
+  .verdict-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .chip { padding: 8px 18px; border-radius: 99px; font-size: 12px; font-weight: 700; border: 1px solid; }
+  .chip-red    { background: rgba(255,85,102,0.1);  border-color: rgba(255,85,102,0.3);  color: var(--red); }
+  .chip-green  { background: rgba(34,201,122,0.1);  border-color: rgba(34,201,122,0.3);  color: var(--green); }
+  .chip-yellow { background: rgba(245,200,66,0.1);  border-color: rgba(245,200,66,0.3);  color: var(--yellow); }
+
+  /* ROADMAP */
+  .roadmap { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 32px; }
+  .roadmap-col { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .roadmap-col h4 { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .roadmap-item { font-size: 12.5px; color: var(--text2); padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 8px; }
+  .roadmap-item:last-child { border-bottom: none; }
+  @media (max-width: 640px) { .roadmap { grid-template-columns: 1fr; } }
+
+  footer { text-align: center; padding: 36px; color: var(--text2); font-size: 12px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">Auditoría Pre-Desarrollo · Segunda Revisión</div>
+  <h1>Tableo — Informe de Auditoría</h1>
+  <p class="hero-sub">Verificación sistemática de todos los documentos antes del primer commit de código. Evidencia real, sin suposiciones.</p>
+  <div class="hero-meta">
+    <span><span class="dot" style="background:var(--green)"></span>7 ADRs revisados</span>
+    <span><span class="dot" style="background:var(--yellow)"></span>38 action items pendientes</span>
+    <span><span class="dot" style="background:var(--red)"></span>3 gaps críticos</span>
+    <span><span class="dot" style="background:var(--blue)"></span>2 HTMLs sincronizados</span>
+  </div>
+</div>
+
+<!-- SCORE BANNER -->
+<div class="score-banner">
+  <div class="score-item" style="border-color:rgba(34,201,122,0.25)">
+    <div class="score-num" style="color:var(--green)">7/7</div>
+    <div class="score-label">ADRs completos</div>
+  </div>
+  <div class="score-item" style="border-color:rgba(34,201,122,0.25)">
+    <div class="score-num" style="color:var(--green)">2/2</div>
+    <div class="score-label">HTMLs sincronizados</div>
+  </div>
+  <div class="score-item" style="border-color:rgba(255,85,102,0.25)">
+    <div class="score-num" style="color:var(--red)">3</div>
+    <div class="score-label">Gaps bloqueantes</div>
+  </div>
+  <div class="score-item" style="border-color:rgba(245,200,66,0.25)">
+    <div class="score-num" style="color:var(--yellow)">38</div>
+    <div class="score-label">Action items abiertos</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ -->
+<!-- SECCIÓN 1: LO QUE ESTÁ BIEN -->
+<!-- ════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <h2>✅ Verificado y correcto</h2>
+  <p class="section-sub">Evidencia directa de los documentos — no suposiciones.</p>
+
+  <div class="finding">
+    <div class="finding-header">
+      <span class="finding-badge badge-ok">OK</span>
+      <span class="finding-title">Todos los ADRs tienen la estructura completa</span>
+    </div>
+    <div class="finding-body">
+      <p>Los 7 ADRs contienen las secciones obligatorias: Context, Decision, Consequences y Action Items. Ninguno está incompleto.</p>
+      <div class="evidence">
+        <table>
+          <thead><tr><th>ADR</th><th>Context</th><th>Decision</th><th>Consequences</th><th>Action Items</th></tr></thead>
+          <tbody>
+            <tr><td><strong>ADR-001</strong> Monolito Modular</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓ (3)</td></tr>
+            <tr><td><strong>ADR-002</strong> Motor Polimórfico</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓ (5)</td></tr>
+            <tr><td><strong>ADR-003</strong> Schema DB</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓ (5)</td></tr>
+            <tr><td><strong>ADR-004</strong> Concurrencia</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓ (5)</td></tr>
+            <tr><td><strong>ADR-005</strong> RLS</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓ (5)</td></tr>
+            <tr><td><strong>ADR-006</strong> Timezones + UI Sector</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓ (8)</td></tr>
+            <tr><td><strong>ADR-007</strong> UX Mobile + A11y</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓ (9)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="finding-header">
+      <span class="finding-badge badge-ok">OK</span>
+      <span class="finding-title">Los dos HTMLs visuales están sincronizados con los ADRs</span>
+    </div>
+    <div class="finding-body">
+      <div class="evidence">
+        <table>
+          <thead><tr><th>Concepto (ADR)</th><th>GSTACK HTML</th><th>Arquitectura Visual HTML</th></tr></thead>
+          <tbody>
+            <tr><td>timezone_id (ADR-006)</td><td class="check">✓ (6 menciones)</td><td class="check">✓ (3 menciones)</td></tr>
+            <tr><td>Google Calendar (ADR-006)</td><td class="check">✓</td><td class="check">✓ (5 menciones)</td></tr>
+            <tr><td>Countdown / Skeleton (ADR-007)</td><td class="check">✓ (7 menciones)</td><td class="check">✓</td></tr>
+            <tr><td>Branding / config (ADR-007)</td><td class="check">✓</td><td class="check">✓ (4 menciones)</td></tr>
+            <tr><td>ARIA / Accesibilidad (ADR-007)</td><td class="check">✓ (25 menciones)</td><td class="check">✓</td></tr>
+            <tr><td>Mobile / táctil (ADR-007)</td><td class="check">✓</td><td class="check">✓ (3 menciones)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="finding-header">
+      <span class="finding-badge badge-ok">OK</span>
+      <span class="finding-title">Referencias cruzadas entre ADRs son consistentes</span>
+    </div>
+    <div class="finding-body">
+      <p>Los conceptos compartidos entre ADRs apuntan a la misma definición. No hay contradicciones en los contratos de interfaz ni en el schema de base de datos.</p>
+      <div class="evidence">
+        <table>
+          <thead><tr><th>Concepto</th><th>ADR propietario</th><th>ADRs que lo referencian</th><th>Consistente</th></tr></thead>
+          <tbody>
+            <tr><td><code>AvailabilityAdapter</code></td><td>ADR-002</td><td>ADR-006</td><td class="check">✓</td></tr>
+            <tr><td><code>reserve_slot()</code></td><td>ADR-004</td><td>ADR-003 (mención)</td><td class="check">✓</td></tr>
+            <tr><td><code>timezone_id</code></td><td>ADR-006</td><td>ADR-003 (schema)</td><td class="check">✓</td></tr>
+            <tr><td>RLS policies</td><td>ADR-005</td><td>ADR-003</td><td class="check">✓</td></tr>
+            <tr><td>bookings.status values</td><td>ADR-003</td><td>ADR-004</td><td class="check">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ════════════════════════════════ -->
+<!-- SECCIÓN 2: HALLAZGOS MENORES -->
+<!-- ════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <h2>⚠️ Hallazgos menores</h2>
+  <p class="section-sub">No bloquean el desarrollo. Se resuelven en el primer sprint.</p>
+
+  <div class="finding">
+    <div class="finding-header">
+      <span class="finding-badge badge-minor">MENOR</span>
+      <span class="finding-title">pg_cron documentado en dos ADRs (ADR-003 y ADR-004)</span>
+    </div>
+    <div class="finding-body">
+      <p>La configuración de <code>pg_cron</code> para limpiar reservas temporales aparece en ADR-003 (schema) y ADR-004 (concurrencia). <strong>El propietario correcto es ADR-004.</strong> ADR-003 debería solo referenciar a ADR-004, no duplicar el código SQL.</p>
+      <p>Impacto: ninguno en el desarrollo. Se corrige en la siguiente revisión de documentación.</p>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="finding-header">
+      <span class="finding-badge badge-minor">MENOR</span>
+      <span class="finding-title">Notificaciones (email/SMS) mencionadas pero sin ADR propio</span>
+    </div>
+    <div class="finding-body">
+      <p>Resend y Twilio se mencionan en el GSTACK HTML y en varios ADRs pero no hay un ADR de notificaciones que defina: qué eventos disparan notificaciones, qué plantillas existen, cuándo se envía SMS vs email, y cómo se gestiona el opt-out.</p>
+      <p>Impacto: bajo para el MVP. Las notificaciones no bloquean el core de reservas. Se crea el ADR-008 durante el primer sprint cuando se implemente el módulo.</p>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="finding-header">
+      <span class="finding-badge badge-minor">MENOR</span>
+      <span class="finding-title">38 action items abiertos — ninguno está priorizado</span>
+    </div>
+    <div class="finding-body">
+      <p>Los 7 ADRs acumulan 38 action items sin prioridad asignada. Algunos son prerequisitos del scaffold (crear el schema de DB), otros son de segunda fase (test de carga con 50 usuarios simultáneos).</p>
+      <p>Se ordenan y priorizan en el plan de implementación — no es un bloqueante de documentación.</p>
+      <div class="evidence">
+        <table>
+          <thead><tr><th>ADR</th><th>Action Items</th></tr></thead>
+          <tbody>
+            <tr><td>ADR-001</td><td>3</td></tr>
+            <tr><td>ADR-002</td><td>5</td></tr>
+            <tr><td>ADR-003</td><td>5</td></tr>
+            <tr><td>ADR-004</td><td>5</td></tr>
+            <tr><td>ADR-005</td><td>5</td></tr>
+            <tr><td>ADR-006</td><td>8</td></tr>
+            <tr><td>ADR-007</td><td>9 — <strong>Total: 38</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ════════════════════════════════ -->
+<!-- SECCIÓN 3: GAPS CRÍTICOS -->
+<!-- ════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <h2>🚨 Gaps críticos — bloqueantes antes del scaffold</h2>
+  <p class="section-sub">Decisiones que no se han tomado y que afectan directamente a cómo se escribe el primer archivo de código.</p>
+
+  <div class="finding" style="border-color:rgba(255,85,102,0.3)">
+    <div class="finding-header" style="background:rgba(255,85,102,0.05)">
+      <span class="finding-badge badge-blocker">BLOQUEANTE #1</span>
+      <span class="finding-title">Capa de datos — Server Actions vs API Routes vs tRPC</span>
+    </div>
+    <div class="finding-body">
+      <p>No hay ADR que decida cómo los componentes de Next.js obtienen y mutan datos. Esta decisión determina la arquitectura de <strong>cada componente</strong> del proyecto. No se puede escribir ni el primer formulario sin tenerla resuelta.</p>
+      <p><strong>Opción A — Server Actions:</strong> Funciones async en el servidor llamadas directamente desde componentes. Máxima simplicidad, menos boilerplate. Recomendado para equipos pequeños con Claude Code.</p>
+      <p><strong>Opción B — API Routes (/api/*):</strong> Endpoints REST clásicos. Más verboso pero más testeable de forma independiente. Permite reutilizar la API desde la app móvil futura.</p>
+      <p><strong>Opción C — tRPC:</strong> Type-safe end-to-end. Potente pero añade complejidad de setup. Overkill para MVP.</p>
+      <p><strong>Decisión pendiente:</strong> Necesita ADR-008 antes de escribir código.</p>
+    </div>
+  </div>
+
+  <div class="finding" style="border-color:rgba(255,85,102,0.3)">
+    <div class="finding-header" style="background:rgba(255,85,102,0.05)">
+      <span class="finding-badge badge-blocker">BLOQUEANTE #2</span>
+      <span class="finding-title">Autenticación — Flujo exacto de Supabase Auth no definido</span>
+    </div>
+    <div class="finding-body">
+      <p>Los ADRs mencionan <code>auth.uid()</code> en las políticas RLS pero nadie ha decidido <strong>cómo se autentica el dueño del negocio</strong>. Supabase Auth soporta múltiples métodos y la elección afecta el wizard de onboarding completo.</p>
+      <p><strong>Opción A — Email + Password:</strong> Clásico. El dueño crea cuenta con email y contraseña. Requiere pantalla de verificación de email.</p>
+      <p><strong>Opción B — Magic Link (email):</strong> El dueño pone su email y recibe un link. Sin contraseña. Más fricción en el primer login, menos gestión de seguridad.</p>
+      <p><strong>Opción C — Google OAuth:</strong> "Continuar con Google". Alta conversión para negocios que ya tienen Google Calendar (que es el caso de Tableo). Combina bien con la integración de Google Calendar.</p>
+      <p><strong>Decisión pendiente:</strong> Necesita ADR-009 antes de construir el onboarding.</p>
+    </div>
+  </div>
+
+  <div class="finding" style="border-color:rgba(255,85,102,0.3)">
+    <div class="finding-header" style="background:rgba(255,85,102,0.05)">
+      <span class="finding-badge badge-blocker">BLOQUEANTE #3</span>
+      <span class="finding-title">Stack técnico exacto no cerrado — 4 decisiones sin tomar</span>
+    </div>
+    <div class="finding-body">
+      <p>El stack dice "Next.js + Supabase" pero hay 4 decisiones de tooling que afectan al <code>package.json</code> inicial y al scaffolding:</p>
+      <div class="evidence">
+        <table>
+          <thead><tr><th>Decisión</th><th>Opciones</th><th>Impacto</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Package manager</strong></td>
+              <td>npm / pnpm / bun</td>
+              <td>Lockfile, CI config, velocidad de install</td>
+            </tr>
+            <tr>
+              <td><strong>Testing framework</strong></td>
+              <td>Jest / Vitest</td>
+              <td>jest-axe del ADR-007 requiere Jest o equivalente Vitest</td>
+            </tr>
+            <tr>
+              <td><strong>CSS / UI</strong></td>
+              <td>Tailwind v4 + shadcn/ui vs Tailwind v3 solo</td>
+              <td>shadcn/ui resuelve los componentes accesibles del ADR-007 gratis</td>
+            </tr>
+            <tr>
+              <td><strong>Gestión de estado</strong></td>
+              <td>Zustand / Jotai / solo Context</td>
+              <td>El countdown del ADR-007 necesita estado global o local claro</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:12px;"><strong>Decisión pendiente:</strong> Necesita ADR-008 (o sección en él) antes del <code>npx create-next-app</code>.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ════════════════════════════════ -->
+<!-- SECCIÓN 4: GAPS CONOCIDOS -->
+<!-- ════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <h2>📋 Gaps conocidos — no bloqueantes ahora</h2>
+  <p class="section-sub">Decisiones que hay que tomar pero no antes del scaffold. Se resuelven en el primer o segundo sprint.</p>
+
+  <div class="evidence">
+    <table>
+      <thead><tr><th>Área</th><th>Estado</th><th>Cuándo resolver</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Pagos (Stripe)</strong></td>
+          <td class="warn">⚠ Sin ADR. Solo mencionado en GSTACK.</td>
+          <td>Sprint 2 — solo se necesita para activar suscripciones Pro</td>
+        </tr>
+        <tr>
+          <td><strong>Notificaciones (Resend + Twilio)</strong></td>
+          <td class="warn">⚠ Sin ADR. Proveedores decididos, triggers no.</td>
+          <td>Sprint 2 — el módulo de notificaciones no es MVP-day-1</td>
+        </tr>
+        <tr>
+          <td><strong>Importador Booksy (CSV)</strong></td>
+          <td class="warn">⚠ Mencionado en GSTACK, sin especificación técnica.</td>
+          <td>Sprint 3 — post-lanzamiento inicial</td>
+        </tr>
+        <tr>
+          <td><strong>Rate limiting / throttling</strong></td>
+          <td class="cross">✗ Sin mención en ningún ADR.</td>
+          <td>Sprint 2 — antes de abrir al público</td>
+        </tr>
+        <tr>
+          <td><strong>Monitoring / error tracking</strong></td>
+          <td class="cross">✗ Sentry/Axiom/similar no mencionado.</td>
+          <td>Sprint 2 — necesario antes de primeros clientes reales</td>
+        </tr>
+        <tr>
+          <td><strong>CI/CD pipeline</strong></td>
+          <td class="warn">⚠ Vercel mencionado, GitHub Actions no definido.</td>
+          <td>Sprint 1 — configurar con el scaffold</td>
+        </tr>
+        <tr>
+          <td><strong>Supabase Storage</strong></td>
+          <td class="warn">⚠ Mencionado en ADR-007, sin política de acceso definida.</td>
+          <td>Sprint 2 — al implementar subida de logo</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ════════════════════════════════ -->
+<!-- PLAN DE RESOLUCIÓN -->
+<!-- ════════════════════════════════ -->
+<section class="section" style="border-bottom:none;">
+<div class="wrap">
+  <h2>🗺️ Plan de resolución antes de escribir código</h2>
+  <p class="section-sub">Los 3 gaps bloqueantes se resuelven en este orden.</p>
+
+  <div class="roadmap">
+    <div class="roadmap-col" style="border-color:rgba(255,85,102,0.25)">
+      <h4 style="color:var(--red)">Paso 1 — Ahora</h4>
+      <div class="roadmap-item"><span>→</span><span>Decidir capa de datos: Server Actions (recomendado)</span></div>
+      <div class="roadmap-item"><span>→</span><span>Decidir auth: Google OAuth (sinergía con Calendar)</span></div>
+      <div class="roadmap-item"><span>→</span><span>Cerrar stack: pnpm + Vitest + Tailwind v3 + shadcn/ui</span></div>
+      <div class="roadmap-item"><span>→</span><span>Escribir ADR-008 (Stack + Capa de datos + Auth)</span></div>
+    </div>
+    <div class="roadmap-col" style="border-color:rgba(245,200,66,0.25)">
+      <h4 style="color:var(--yellow)">Paso 2 — Sprint 1</h4>
+      <div class="roadmap-item"><span>→</span><span>Scaffold del proyecto con el stack cerrado</span></div>
+      <div class="roadmap-item"><span>→</span><span>Migraciones Supabase (schema + RLS + pg_cron)</span></div>
+      <div class="roadmap-item"><span>→</span><span>CI/CD con GitHub Actions + Vercel</span></div>
+      <div class="roadmap-item"><span>→</span><span>Módulo de autenticación completo</span></div>
+    </div>
+    <div class="roadmap-col" style="border-color:rgba(34,201,122,0.25)">
+      <h4 style="color:var(--green)">Paso 3 — Sprint 2</h4>
+      <div class="roadmap-item"><span>→</span><span>Motor de disponibilidad + BeautyAdapter</span></div>
+      <div class="roadmap-item"><span>→</span><span>Página pública de reservas</span></div>
+      <div class="roadmap-item"><span>→</span><span>Dashboard del negocio (calendario mobile)</span></div>
+      <div class="roadmap-item"><span>→</span><span>Google Calendar sync en confirmación</span></div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <h2>Veredicto de la Auditoría</h2>
+    <p>La arquitectura está documentada, es consistente y los dos HTMLs están sincronizados. <strong>No se puede escribir el primer archivo de código</strong> hasta cerrar los 3 gaps bloqueantes: capa de datos, flujo de autenticación y stack técnico exacto. Son decisiones de 30 minutos que evitan reescrituras de días.</p>
+    <div class="verdict-chips">
+      <span class="chip chip-green">✓ 7 ADRs completos y consistentes</span>
+      <span class="chip chip-green">✓ HTMLs visuales sincronizados</span>
+      <span class="chip chip-red">✗ ADR-008 pendiente (stack + auth + capa datos)</span>
+      <span class="chip chip-yellow">⚠ 38 action items sin priorizar</span>
+      <span class="chip chip-yellow">⚠ 7 gaps no bloqueantes documentados</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <p>Tableo · Auditoría Pre-Desarrollo · 27 de abril de 2026</p>
+  <p style="margin-top:6px; color:#333">Evidencia verificada directamente de los ficheros del repositorio — no inferida</p>
+</footer>
+
+</body>
+</html>
