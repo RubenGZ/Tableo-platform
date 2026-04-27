@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableo — Análisis GSTACK de Viabilidad Técnica</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --bg2: #141414;
+    --bg3: #1a1a1a;
+    --border: #2a2a2a;
+    --text: #e8e8e8;
+    --text2: #999;
+    --accent: #6c63ff;
+    --accent2: #9d97ff;
+    --green: #22c55e;
+    --yellow: #f5a623;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a1230 50%, #0d0d0d 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 64px 40px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.3);
+    color: var(--accent2);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    color: var(--text2);
+    font-size: 16px;
+    max-width: 580px;
+    margin: 0 auto 32px;
+  }
+  .meta-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text2);
+    font-size: 13px;
+  }
+  .meta-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  /* NAV */
+  .toc {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc-item {
+    padding: 16px 20px;
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .toc-item:hover { color: var(--text); border-bottom-color: var(--accent); }
+  .toc-letter {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    text-align: center;
+    line-height: 18px;
+    margin-right: 6px;
+  }
+
+  /* LAYOUT */
+  .container { max-width: 960px; margin: 0 auto; padding: 0 40px; }
+
+  /* PILLAR SECTIONS */
+  .pillar {
+    border-bottom: 1px solid var(--border);
+    padding: 64px 0;
+  }
+  .pillar-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  .pillar-letter {
+    flex-shrink: 0;
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 900;
+    color: white;
+  }
+  .pillar-title-block h2 {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .pillar-title-block p {
+    color: var(--text2);
+    font-size: 14px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card p, .card li { color: var(--text2); font-size: 14px; line-height: 1.7; }
+  .card ul { padding-left: 20px; margin-top: 8px; }
+  .card li { margin-bottom: 4px; }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* CALLOUT */
+  .callout {
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .callout-warn { background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.25); }
+  .callout-good { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); }
+  .callout-info { background: rgba(108,99,255,0.08); border: 1px solid rgba(108,99,255,0.25); }
+  .callout-bad  { background: rgba(239,68,68,0.08);  border: 1px solid rgba(239,68,68,0.25);  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { font-size: 14px; line-height: 1.65; color: var(--text2); }
+  .callout-body strong { color: var(--text); }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: #cdd6f4;
+    overflow-x: auto;
+    margin-bottom: 16px;
+  }
+  .code-block .c { color: #6c7086; }
+  .code-block .k { color: #cba6f7; }
+  .code-block .s { color: #a6e3a1; }
+  .code-block .n { color: #89b4fa; }
+  .code-block .t { color: #f38ba8; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th {
+    background: var(--bg3);
+    color: var(--text2);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #1f1f1f;
+    color: var(--text2);
+    vertical-align: top;
+  }
+  td strong { color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    vertical-align: middle;
+  }
+  .badge-green { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .badge-yellow { background: rgba(245,166,35,0.15); color: #f5a623; }
+  .badge-red { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .badge-blue { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .badge-purple { background: rgba(108,99,255,0.15); color: var(--accent2); }
+
+  /* RISK CARDS */
+  .risk-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .risk-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .risk-number {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 16px; flex-shrink: 0;
+  }
+  .risk-1 { background: rgba(239,68,68,0.15); color: #ef4444; }
+  .risk-2 { background: rgba(245,166,35,0.15); color: #f5a623; }
+  .risk-3 { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .risk-title { font-size: 16px; font-weight: 700; }
+  .risk-severity { margin-left: auto; }
+  .risk-body { padding: 20px 24px; }
+  .risk-section { margin-bottom: 16px; }
+  .risk-section:last-child { margin-bottom: 0; }
+  .risk-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-bottom: 6px;
+  }
+  .risk-section p { font-size: 14px; color: var(--text2); line-height: 1.65; }
+
+  /* KPI GRID */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 16px; }
+  .kpi-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--accent2);
+    margin-bottom: 4px;
+  }
+  .kpi-label { font-size: 12px; color: var(--text2); font-weight: 500; }
+  .kpi-desc { font-size: 11px; color: #666; margin-top: 4px; }
+
+  /* VERDICT */
+  .verdict {
+    background: linear-gradient(135deg, rgba(108,99,255,0.08) 0%, rgba(34,197,94,0.05) 100%);
+    border: 1px solid rgba(108,99,255,0.25);
+    border-radius: 16px;
+    padding: 40px;
+    margin: 64px 0;
+    text-align: center;
+  }
+  .verdict h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+  .verdict p { color: var(--text2); font-size: 15px; max-width: 640px; margin: 0 auto 24px; line-height: 1.7; }
+  .verdict-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.25);
+    border-radius: 50px;
+    padding: 10px 28px;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--green);
+  }
+
+  /* DIAGRAM */
+  .arch-diagram {
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.9;
+    color: #cdd6f4;
+    overflow-x: auto;
+  }
+  .arch-diagram .layer { color: #6c7086; font-size: 11px; letter-spacing: 1px; }
+  .arch-diagram .box { color: #89b4fa; }
+  .arch-diagram .arrow { color: #6c7086; }
+  .arch-diagram .adapter { color: #a6e3a1; }
+  .arch-diagram .highlight { color: #cba6f7; font-weight: 600; }
+
+  /* DIVIDER */
+  .section-divider { height: 1px; background: var(--border); margin: 32px 0; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 40px;
+    color: var(--text2);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* PROGRESS */
+  .progress-bar {
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Análisis GSTACK · Viabilidad Técnica · 2026</div>
+  <h1>Tableo</h1>
+  <p class="hero-sub">Plataforma de reservas universal. Análisis estratégico y técnico de viabilidad previo a la ejecución del MVP.</p>
+  <div class="meta-row">
+    <span class="meta-item"><span class="meta-dot"></span>Vertical V1: Belleza &amp; Bienestar</span>
+    <span class="meta-item"><span class="meta-dot" style="background:var(--green)"></span>Mercado: España</span>
+    <span class="meta-item"><span class="meta-dot" style="background:var(--yellow)"></span>Equipo: 2 personas + Claude Code</span>
+    <span class="meta-item"><span class="meta-dot" style="background:var(--blue)"></span>Stack: Next.js + Supabase</span>
+  </div>
+</div>
+
+<!-- TOC -->
+<nav class="toc">
+  <a class="toc-item" href="#goals"><span class="toc-letter">G</span>Goals</a>
+  <a class="toc-item" href="#strategy"><span class="toc-letter" style="background:var(--blue)">S</span>Strategy</a>
+  <a class="toc-item" href="#technology"><span class="toc-letter" style="background:var(--green)">T</span>Technology</a>
+  <a class="toc-item" href="#architecture"><span class="toc-letter" style="background:var(--yellow)">A</span>Architecture</a>
+  <a class="toc-item" href="#costs"><span class="toc-letter" style="background:var(--red)">C</span>Costs</a>
+  <a class="toc-item" href="#kpis"><span class="toc-letter" style="background:#a855f7">K</span>KPIs</a>
+  <a class="toc-item" href="#risks">⚠ Riesgos Críticos</a>
+  <a class="toc-item" href="#verdict">✓ Veredicto</a>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- G — GOALS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="goals" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter">G</div>
+    <div class="pillar-title-block">
+      <h2>Goals — El Reto de la Reserva Universal</h2>
+      <p>¿Cómo unificamos lógicas radicalmente distintas en un solo modelo?</p>
+    </div>
+  </div>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body"><strong>El fallo más común al diseñar plataformas "universales":</strong> intentar construir todo a la vez y acabar con una plataforma mediocre en todos los verticales. Tableo debe ser excelente en Belleza &amp; Bienestar antes de expandirse. La arquitectura debe ser extensible, no la implementación.</div>
+  </div>
+
+  <h3 style="margin-bottom:16px; font-size:18px;">Los 3 tipos de reserva y su primitiva común</h3>
+
+  <div class="grid-3">
+    <div class="card">
+      <h3>⏱ Basada en Tiempo</h3>
+      <p><strong style="color:var(--text)">Ejemplos:</strong> Peluquerías, spas, médicos</p>
+      <ul>
+        <li>Recurso = profesional disponible</li>
+        <li>Restricción = duración del servicio</li>
+        <li>Variable = múltiples profesionales simultáneos</li>
+      </ul>
+      <p style="margin-top:10px;"><span class="badge badge-green">V1 — Implementar ahora</span></p>
+    </div>
+    <div class="card">
+      <h3>🪑 Basada en Inventario</h3>
+      <p><strong style="color:var(--text)">Ejemplos:</strong> Restaurantes, hoteles</p>
+      <ul>
+        <li>Recurso = mesa o habitación</li>
+        <li>Restricción = capacidad + turnos</li>
+        <li>Variable = tamaño del grupo</li>
+      </ul>
+      <p style="margin-top:10px;"><span class="badge badge-yellow">V2 — Diseñar ahora, implementar luego</span></p>
+    </div>
+    <div class="card">
+      <h3>🏠 Basada en Activos</h3>
+      <p><strong style="color:var(--text)">Ejemplos:</strong> Inmobiliaria, coches</p>
+      <ul>
+        <li>Recurso = activo único</li>
+        <li>Restricción = ocupación exclusiva</li>
+        <li>Variable = ventanas de inspección</li>
+      </ul>
+      <p style="margin-top:10px;"><span class="badge badge-blue">V3 — Solo arquitectura extensible</span></p>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body"><strong>La primitiva unificadora:</strong> Los tres tipos comparten el mismo átomo de reserva: <code>Slot(resource_id, start_time, end_time, capacity, status)</code>. La diferencia está solo en cómo se calcula la disponibilidad y qué significa "recurso" en cada sector. Esta es la base del Motor Polimórfico.</div>
+  </div>
+
+  <h3 style="margin-bottom:16px; font-size:18px;">Modelo de datos unificado (sector-agnostic)</h3>
+
+  <div class="code-block">
+<span class="c">-- Core: sector-agnostic. Nunca cambia entre verticales.</span>
+
+<span class="k">CREATE TABLE</span> <span class="n">businesses</span> (
+  id          uuid <span class="k">PRIMARY KEY</span>,
+  name        text,
+  sector_type text  <span class="c">-- 'beauty' | 'restaurant' | 'real_estate'</span>
+  config      jsonb <span class="c">-- configuración específica del sector</span>
+);
+
+<span class="k">CREATE TABLE</span> <span class="n">resources</span> (
+  id            uuid <span class="k">PRIMARY KEY</span>,
+  business_id   uuid <span class="k">REFERENCES</span> businesses,
+  resource_type text, <span class="c">-- 'staff' | 'table' | 'asset'</span>
+  name          text,
+  metadata      jsonb <span class="c">-- atributos específicos: {'specialties': ['corte', 'color']}</span>
+);
+
+<span class="k">CREATE TABLE</span> <span class="n">bookings</span> (
+  id          uuid <span class="k">PRIMARY KEY</span>,
+  resource_id uuid <span class="k">REFERENCES</span> resources,
+  customer_id uuid,
+  start_at    timestamptz,
+  end_at      timestamptz,
+  status      text, <span class="c">-- 'pending' | 'confirmed' | 'cancelled' | 'completed'</span>
+  metadata    jsonb  <span class="c">-- {'service': 'corte', 'party_size': 4, ...}</span>
+);
+
+<span class="k">CREATE TABLE</span> <span class="n">availability_windows</span> (
+  id          uuid <span class="k">PRIMARY KEY</span>,
+  resource_id uuid <span class="k">REFERENCES</span> resources,
+  day_of_week int, <span class="c">-- 0=Lun, 6=Dom</span>
+  open_time   time,
+  close_time  time
+);
+  </div>
+
+  <div class="callout callout-good">
+    <span class="callout-icon">✅</span>
+    <div class="callout-body"><strong>Por qué este diseño es correcto:</strong> El campo <code>metadata jsonb</code> en <code>resources</code> y <code>bookings</code> absorbe todos los atributos sector-específicos sin romper el esquema. Añadir el vertical de restaurantes en V2 no requiere migración — solo un nuevo adaptador.</div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- S — STRATEGY -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="strategy" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background: linear-gradient(135deg, var(--blue), #60a5fa)">S</div>
+    <div class="pillar-title-block">
+      <h2>Strategy — Cómo Desbancar a Booksy</h2>
+      <p>Reducción de costes, go-to-market y eliminación de fricción de entrada</p>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:16px; font-size:18px;">Modelo de negocio recomendado: Híbrido por capas</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tier</th>
+          <th>Precio</th>
+          <th>Límites</th>
+          <th>Objetivo estratégico</th>
+          <th>Revenue</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Free</strong></td>
+          <td><strong>€0/mes</strong></td>
+          <td>50 reservas/mes · 1 profesional</td>
+          <td>Adquisición masiva, viral loop</td>
+          <td>€0 (inversión en CAC)</td>
+        </tr>
+        <tr>
+          <td><strong>Pro</strong> <span class="badge badge-green">Core</span></td>
+          <td><strong>€14/mes</strong></td>
+          <td>Ilimitado · 3 profesionales · SMS</td>
+          <td>La masa crítica — 60% del revenue</td>
+          <td>€14 × escala</td>
+        </tr>
+        <tr>
+          <td><strong>Business</strong></td>
+          <td><strong>€29/mes</strong></td>
+          <td>Multi-sede · Analytics · API</td>
+          <td>Upsell natural al crecer</td>
+          <td>€29 × escala</td>
+        </tr>
+        <tr>
+          <td><strong>Pagos</strong> <span class="badge badge-purple">Multiplicador</span></td>
+          <td><strong>0.9%</strong> por cobro</td>
+          <td>Opcional, sobre lo procesado</td>
+          <td>Revenue pasivo escalable</td>
+          <td>~€450/mes a 100 negocios</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">🎯</span>
+    <div class="callout-body"><strong>Ventaja diferencial:</strong> Booksy cobra €35/mes sin tier gratuito. Tableo entra con €0 y captura el segmento de peluquerías unipersonales (el más numeroso en España) que hoy usan WhatsApp o no usan nada digital. Una vez enganchados, la conversión a Pro es casi automática cuando superan las 50 reservas/mes.</div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <h3 style="margin-bottom:16px; font-size:18px;">Estrategia de migración desde Booksy / Treatwell</h3>
+
+  <div class="callout callout-bad">
+    <span class="callout-icon">🚨</span>
+    <div class="callout-body"><strong>El mayor obstáculo no es técnico:</strong> Los negocios no cambian de plataforma por precio. Cambian cuando perciben que no van a perder su historial de clientes. La migración de datos perfecta es el producto más importante del go-to-market.</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>📥 Fase 1 — Importación de datos</h3>
+      <ul>
+        <li>Importador CSV de Booksy (permiten exportar)</li>
+        <li>Sincronización Google Calendar bidireccional</li>
+        <li>Import wizard: subir lista de clientes → mapear campos → activar</li>
+        <li>Soporte WhatsApp: "Envía tus contactos de Booksy, los importamos en 24h"</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🤝 Fase 2 — Retención de clientes del negocio</h3>
+      <ul>
+        <li>Email/SMS automático a clientes existentes: "Tu peluquería ha migrado a Tableo, reserva aquí"</li>
+        <li>Página de reserva pública con el historial visible para el cliente</li>
+        <li>Primeros 50 negocios: migración manual (white-glove) para aprender los puntos de dolor</li>
+        <li>Período de gracia: 3 meses de Pro gratis al migrar</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <h3 style="margin-bottom:16px; font-size:18px;">Go-to-market España — Primeros 100 negocios</h3>
+
+  <div class="grid-3">
+    <div class="card">
+      <h3>🎯 Canal 1 — Comunidades</h3>
+      <p>Grupos de Facebook y Telegram de peluqueros autónomos en España. Alta densidad, bajo CAC, alta credibilidad peer-to-peer.</p>
+    </div>
+    <div class="card">
+      <h3>📲 Canal 2 — Viral loop</h3>
+      <p>Cada cliente que reserva ve "Reservado con Tableo". Link a landing de registro para el negocio. El producto se vende solo.</p>
+    </div>
+    <div class="card">
+      <h3>🤝 Canal 3 — Asociaciones</h3>
+      <p>Acuerdos con asociaciones de peluqueros (ANPE, Coiffure EU España). Un acuerdo da acceso a miles de negocios.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- T — TECHNOLOGY -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="technology" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background: linear-gradient(135deg, var(--green), #4ade80)">T</div>
+    <div class="pillar-title-block">
+      <h2>Technology — Evaluación del Stack</h2>
+      <p>Next.js + Supabase: ¿aguanta los "calendarios infinitos" y la concurrencia masiva?</p>
+    </div>
+  </div>
+
+  <div class="callout callout-good">
+    <span class="callout-icon">✅</span>
+    <div class="callout-body"><strong>Veredicto general: Stack correcto para este momento.</strong> Next.js + Supabase es la combinación más eficiente para un equipo de 2 personas + Claude Code. Tiene caveats importantes que hay que conocer desde el día 1, pero ninguno es bloqueante para el MVP.</div>
+  </div>
+
+  <h3 style="margin-bottom:16px; font-size:18px;">Evaluación por componente</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Componente</th><th>Fortaleza para Tableo</th><th>Riesgo</th><th>Severidad</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Supabase RLS</strong></td>
+          <td>Multi-tenancy gratis desde el día 1. Cada negocio aislado a nivel de base de datos.</td>
+          <td>Políticas RLS mal escritas = fuga de datos entre negocios</td>
+          <td><span class="badge badge-red">Alto</span></td>
+        </tr>
+        <tr>
+          <td><strong>Supabase Realtime</strong></td>
+          <td>Actualizaciones de calendario en vivo sin polling. WebSockets gestionados.</td>
+          <td>Coste de conexiones simultáneas en tier Free</td>
+          <td><span class="badge badge-yellow">Medio</span></td>
+        </tr>
+        <tr>
+          <td><strong>Supabase Edge Functions</strong></td>
+          <td>Motor de disponibilidad serverless, escala automáticamente.</td>
+          <td>Cold starts de ~200ms en la primera llamada</td>
+          <td><span class="badge badge-yellow">Bajo-Medio</span></td>
+        </tr>
+        <tr>
+          <td><strong>Next.js Server Components</strong></td>
+          <td>Página de reserva pública renderizada server-side. Rápida, SEO-friendly, sin JS para el cliente final.</td>
+          <td>Curva de aprendizaje de RSC + Suspense para Claude Code</td>
+          <td><span class="badge badge-green">Bajo</span></td>
+        </tr>
+        <tr>
+          <td><strong>Connection Pooling (PgBouncer)</strong></td>
+          <td>Crítico bajo carga concurrente. Supabase Pro lo incluye.</td>
+          <td>Sin PgBouncer, 100 usuarios simultáneos = 100 conexiones Postgres → agotamiento</td>
+          <td><span class="badge badge-red">Crítico</span></td>
+        </tr>
+        <tr>
+          <td><strong>Índices en bookings</strong></td>
+          <td>Con índices correctos, queries de disponibilidad en &lt;50ms.</td>
+          <td>Sin índice en (resource_id, start_at, end_at) = full table scan a escala</td>
+          <td><span class="badge badge-red">Alto</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-bottom:16px; margin-top:32px; font-size:18px;">El problema de concurrencia — y cómo resolverlo</h3>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚡</span>
+    <div class="callout-body"><strong>Escenario de riesgo:</strong> El último slot disponible un sábado a las 11:00h en una peluquería popular. 3 clientes abren la página simultáneamente y pulsan "Reservar" al mismo tiempo. Sin control de concurrencia → 3 reservas en el mismo slot → caos.</div>
+  </div>
+
+  <div class="code-block">
+<span class="c">-- Solución: Two-Phase Booking con SELECT FOR UPDATE NOWAIT</span>
+<span class="c">-- Esto es un primitivo de PostgreSQL — funciona perfecto en Supabase</span>
+
+<span class="c">-- FASE 1: Reserva temporal (TTL 5 minutos)</span>
+<span class="k">BEGIN</span>;
+  <span class="k">SELECT</span> * <span class="k">FROM</span> <span class="n">slots</span>
+  <span class="k">WHERE</span> resource_id = $1
+    <span class="k">AND</span> start_at = $2
+    <span class="k">AND</span> status = <span class="s">'available'</span>
+  <span class="k">FOR UPDATE NOWAIT</span>; <span class="c">-- Rechaza instantáneo si ya está bloqueado</span>
+
+  <span class="k">UPDATE</span> <span class="n">slots</span> <span class="k">SET</span>
+    status = <span class="s">'reserved'</span>,
+    reserved_until = NOW() + INTERVAL <span class="s">'5 minutes'</span>,
+    reserved_by = $session_id
+  <span class="k">WHERE</span> id = $slot_id;
+<span class="k">COMMIT</span>;
+
+<span class="c">-- FASE 2: Confirmar (tras pago o confirmación del usuario)</span>
+<span class="k">UPDATE</span> <span class="n">bookings</span> <span class="k">SET</span> status = <span class="s">'confirmed'</span>
+<span class="k">WHERE</span> session_id = $session_id
+  <span class="k">AND</span> reserved_until > NOW();
+
+<span class="c">-- pg_cron limpia reservas expiradas cada minuto</span>
+<span class="k">SELECT</span> cron.schedule(<span class="s">'cleanup-expired'</span>, <span class="s">'* * * * *'</span>,
+  <span class="s">'UPDATE slots SET status=''available'' WHERE status=''reserved'' AND reserved_until &lt; NOW()'</span>);
+  </div>
+
+  <h3 style="margin-bottom:16px; margin-top:32px; font-size:18px;">Capacidad real del stack a escala</h3>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-value">100k</div>
+      <div class="kpi-label">MAU soportados</div>
+      <div class="kpi-desc">Supabase Pro sin cambios</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">&lt;50ms</div>
+      <div class="kpi-label">Query de disponibilidad</div>
+      <div class="kpi-desc">Con índices correctos en Postgres</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">500/s</div>
+      <div class="kpi-label">Reservas simultáneas</div>
+      <div class="kpi-desc">Con PgBouncer activo</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">8GB</div>
+      <div class="kpi-label">Base de datos incluida</div>
+      <div class="kpi-desc">Supabase Pro — más que suficiente para 1.000 negocios</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- A — ARCHITECTURE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="architecture" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background: linear-gradient(135deg, var(--yellow), #fbbf24)">A</div>
+    <div class="pillar-title-block">
+      <h2>Architecture — Monolito Modular + Motor Polimórfico</h2>
+      <p>Cómo evitar el código espagueti sin sobre-ingeniería prematura</p>
+    </div>
+  </div>
+
+  <div class="callout callout-bad">
+    <span class="callout-icon">❌</span>
+    <div class="callout-body"><strong>El anti-patrón que destruye plataformas universales:</strong> <code>if (sector === 'beauty') {'{'} ... {'}'} else if (sector === 'restaurant') {'{'} ... {'}'}</code> en el núcleo del sistema. Cada nuevo sector añade 200 líneas de condicionales. En 6 meses nadie entiende el código. Claude Code empieza a romper cosas al editar.</div>
+  </div>
+
+  <h3 style="margin-bottom:16px; font-size:18px;">El Motor de Disponibilidad Polimórfico</h3>
+
+  <div class="arch-diagram">
+<span class="layer">┌─────────────────────────────────────────────────────────┐</span>
+<span class="layer">│                    NEXT.JS APP                          │</span>
+<span class="layer">│  Pages / API Routes / Server Components                 │</span>
+<span class="layer">└────────────────────────┬────────────────────────────────┘</span>
+                         │
+<span class="layer">┌────────────────────────▼────────────────────────────────┐</span>
+<span class="highlight">│           AVAILABILITY ENGINE (interfaz)                │</span>
+<span class="highlight">│     getSlots() · validateBooking() · lockSlot()         │</span>
+<span class="layer">└──────┬───────────────────────────────────────┬──────────┘</span>
+       │                                       │
+<span class="layer">┌──────▼──────┐                       ┌───────▼──────┐</span>
+<span class="adapter">│TimeBasedAdapter│                     │InventoryAdapter│</span>
+<span class="adapter">│ (V1 — Beauty) │                     │(V2 — Restaur.) │</span>
+<span class="layer">└─────────────┘                       └──────────────┘</span>
+       │                                       │
+<span class="layer">┌──────▼───────────────────────────────────────────────────┐</span>
+<span class="layer">│              SUPABASE (PostgreSQL)                        │</span>
+<span class="layer">│  businesses · resources · bookings · availability_windows │</span>
+<span class="layer">└──────────────────────────────────────────────────────────┘</span>
+  </div>
+
+  <h3 style="margin-bottom:16px; margin-top:32px; font-size:18px;">Estructura de directorios del proyecto</h3>
+
+  <div class="code-block">
+src/
+├── <span class="n">app/</span>                          <span class="c">next.js app router</span>
+│   ├── <span class="n">(dashboard)/</span>              <span class="c">panel del negocio (auth required)</span>
+│   ├── <span class="n">(booking)/[slug]/</span>         <span class="c">página pública de reserva (no auth)</span>
+│   └── <span class="n">api/</span>
+│       └── <span class="n">availability/</span>         <span class="c">API route — llama al engine</span>
+│
+├── <span class="highlight">availability/</span>                 <span class="c">EL MOTOR — núcleo del sistema</span>
+│   ├── <span class="highlight">engine.ts</span>               <span class="c">interfaz + factory — NUNCA importa adapters directamente</span>
+│   ├── <span class="n">types.ts</span>                 <span class="c">Slot, BookingRequest, AvailabilityAdapter</span>
+│   └── <span class="n">adapters/</span>
+│       ├── <span class="adapter">beauty.adapter.ts</span>    <span class="c">lógica específica de belleza — V1</span>
+│       └── <span class="adapter">restaurant.adapter.ts</span> <span class="c">V2 — no existe aún, no contamina V1</span>
+│
+├── <span class="n">modules/</span>                      <span class="c">features por dominio</span>
+│   ├── <span class="n">businesses/</span>
+│   ├── <span class="n">bookings/</span>
+│   ├── <span class="n">customers/</span>
+│   ├── <span class="n">notifications/</span>           <span class="c">email + SMS — sector-agnostic</span>
+│   └── <span class="n">payments/</span>               <span class="c">stripe — sector-agnostic</span>
+│
+└── <span class="n">lib/</span>                          <span class="c">utilidades compartidas</span>
+    ├── <span class="n">supabase/</span>
+    └── <span class="n">utils/</span>
+  </div>
+
+  <div class="callout callout-good">
+    <span class="callout-icon">✅</span>
+    <div class="callout-body"><strong>Por qué esta estructura es AI-friendly:</strong> Claude Code puede editar <code>beauty.adapter.ts</code> sin tocar el engine. Puede añadir <code>restaurant.adapter.ts</code> sin romper nada existente. Cada archivo tiene una responsabilidad clara que cabe en el contexto de un prompt. Sin this, Claude empieza a cometer errores al editar archivos de 500+ líneas con lógica mezclada.</div>
+  </div>
+
+  <h3 style="margin-bottom:16px; margin-top:32px; font-size:18px;">Reglas de oro del Monolito Modular</h3>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>✅ Lo que SÍ hacer</h3>
+      <ul>
+        <li>Un módulo, una responsabilidad</li>
+        <li>Los adaptadores implementan una interfaz común</li>
+        <li>El engine selecciona el adaptador por <code>business.sector_type</code> en un factory</li>
+        <li>Los módulos se comunican solo a través de sus interfaces públicas</li>
+        <li>Tests unitarios por adaptador — aislados</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>❌ Lo que NO hacer</h3>
+      <ul>
+        <li>Condicionales <code>if sector === 'x'</code> fuera de los adaptadores</li>
+        <li>Importar un adaptador directamente desde pages/api</li>
+        <li>Mezclar lógica de negocio en los API routes</li>
+        <li>Tablas separadas por sector en la base de datos</li>
+        <li>Añadir V2 antes de que V1 esté en producción con clientes reales</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- C — COSTS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="costs" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background: linear-gradient(135deg, var(--red), #f87171)">C</div>
+    <div class="pillar-title-block">
+      <h2>Costs — Infraestructura para los Primeros 100 Negocios</h2>
+      <p>¿Podemos mantener margen cobrando una fracción de lo que cobra Booksy?</p>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:16px; font-size:18px;">Costes de infraestructura mensuales</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Servicio</th><th>Tier</th><th>Coste/mes</th><th>Límites</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Supabase</strong></td>
+          <td>Pro</td>
+          <td><strong>$25</strong></td>
+          <td>8GB DB · 100k MAU · PgBouncer incluido</td>
+        </tr>
+        <tr>
+          <td><strong>Vercel</strong></td>
+          <td>Pro</td>
+          <td><strong>$20</strong></td>
+          <td>Builds ilimitados · Edge Network global</td>
+        </tr>
+        <tr>
+          <td><strong>Resend</strong> (email)</td>
+          <td>Free</td>
+          <td><strong>€0</strong></td>
+          <td>3.000 emails/mes — suficiente para V1</td>
+        </tr>
+        <tr>
+          <td><strong>Twilio</strong> (SMS)</td>
+          <td>Pay-as-go</td>
+          <td><strong>~€10</strong></td>
+          <td>~500 SMS recordatorios (€0.02/SMS)</td>
+        </tr>
+        <tr>
+          <td><strong>Stripe</strong> (pagos)</td>
+          <td>Estándar</td>
+          <td><strong>€0 fijo</strong></td>
+          <td>1.5% + €0.25 por transacción (solo si hay pagos)</td>
+        </tr>
+        <tr>
+          <td><strong>Dominio + SSL</strong></td>
+          <td>Anual</td>
+          <td><strong>~€1.5</strong></td>
+          <td>€18/año prorrateado</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="background: rgba(34,197,94,0.05); border-color: rgba(34,197,94,0.2); margin-bottom:16px;">
+    <h3 style="color: var(--green)">💰 Total infraestructura: ~€57/mes</h3>
+    <p>Para 100 negocios activos con tráfico real. El coste escala de forma muy suave — Supabase y Vercel no suben de tier hasta volúmenes mucho mayores.</p>
+  </div>
+
+  <h3 style="margin-bottom:16px; margin-top:32px; font-size:18px;">Revenue proyectado a 100 negocios</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Segmento</th><th>Número</th><th>Precio</th><th>Revenue/mes</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Free</strong> (cantera de conversión)</td>
+          <td>40 negocios</td>
+          <td>€0</td>
+          <td>€0</td>
+        </tr>
+        <tr>
+          <td><strong>Pro</strong> <span class="badge badge-green">Core</span></td>
+          <td>45 negocios</td>
+          <td>€14/mes</td>
+          <td><strong>€630</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Business</strong></td>
+          <td>15 negocios</td>
+          <td>€29/mes</td>
+          <td><strong>€435</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Comisiones de pago</strong></td>
+          <td>~€50k procesados</td>
+          <td>0.9%</td>
+          <td><strong>€450</strong></td>
+        </tr>
+        <tr style="background: rgba(108,99,255,0.05);">
+          <td><strong>TOTAL</strong></td>
+          <td>100 negocios</td>
+          <td>—</td>
+          <td><strong style="font-size:18px; color:var(--accent2)">€1.515/mes</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-2">
+    <div class="kpi-card">
+      <div class="kpi-value" style="color:var(--green)">~96%</div>
+      <div class="kpi-label">Margen operativo bruto</div>
+      <div class="kpi-desc">€1.515 revenue – €57 infra. Sin contar tiempo de los founders.</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value" style="color:var(--yellow)">5</div>
+      <div class="kpi-label">Negocios Pro para break-even</div>
+      <div class="kpi-desc">5 × €14 = €70 &gt; €57 de infra. Alcanzable en semana 1.</div>
+    </div>
+  </div>
+
+  <div class="callout callout-info" style="margin-top:16px;">
+    <span class="callout-icon">📈</span>
+    <div class="callout-body"><strong>Comparativa con Booksy:</strong> Booksy necesita equipos de ventas, soporte, y oficinas para sus precios. Tableo es 100% self-serve + Claude Code para el producto. El margen del 96% permite crecer sin inversión externa hasta miles de negocios.</div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- K — KPIs -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="kpis" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background: linear-gradient(135deg, #a855f7, #c084fc)">K</div>
+    <div class="pillar-title-block">
+      <h2>KPIs — Métricas que Definen el Éxito del MVP</h2>
+      <p>Rendimiento técnico y métricas de negocio con umbrales claros</p>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:16px; font-size:18px;">KPIs de Rendimiento Técnico</h3>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-value">&lt;300ms</div>
+      <div class="kpi-label">Confirmación de reserva</div>
+      <div class="kpi-desc">p95 · incluye lock + insert + email</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">&lt;150ms</div>
+      <div class="kpi-label">Query de disponibilidad</div>
+      <div class="kpi-desc">p95 · con índices correctos en Postgres</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">&lt;1.5s</div>
+      <div class="kpi-label">LCP página de reserva</div>
+      <div class="kpi-desc">Largest Contentful Paint · impacta conversión directamente</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">&gt;99.5%</div>
+      <div class="kpi-label">Booking success rate</div>
+      <div class="kpi-desc">Sin dobles reservas · el KPI más crítico</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">&gt;99.9%</div>
+      <div class="kpi-label">Uptime</div>
+      <div class="kpi-desc">&lt;8.7h downtime/año · Supabase lo garantiza en Pro</div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <h3 style="margin-bottom:16px; font-size:18px;">KPIs de Negocio</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>KPI</th><th>Target MVP (3 meses)</th><th>Target Crecimiento (12 meses)</th><th>Por qué importa</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Time to first booking</strong></td>
+          <td>&lt;20 min</td>
+          <td>&lt;10 min</td>
+          <td>Un negocio que tarda más de 20 min en su primera reserva tiene 80% de probabilidad de abandonar</td>
+        </tr>
+        <tr>
+          <td><strong>Free → Pro conversion</strong></td>
+          <td>&gt;10% a 90 días</td>
+          <td>&gt;18% a 90 días</td>
+          <td>El motor financiero del modelo. Bajo esta cifra no es viable.</td>
+        </tr>
+        <tr>
+          <td><strong>Monthly churn (Pro)</strong></td>
+          <td>&lt;6%</td>
+          <td>&lt;3%</td>
+          <td>Al 6% el LTV es €233. Al 3% es €467. La diferencia es el doble de negocio.</td>
+        </tr>
+        <tr>
+          <td><strong>NPS negocios</strong></td>
+          <td>&gt;40</td>
+          <td>&gt;60</td>
+          <td>NPS &gt;50 genera referidos orgánicos. El canal más barato que existe.</td>
+        </tr>
+        <tr>
+          <td><strong>CAC</strong></td>
+          <td>&lt;€50</td>
+          <td>&lt;€25</td>
+          <td>Self-serve + viral loop debe mantener el CAC bajo. Si sube, el modelo se rompe.</td>
+        </tr>
+        <tr>
+          <td><strong>Bookings procesadas/mes</strong></td>
+          <td>500 (total plataforma)</td>
+          <td>10.000</td>
+          <td>Indicador de engagement real. Negocios que no generan reservas están a punto de churnar.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body"><strong>El KPI más importante del MVP:</strong> Booking success rate &gt;99.5%. Un doble booking destruye la reputación de Tableo con el negocio y sus clientes. Es el tipo de bug que se viraliza en grupos de Telegram de peluqueros. Antes de lanzar, el sistema de locks debe ser probado bajo carga concurrente.</div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- RISKS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="risks" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background: linear-gradient(135deg, #ef4444, #f87171)">⚠</div>
+    <div class="pillar-title-block">
+      <h2>Veredicto Crítico — Los 3 Riesgos Técnicos Más Altos</h2>
+      <p>Los fallos que hunden plataformas de reservas. Y cómo prevenirlos.</p>
+    </div>
+  </div>
+
+  <!-- RIESGO 1 -->
+  <div class="risk-card">
+    <div class="risk-header">
+      <div class="risk-number risk-1">1</div>
+      <div>
+        <div class="risk-title">Double-booking bajo carga concurrente</div>
+        <div style="color:var(--text2); font-size:13px; margin-top:3px;">Disponibilidad &amp; Concurrencia</div>
+      </div>
+      <div class="risk-severity"><span class="badge badge-red">Severidad: CRÍTICA</span></div>
+    </div>
+    <div class="risk-body">
+      <div class="risk-section">
+        <div class="risk-label">El escenario</div>
+        <p>Una peluquería popular tiene el último slot del sábado. 3-5 usuarios llegan simultáneamente a la página de reserva. Todos ven el slot disponible (la disponibilidad se consultó hace 2 segundos). Los 3 pulsan "Confirmar" en el mismo segundo. Sin control de concurrencia, los 3 obtienen confirmación. El lunes el negocio recibe 3 clientes para el mismo horario.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Impacto real</div>
+        <p>Un solo doble-booking publicado en redes sociales puede destruir la confianza en Tableo. Los negocios de peluquería viven de su reputación local. Este tipo de incidente se viraliza en grupos de WhatsApp del barrio. No hay segunda oportunidad.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Solución de ingeniería</div>
+        <p><strong>Two-Phase Booking con <code>SELECT FOR UPDATE NOWAIT</code> de PostgreSQL.</strong> Fase 1: reserva temporal con TTL de 5 minutos usando un lock a nivel de fila (no a nivel de aplicación). El primer usuario que ejecuta la transacción gana el lock; los demás reciben un error inmediato y se les muestra "Este slot acaba de ser reservado". Fase 2: confirmación definitiva tras acción del usuario. <code>pg_cron</code> limpia reservas temporales expiradas cada minuto. Este patrón es robusto porque el lock vive en la base de datos, no en memoria de la aplicación — funciona incluso con múltiples instancias de Next.js.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIESGO 2 -->
+  <div class="risk-card">
+    <div class="risk-header">
+      <div class="risk-number risk-2">2</div>
+      <div>
+        <div class="risk-title">Spaghetti arquitectónico al escalar sectores</div>
+        <div style="color:var(--text2); font-size:13px; margin-top:3px;">Arquitectura &amp; Mantenibilidad</div>
+      </div>
+      <div class="risk-severity"><span class="badge badge-yellow">Severidad: ALTA</span></div>
+    </div>
+    <div class="risk-body">
+      <div class="risk-section">
+        <div class="risk-label">El escenario</div>
+        <p>En el mes 4, hay demanda de restaurantes. Se añade lógica de mesas directamente en el availability engine con <code>if (sector === 'restaurant')</code>. En el mes 7 llega inmobiliaria. Para el mes 10, el archivo <code>engine.ts</code> tiene 800 líneas con condicionales anidados. Claude Code empieza a romper V1 (beauty) al intentar añadir features de V3 (real estate). El equipo de 2 ya no puede mantener el ritmo.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Impacto real</div>
+        <p>Velocidad de desarrollo cae un 70%. El tiempo de Claude Code en generar código correcto se multiplica porque los archivos son demasiado largos y complejos para razonar en un solo contexto. La deuda técnica se convierte en el principal bloqueante del negocio.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Solución de ingeniería</div>
+        <p><strong>Motor de Disponibilidad Polimórfico con registro de adaptadores.</strong> El engine nunca importa los adaptadores directamente. Los adaptadores se registran a sí mismos en un factory al inicializar la aplicación. El engine solo conoce la interfaz <code>AvailabilityAdapter</code>. Añadir un sector nuevo = crear un archivo nuevo que implementa la interfaz. Cero cambios en el engine existente. Los archivos se mantienen cortos (&lt;200 líneas), Claude Code puede razonar sobre cada uno de forma aislada, y los tests unitarios por adaptador garantizan que V1 no rompe al añadir V2.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIESGO 3 -->
+  <div class="risk-card">
+    <div class="risk-header">
+      <div class="risk-number risk-3">3</div>
+      <div>
+        <div class="risk-title">Fricción de migración mata la adopción</div>
+        <div style="color:var(--text2); font-size:13px; margin-top:3px;">Product &amp; Go-to-Market</div>
+      </div>
+      <div class="risk-severity"><span class="badge badge-blue">Severidad: ALTA</span></div>
+    </div>
+    <div class="risk-body">
+      <div class="risk-section">
+        <div class="risk-label">El escenario</div>
+        <p>Una peluquería lleva 3 años en Booksy. Tiene 400 clientes con historial de visitas, preferencias, notas internas. El proceso de cambio a Tableo requiere: exportar CSV de Booksy, reformatear manualmente, subir a Tableo, avisar a 400 clientes de que cambien de plataforma. Tiempo estimado: 4-6 horas. Resultado: el 90% de los negocios interesados decide no migrar.</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Impacto real</div>
+        <p>El mejor producto del mundo no crece si la fricción de entrada es demasiado alta. Booksy tiene el lock-in de los datos como su mayor ventaja competitiva, no sus features. Si Tableo no resuelve esto, el TAM accesible se reduce a negocios nuevos que nunca han usado nada (más lentos de convertir y con menos datos).</p>
+      </div>
+      <div class="risk-section">
+        <div class="risk-label">Solución de ingeniería</div>
+        <p><strong>Migration Wizard + White-Glove para los primeros 50.</strong> Técnicamente: importador CSV de Booksy (el formato es conocido y documentado), sincronización bidireccional con Google Calendar (para negocios que usan GCal como sistema primario), y detección automática de duplicados en la importación. No técnicamente: para los primeros 50 negocios, los founders hacen la migración de forma manual — esto no escala pero genera un aprendizaje invaluable sobre los puntos de dolor reales, y esos 50 negocios se convierten en los mejores embajadores del producto. Después de 50, el proceso es lo suficientemente conocido para automatizarlo completamente.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- VERDICT -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section id="verdict">
+<div class="container">
+  <div class="verdict">
+    <h2>Veredicto Final</h2>
+    <p>Tableo es <strong>técnicamente viable</strong> con el stack y enfoque propuesto. El mayor riesgo no es la tecnología — es la ejecución disciplinada: arrancar en un solo vertical, proteger la arquitectura desde el día 1, y resolver la migración antes de escalar. Con 2 personas + Claude Code y un Monolito Modular bien diseñado, el MVP puede estar en producción en 4-6 semanas con margen operativo positivo desde el día 5.</p>
+    <div class="verdict-score">
+      ✓ &nbsp; Viabilidad técnica: ALTA &nbsp;·&nbsp; Riesgo de ejecución: MEDIO &nbsp;·&nbsp; Recomendación: PROCEDER
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:64px;">
+    <div class="card">
+      <h3>🚀 Semanas 1-2</h3>
+      <ul>
+        <li>Setup Next.js + Supabase con RLS desde cero</li>
+        <li>Schema unificado + índices correctos</li>
+        <li>Motor de Disponibilidad + TimeBasedAdapter</li>
+        <li>Sistema de locks (two-phase booking)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>⚙️ Semanas 3-4</h3>
+      <ul>
+        <li>Dashboard del negocio (gestión de horarios)</li>
+        <li>Página pública de reserva (UX fluida)</li>
+        <li>Notificaciones email + SMS</li>
+        <li>Importador CSV de Booksy</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🎯 Semanas 5-6</h3>
+      <ul>
+        <li>Stripe — suscripciones Pro/Business</li>
+        <li>Onboarding wizard (&lt;20 min a primera reserva)</li>
+        <li>Tests de carga en el sistema de locks</li>
+        <li>Primeros 5 negocios reales en producción</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <p>Tableo · Análisis GSTACK de Viabilidad Técnica · Generado el 27 de abril de 2026</p>
+  <p style="margin-top:8px; color:#555;">Documento estratégico previo a la fase de implementación · Confidencial</p>
+</footer>
+
+</body>
+</html>
