@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableo — Cómo está construido</title>
+<style>
+  :root {
+    --bg: #0f0f13;
+    --bg2: #16161d;
+    --bg3: #1c1c26;
+    --border: #2a2a38;
+    --text: #eeeef2;
+    --text2: #8888aa;
+    --purple: #7c6dff;
+    --purple-light: #a99dff;
+    --green: #22c97a;
+    --yellow: #f5c842;
+    --red: #ff5c5c;
+    --blue: #4da6ff;
+    --orange: #ff8c42;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 72px 24px 56px;
+    text-align: center;
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,109,255,0.18) 0%, transparent 70%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(124,109,255,0.12);
+    border: 1px solid rgba(124,109,255,0.3);
+    color: var(--purple-light);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    border-radius: 99px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    background: linear-gradient(135deg, #fff 30%, var(--purple-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .hero-sub {
+    color: var(--text2);
+    font-size: 17px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ── CONTENEDOR ── */
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── SECCIÓN ── */
+  .section { padding: 72px 0; border-bottom: 1px solid var(--border); }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  .section h2 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .section-intro {
+    color: var(--text2);
+    font-size: 16px;
+    margin-bottom: 40px;
+    max-width: 680px;
+  }
+
+  /* ── CAPAS APILADAS ── */
+  .layers { display: flex; flex-direction: column; gap: 6px; margin-bottom: 32px; }
+  .layer {
+    border-radius: 14px;
+    padding: 22px 28px;
+    border: 1px solid var(--border);
+    position: relative;
+    cursor: default;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .layer:hover { transform: translateX(4px); }
+  .layer-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .layer-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .layer-desc { font-size: 13.5px; color: var(--text2); }
+  .layer-arrow {
+    text-align: center;
+    color: var(--border);
+    font-size: 22px;
+    padding: 2px 0;
+  }
+
+  .layer-ui    { background: rgba(124,109,255,0.07); border-color: rgba(124,109,255,0.3); }
+  .layer-motor { background: rgba(245,200,66,0.07);  border-color: rgba(245,200,66,0.3); }
+  .layer-db    { background: rgba(34,201,122,0.07);  border-color: rgba(34,201,122,0.3); }
+  .layer-notif { background: rgba(77,166,255,0.07);  border-color: rgba(77,166,255,0.3); }
+
+  /* ── CARDS HORIZONTALES ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 16px; }
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: rgba(124,109,255,0.4); }
+  .card-icon { font-size: 28px; margin-bottom: 12px; }
+  .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .card p  { font-size: 13.5px; color: var(--text2); line-height: 1.6; }
+
+  /* ── MOTOR POLIMÓRFICO ── */
+  .engine-box {
+    background: var(--bg2);
+    border: 1px solid rgba(245,200,66,0.35);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+  .engine-header {
+    background: rgba(245,200,66,0.08);
+    border-bottom: 1px solid rgba(245,200,66,0.2);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .engine-header h3 { font-size: 17px; font-weight: 800; }
+  .engine-header p  { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .engine-adapters {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+  .adapter {
+    padding: 24px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+  .adapter:last-child { border-right: none; }
+  .adapter-icon { font-size: 32px; margin-bottom: 10px; }
+  .adapter-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .adapter-desc { font-size: 12px; color: var(--text2); }
+  .adapter-tag  {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .tag-v1 { background: rgba(34,201,122,0.15); color: var(--green); }
+  .tag-v2 { background: rgba(77,166,255,0.12); color: var(--blue); }
+  .tag-v3 { background: rgba(255,92,92,0.12);  color: #ff8080; }
+
+  @media (max-width: 600px) {
+    .engine-adapters { grid-template-columns: 1fr; }
+    .adapter { border-right: none; border-bottom: 1px solid var(--border); }
+    .adapter:last-child { border-bottom: none; }
+  }
+
+  /* ── TABLA DE BOOKING ── */
+  .booking-flow {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .bf-step {
+    flex: 1;
+    padding: 24px 18px;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .bf-step:last-child { border-right: none; }
+  .bf-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .bf-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .bf-desc  { font-size: 11.5px; color: var(--text2); line-height: 1.5; }
+  @media (max-width: 640px) {
+    .booking-flow { flex-direction: column; }
+    .bf-step { border-right: none; border-bottom: 1px solid var(--border); }
+    .bf-step:last-child { border-bottom: none; }
+  }
+
+  /* ── SCHEMA ── */
+  .schema-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .table-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .table-header {
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-fields { padding: 12px 16px; }
+  .field {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .field:last-child { border-bottom: none; }
+  .field-name { color: var(--text); font-family: monospace; }
+  .field-type { color: var(--text2); font-size: 11px; }
+  .field-pk   { color: var(--yellow); }
+  .field-fk   { color: var(--blue); }
+  .field-json { color: var(--orange); }
+
+  /* ── MULTITENANCY ── */
+  .tenant-demo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .tenant {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .tenant-header {
+    padding: 14px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tenant-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .tenant-rows { padding: 12px 18px; }
+  .tenant-row {
+    font-size: 12px;
+    font-family: monospace;
+    color: var(--text2);
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .tenant-row:last-child { border-bottom: none; }
+  .tenant-row.own { color: var(--green); }
+  .blocked-row {
+    text-align: center;
+    padding: 12px 18px;
+    font-size: 12px;
+    color: var(--red);
+    background: rgba(255,92,92,0.06);
+  }
+
+  /* ── COSTES ── */
+  .cost-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .cost-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+  }
+  .cost-service { font-size: 11px; color: var(--text2); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+  .cost-price   { font-size: 24px; font-weight: 900; letter-spacing: -1px; }
+  .cost-detail  { font-size: 11px; color: var(--text2); margin-top: 4px; }
+  .cost-total {
+    background: rgba(34,201,122,0.08);
+    border: 1px solid rgba(34,201,122,0.25);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .cost-total-label { font-size: 13px; color: var(--text2); }
+  .cost-total-value { font-size: 32px; font-weight: 900; color: var(--green); }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.65;
+    display: flex;
+    gap: 14px;
+  }
+  .callout-icon { font-size: 20px; flex-shrink: 0; }
+  .callout-green  { background: rgba(34,201,122,0.08); border: 1px solid rgba(34,201,122,0.25); }
+  .callout-yellow { background: rgba(245,200,66,0.08); border: 1px solid rgba(245,200,66,0.25); }
+  .callout-purple { background: rgba(124,109,255,0.08); border: 1px solid rgba(124,109,255,0.3); }
+  .callout p { color: var(--text2); }
+  .callout strong { color: var(--text); }
+
+  /* ── REGLAS ── */
+  .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .rule-yes, .rule-no {
+    background: var(--bg2);
+    border-radius: 12px;
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+  }
+  .rule-yes h4 { color: var(--green); font-size: 13px; margin-bottom: 10px; }
+  .rule-no  h4 { color: var(--red);   font-size: 13px; margin-bottom: 10px; }
+  .rule-item { font-size: 13px; color: var(--text2); padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 8px; }
+  .rule-item:last-child { border-bottom: none; }
+
+  /* ── RESUMEN FINAL ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .summary-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .summary-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+  .summary-card p  { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--text2);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Arquitectura del sistema</div>
+  <h1>Cómo está construido Tableo</h1>
+  <p class="hero-sub">Una explicación visual de las decisiones técnicas que hacen posible la plataforma — sin jerga innecesaria.</p>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- 1. LAS CAPAS DEL SISTEMA -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num" style="background:rgba(124,109,255,0.15); color:var(--purple)">1</div>
+  <h2>Las capas del sistema</h2>
+  <p class="section-intro">Tableo funciona como una pila de capas especializadas. Cada capa tiene una función clara y habla solo con la capa de debajo. Así evitamos que todo esté mezclado y el código sea un desastre.</p>
+
+  <div class="layers">
+
+    <div class="layer layer-ui">
+      <div class="layer-label" style="color:var(--purple-light)">Capa 1 — Lo que ve el usuario</div>
+      <div class="layer-title">Interfaz Web (Next.js)</div>
+      <div class="layer-desc">
+        Dos experiencias distintas: el <strong>panel del negocio</strong> (donde el peluquero gestiona su agenda y clientes) y la <strong>página pública de reservas</strong> (donde el cliente final elige su cita sin necesidad de crear cuenta). Esta capa no contiene ninguna lógica de negocio — solo muestra y recoge información.
+      </div>
+    </div>
+
+    <div class="layer-arrow">↓</div>
+
+    <div class="layer layer-motor">
+      <div class="layer-label" style="color:var(--yellow)">Capa 2 — El cerebro</div>
+      <div class="layer-title">Motor de Disponibilidad</div>
+      <div class="layer-desc">
+        El componente más importante de Tableo. Calcula qué huecos están libres, valida si una reserva es posible y bloquea el slot en la base de datos de forma que dos personas no puedan reservar lo mismo al mismo tiempo. Está diseñado para funcionar con cualquier sector (peluquerías, restaurantes, inmobiliaria) sin cambiar su núcleo.
+      </div>
+    </div>
+
+    <div class="layer-arrow">↓</div>
+
+    <div class="layer layer-notif">
+      <div class="layer-label" style="color:var(--blue)">Capa 3 — Comunicaciones</div>
+      <div class="layer-title">Notificaciones (Email + SMS)</div>
+      <div class="layer-desc">
+        Se encarga de enviar confirmaciones, recordatorios y alertas tanto al negocio como al cliente. Funciona de forma independiente — si el sistema de notificaciones falla, las reservas siguen funcionando perfectamente.
+      </div>
+    </div>
+
+    <div class="layer-arrow">↓</div>
+
+    <div class="layer layer-db">
+      <div class="layer-label" style="color:var(--green)">Capa 4 — La memoria</div>
+      <div class="layer-title">Base de Datos (Supabase / PostgreSQL)</div>
+      <div class="layer-desc">
+        Donde vive toda la información: negocios, profesionales, reservas y clientes. Tiene una capa de seguridad integrada (RLS) que garantiza que la peluquería A nunca puede ver los datos de la peluquería B, aunque hubiera un bug en el código.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="callout callout-purple">
+    <span class="callout-icon">💡</span>
+    <p><strong>¿Por qué esta estructura?</strong> Es lo que se llama un "monolito modular". Todo en un mismo proyecto pero con partes bien separadas. Es la arquitectura de Shopify, GitHub y Basecamp — aguanta millones de usuarios y permite a un equipo de 2 personas moverse muy rápido.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- 2. EL MOTOR DE DISPONIBILIDAD -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num" style="background:rgba(245,200,66,0.15); color:var(--yellow)">2</div>
+  <h2>El Motor de Disponibilidad</h2>
+  <p class="section-intro">Esta es la pieza más inteligente de Tableo. En lugar de tener un código diferente para cada tipo de negocio, tiene un motor central con "adaptadores" intercambiables — como enchufes de viaje.</p>
+
+  <div class="engine-box">
+    <div class="engine-header">
+      <div style="font-size:24px">⚙️</div>
+      <div>
+        <h3>Motor Central</h3>
+        <p>Sabe hacer tres cosas: ver huecos libres · validar una reserva · bloquear el slot</p>
+      </div>
+    </div>
+    <div class="engine-adapters">
+      <div class="adapter">
+        <div class="adapter-icon">💇</div>
+        <div class="adapter-name">Adaptador Belleza</div>
+        <div class="adapter-desc">Calcula disponibilidad por profesional y duración del servicio. "¿Tiene Laura 60 minutos libres el martes a las 11h?"</div>
+        <div><span class="adapter-tag tag-v1">✓ V1 — Ya disponible</span></div>
+      </div>
+      <div class="adapter">
+        <div class="adapter-icon">🍽️</div>
+        <div class="adapter-name">Adaptador Restaurantes</div>
+        <div class="adapter-desc">Calcula disponibilidad por mesa y capacidad. "¿Hay mesa para 4 personas el viernes a las 21h?"</div>
+        <div><span class="adapter-tag tag-v2">V2 — Planificado</span></div>
+      </div>
+      <div class="adapter">
+        <div class="adapter-icon">🏠</div>
+        <div class="adapter-name">Adaptador Inmobiliaria</div>
+        <div class="adapter-desc">Calcula disponibilidad por propiedad. "¿Está libre el piso de Goya para visita el jueves a las 17h?"</div>
+        <div><span class="adapter-tag tag-v3">V3 — Futuro</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-yellow">
+    <span class="callout-icon">🔌</span>
+    <p><strong>La ventaja clave:</strong> Añadir restaurantes en V2 no toca ni una línea del adaptador de belleza. Se crea un archivo nuevo. Esto es lo que evita que el código se convierta en espagueti cuando Tableo crezca a nuevos verticales.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- 3. CÓMO FUNCIONA UNA RESERVA -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num" style="background:rgba(77,166,255,0.15); color:var(--blue)">3</div>
+  <h2>Cómo funciona una reserva</h2>
+  <p class="section-intro">El proceso de reserva tiene dos fases para evitar que dos personas reserven el mismo hueco al mismo tiempo. Como cuando compras una entrada de concierto — el asiento se "bloquea" mientras pagas.</p>
+
+  <div class="booking-flow">
+    <div class="bf-step">
+      <div class="bf-num" style="background:rgba(124,109,255,0.2); color:var(--purple)">1</div>
+      <div class="bf-title">Ver huecos</div>
+      <div class="bf-desc">El cliente abre el calendario y ve los slots disponibles en tiempo real</div>
+    </div>
+    <div class="bf-step">
+      <div class="bf-num" style="background:rgba(245,200,66,0.2); color:var(--yellow)">2</div>
+      <div class="bf-title">Bloqueo temporal</div>
+      <div class="bf-desc">Al pulsar un slot, queda bloqueado 5 minutos solo para ese cliente</div>
+    </div>
+    <div class="bf-step">
+      <div class="bf-num" style="background:rgba(77,166,255,0.2); color:var(--blue)">3</div>
+      <div class="bf-title">Datos del cliente</div>
+      <div class="bf-desc">Nombre, teléfono, servicio elegido. Sin crear cuenta.</div>
+    </div>
+    <div class="bf-step">
+      <div class="bf-num" style="background:rgba(34,201,122,0.2); color:var(--green)">4</div>
+      <div class="bf-title">Confirmación</div>
+      <div class="bf-desc">La reserva se confirma definitivamente. Email + SMS enviados a ambos.</div>
+    </div>
+  </div>
+
+  <div class="callout callout-green">
+    <span class="callout-icon">🔒</span>
+    <p><strong>¿Qué pasa si dos personas pulsan el mismo slot a la vez?</strong> La base de datos tiene un sistema de locks que garantiza que exactamente uno de los dos obtiene la reserva. El otro recibe un mensaje de "Este horario acaba de reservarse" al instante. Cero dobles reservas, garantizado matemáticamente.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">⏱️</div>
+      <h3>Respuesta en &lt;300ms</h3>
+      <p>Desde que el cliente pulsa "Reservar" hasta que ve la confirmación. Menos de un tercio de segundo.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔄</div>
+      <h3>Tiempo real</h3>
+      <p>Si alguien reserva un slot, desaparece del calendario de los demás usuarios al instante. Sin recargar la página.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💨</div>
+      <h3>Sin cuenta obligatoria</h3>
+      <p>El cliente final reserva con nombre y teléfono. Sin registro, sin contraseña, sin fricción.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- 4. LA BASE DE DATOS -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num" style="background:rgba(34,201,122,0.15); color:var(--green)">4</div>
+  <h2>La base de datos</h2>
+  <p class="section-intro">Solo 5 tablas principales. El diseño es intencionalmente simple: funciona igual para peluquerías, restaurantes e inmobiliaria sin necesitar tablas distintas para cada sector.</p>
+
+  <div class="schema-grid">
+
+    <div class="table-card">
+      <div class="table-header" style="background:rgba(124,109,255,0.1); color:var(--purple-light)">📋 businesses</div>
+      <div class="table-fields">
+        <div class="field"><span class="field-name field-pk">id</span><span class="field-type">uuid PK</span></div>
+        <div class="field"><span class="field-name">name</span><span class="field-type">text</span></div>
+        <div class="field"><span class="field-name">slug</span><span class="field-type">text</span></div>
+        <div class="field"><span class="field-name">sector_type</span><span class="field-type">beauty…</span></div>
+        <div class="field"><span class="field-name field-json">config</span><span class="field-type">jsonb</span></div>
+        <div class="field"><span class="field-name field-fk">owner_id</span><span class="field-type">FK users</span></div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header" style="background:rgba(245,200,66,0.1); color:var(--yellow)">👤 resources</div>
+      <div class="table-fields">
+        <div class="field"><span class="field-name field-pk">id</span><span class="field-type">uuid PK</span></div>
+        <div class="field"><span class="field-name field-fk">business_id</span><span class="field-type">FK</span></div>
+        <div class="field"><span class="field-name">resource_type</span><span class="field-type">staff…</span></div>
+        <div class="field"><span class="field-name">name</span><span class="field-type">text</span></div>
+        <div class="field"><span class="field-name field-json">metadata</span><span class="field-type">jsonb ★</span></div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header" style="background:rgba(34,201,122,0.1); color:var(--green)">📅 bookings</div>
+      <div class="table-fields">
+        <div class="field"><span class="field-name field-pk">id</span><span class="field-type">uuid PK</span></div>
+        <div class="field"><span class="field-name field-fk">resource_id</span><span class="field-type">FK</span></div>
+        <div class="field"><span class="field-name field-fk">customer_id</span><span class="field-type">FK</span></div>
+        <div class="field"><span class="field-name">start_at</span><span class="field-type">timestamp</span></div>
+        <div class="field"><span class="field-name">end_at</span><span class="field-type">timestamp</span></div>
+        <div class="field"><span class="field-name">status</span><span class="field-type">confirmed…</span></div>
+        <div class="field"><span class="field-name field-json">metadata</span><span class="field-type">jsonb ★</span></div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header" style="background:rgba(77,166,255,0.1); color:var(--blue)">🙋 customers</div>
+      <div class="table-fields">
+        <div class="field"><span class="field-name field-pk">id</span><span class="field-type">uuid PK</span></div>
+        <div class="field"><span class="field-name field-fk">business_id</span><span class="field-type">FK</span></div>
+        <div class="field"><span class="field-name">name</span><span class="field-type">text</span></div>
+        <div class="field"><span class="field-name">phone</span><span class="field-type">text</span></div>
+        <div class="field"><span class="field-name">email</span><span class="field-type">text</span></div>
+        <div class="field"><span class="field-name field-json">notes</span><span class="field-type">text</span></div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header" style="background:rgba(255,140,66,0.1); color:var(--orange)">🕐 availability_windows</div>
+      <div class="table-fields">
+        <div class="field"><span class="field-name field-pk">id</span><span class="field-type">uuid PK</span></div>
+        <div class="field"><span class="field-name field-fk">resource_id</span><span class="field-type">FK</span></div>
+        <div class="field"><span class="field-name">day_of_week</span><span class="field-type">0–6</span></div>
+        <div class="field"><span class="field-name">open_time</span><span class="field-type">time</span></div>
+        <div class="field"><span class="field-name">close_time</span><span class="field-type">time</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="callout callout-yellow">
+    <span class="callout-icon">★</span>
+    <p><strong>¿Qué es el campo <code>metadata</code>?</strong> Es un campo flexible que guarda información diferente según el sector. Para una peluquería guarda el servicio y el precio. Para un restaurante guardará el tamaño de la mesa. El schema no cambia — solo cambia lo que va dentro de ese campo.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- 5. SEGURIDAD: CADA NEGOCIO AISLADO -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num" style="background:rgba(255,92,92,0.15); color:var(--red)">5</div>
+  <h2>Seguridad: cada negocio en su burbuja</h2>
+  <p class="section-intro">Todos los negocios comparten la misma base de datos, pero con una separación impenetrable entre ellos. Esta separación vive en la base de datos — ni siquiera un bug en el código puede romperla.</p>
+
+  <div class="tenant-demo">
+    <div class="tenant">
+      <div class="tenant-header">
+        <div class="tenant-dot" style="background:var(--purple)"></div>
+        Peluquería "Salon Luna" (sesión activa)
+      </div>
+      <div class="tenant-rows">
+        <div class="tenant-row own">✓ reserva_001 — Ana García — Lunes 10h</div>
+        <div class="tenant-row own">✓ reserva_002 — Marta López — Lunes 11h</div>
+        <div class="tenant-row own">✓ reserva_003 — Pedro R. — Martes 9h</div>
+      </div>
+      <div style="padding:8px 18px; font-size:11px; color:var(--text2);">Ve sus 3 reservas ✓</div>
+    </div>
+    <div class="tenant">
+      <div class="tenant-header">
+        <div class="tenant-dot" style="background:var(--blue)"></div>
+        Peluquería "BarberKing" (otro negocio)
+      </div>
+      <div class="blocked-row">🔒 Acceso bloqueado por la base de datos</div>
+      <div class="tenant-rows">
+        <div class="tenant-row" style="filter:blur(4px); user-select:none">reserva_xxx — ██████ ██████</div>
+        <div class="tenant-row" style="filter:blur(4px); user-select:none">reserva_xxx — ██████ ██████</div>
+      </div>
+      <div style="padding:8px 18px; font-size:11px; color:var(--red);">Datos invisibles para Salon Luna ✗</div>
+    </div>
+  </div>
+
+  <div class="callout callout-green">
+    <span class="callout-icon">🛡️</span>
+    <p><strong>Row Level Security (RLS):</strong> Es una funcionalidad de PostgreSQL que filtra automáticamente los datos según quién está conectado. No necesitamos escribir <code>WHERE business_id = X</code> en cada consulta — la base de datos lo hace sola. Si olvidamos el filtro en el código, la base de datos lo aplica igualmente. Seguridad a prueba de descuidos.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- 6. COSTES -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num" style="background:rgba(34,201,122,0.15); color:var(--green)">6</div>
+  <h2>Lo que cuesta esto al mes</h2>
+  <p class="section-intro">Para los primeros 100 negocios activos en la plataforma, la infraestructura completa cuesta menos de lo que cuesta un almuerzo para dos.</p>
+
+  <div class="cost-grid">
+    <div class="cost-card">
+      <div class="cost-service">Supabase Pro</div>
+      <div class="cost-price" style="color:var(--green)">$25</div>
+      <div class="cost-detail">Base de datos + auth + realtime</div>
+    </div>
+    <div class="cost-card">
+      <div class="cost-service">Vercel Pro</div>
+      <div class="cost-price" style="color:var(--blue)">$20</div>
+      <div class="cost-detail">Hosting + deploys ilimitados</div>
+    </div>
+    <div class="cost-card">
+      <div class="cost-service">Email (Resend)</div>
+      <div class="cost-price" style="color:var(--purple)">€0</div>
+      <div class="cost-detail">3.000 emails/mes gratis</div>
+    </div>
+    <div class="cost-card">
+      <div class="cost-service">SMS (Twilio)</div>
+      <div class="cost-price" style="color:var(--orange)">~€10</div>
+      <div class="cost-detail">~500 recordatorios/mes</div>
+    </div>
+  </div>
+
+  <div class="cost-total">
+    <div>
+      <div class="cost-total-label">Coste total de infraestructura/mes</div>
+      <div style="font-size:13px; color:var(--text2); margin-top:4px;">Para 100 negocios · Escala muy suavemente</div>
+    </div>
+    <div class="cost-total-value">~€57</div>
+  </div>
+
+  <div class="callout callout-green">
+    <span class="callout-icon">📈</span>
+    <p><strong>El margen es brutal:</strong> Con 5 negocios en plan Pro (5 × €14 = €70) ya se cubren los costes de infraestructura. A 100 negocios, el revenue es ~€1.500/mes con €57 de costes. El 96% es margen. Booksy necesita un equipo de ventas para esto — Tableo no.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- 7. LAS REGLAS DEL JUEGO -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num" style="background:rgba(255,140,66,0.15); color:var(--orange)">7</div>
+  <h2>Las reglas del código</h2>
+  <p class="section-intro">Para que Claude Code pueda trabajar rápido sin romper cosas, hay reglas claras que todos los archivos deben cumplir.</p>
+
+  <div class="rules">
+    <div class="rule-yes">
+      <h4>✅ Sí hacemos esto</h4>
+      <div class="rule-item"><span>✓</span><span>Un archivo = una responsabilidad clara</span></div>
+      <div class="rule-item"><span>✓</span><span>Archivos de menos de 200 líneas</span></div>
+      <div class="rule-item"><span>✓</span><span>La lógica específica de sector vive en su adaptador</span></div>
+      <div class="rule-item"><span>✓</span><span>Toda tabla nueva tiene RLS activado</span></div>
+      <div class="rule-item"><span>✓</span><span>Two-phase booking para toda reserva</span></div>
+      <div class="rule-item"><span>✓</span><span>Tests por cada adaptador del motor</span></div>
+    </div>
+    <div class="rule-no">
+      <h4>❌ Nunca hacemos esto</h4>
+      <div class="rule-item"><span>✗</span><span><code>if sector === 'beauty'</code> fuera de los adaptadores</span></div>
+      <div class="rule-item"><span>✗</span><span>Lógica de negocio en los componentes de UI</span></div>
+      <div class="rule-item"><span>✗</span><span>Importar un adaptador directamente desde las páginas</span></div>
+      <div class="rule-item"><span>✗</span><span>Tablas separadas por sector en la DB</span></div>
+      <div class="rule-item"><span>✗</span><span>INSERT directo en bookings sin el sistema de locks</span></div>
+      <div class="rule-item"><span>✗</span><span>Añadir V2 antes de que V1 tenga clientes reales</span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- RESUMEN FINAL -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section" style="border-bottom:none">
+<div class="wrap">
+  <h2 style="text-align:center; margin-bottom:8px;">En resumen</h2>
+  <p class="section-intro" style="text-align:center; margin:0 auto 40px;">Cinco decisiones técnicas que hacen de Tableo una plataforma sólida desde el día 1.</p>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <h4>🏗️ Monolito Modular</h4>
+      <p>Un solo proyecto, bien organizado por dentro. Rápido de construir, fácil de mantener para un equipo de 2 + Claude Code.</p>
+    </div>
+    <div class="summary-card">
+      <h4>⚙️ Motor Polimórfico</h4>
+      <p>Añadir un nuevo sector (restaurantes, inmobiliaria) es crear un archivo nuevo. Cero impacto en lo que ya funciona.</p>
+    </div>
+    <div class="summary-card">
+      <h4>🗄️ Schema Unificado</h4>
+      <p>5 tablas para todos los sectores. El campo <code>metadata</code> absorbe las diferencias. Sin migraciones al expandir.</p>
+    </div>
+    <div class="summary-card">
+      <h4>🔒 Locks Postgres</h4>
+      <p>Garantía matemática de cero dobles reservas. Funciona con cualquier número de usuarios simultáneos.</p>
+    </div>
+    <div class="summary-card">
+      <h4>🛡️ RLS en DB</h4>
+      <p>El aislamiento entre negocios vive en la base de datos. Un bug en el código no puede filtrar datos de otro negocio.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <p>Tableo · Documento de Arquitectura · Abril 2026</p>
+  <p style="margin-top:6px; color:#444">Para uso interno del equipo — no publicar</p>
+</footer>
+
+</body>
+</html>
