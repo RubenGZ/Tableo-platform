@@ -37,3 +37,6 @@ npm-debug.log*
 # Supabase local
 supabase/.branches
 supabase/.temp
+
+# WhatsApp Baileys session (contains auth credentials — never commit)
+baileys-session/
