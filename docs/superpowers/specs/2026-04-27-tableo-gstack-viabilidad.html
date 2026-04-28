@@ -878,6 +878,48 @@ src/
     </div>
   </div>
 
+  <h3 style="margin-bottom:16px; margin-top:32px; font-size:18px;">Capa de Confianza — ADR-009</h3>
+
+  <div class="grid-2" style="margin-bottom:24px;">
+    <div class="card">
+      <h3>🔔 Notificaciones a coste €0</h3>
+      <ul>
+        <li><strong>PWA Push + Email</strong> — canal primario, gratis</li>
+        <li><strong>WhatsApp</strong> — Baileys (SIM dedicada Tableo, recordatorio 1h antes)</li>
+        <li><strong>SMS</strong> — upsell de pago ($0.02 coste → $0.05 PVP al negocio)</li>
+        <li>Patrón <code>NotificationProvider</code> — mismo patrón que <code>AvailabilityAdapter</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🔢 Anti-fraude bilateral</h3>
+      <ul>
+        <li>Código rotativo 4 dígitos (caduca cada 5 min) en dashboard del negocio</li>
+        <li>Cliente introduce código al llegar → prueba objetiva de presencia</li>
+        <li>Conflicto → disputa manual, fondos retenidos, sin resolución automática</li>
+        <li>Audit log completo: timestamp + código + GPS opcional</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>💳 Devoluciones con reglas claras</h3>
+      <ul>
+        <li>+24h → reembolso Stripe 100%</li>
+        <li>&lt;24h → crédito Tableo 100%</li>
+        <li>No-show sin código → crédito 50%</li>
+        <li>Disputa → revisión humana, nunca automática</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>📋 6 tablas nuevas en DB</h3>
+      <ul>
+        <li><code>notification_log</code> — historial de envíos</li>
+        <li><code>presence_codes</code> + <code>presence_checks</code> — verificación</li>
+        <li><code>disputes</code> — cola de conflictos</li>
+        <li><code>audit_logs</code> — trazabilidad total</li>
+        <li><code>refund_transactions</code> — historial de devoluciones</li>
+      </ul>
+    </div>
+  </div>
+
   <h3 style="margin-bottom:16px; margin-top:32px; font-size:18px;">Reglas de oro del Monolito Modular</h3>
 
   <div class="grid-2">

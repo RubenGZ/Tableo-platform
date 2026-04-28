@@ -12,6 +12,7 @@
 | [ADR-006](decisions/ADR-006-timezones-y-ui-por-sector.md) | Zonas Horarias + UI Components por Sector | Accepted |
 | [ADR-007](decisions/ADR-007-ux-mobile-first-accesibilidad.md) | UX Mobile-First, Branding Dinámico, Feedback y A11y | Accepted |
 | [ADR-008](decisions/ADR-008-stack-auth-data-layer.md) | Stack Técnico, Autenticación y Capa de Datos | Accepted |
+| [ADR-009](decisions/ADR-009-notificaciones-presencia-devoluciones.md) | Notificaciones, Verificación de Presencia y Motor de Devoluciones | Accepted |
 
 ## Diagrama de Capas
 

@@ -871,6 +871,45 @@
 </section>
 
 <!-- ══════════════════════════════════════════ -->
+<!-- 10. CONFIANZA Y NOTIFICACIONES -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num" style="background:rgba(34,201,122,0.15); color:var(--green)">10</div>
+  <h2>Confianza, Notificaciones y Devoluciones</h2>
+  <p class="section-intro">Tres capas que eliminan el fraude bilateral y mantienen a clientes y negocios informados — todo a coste casi cero.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🔔</div>
+      <h3>Notificaciones sin coste</h3>
+      <p>PWA Push + Email son el canal base (€0). WhatsApp vía Baileys añade recordatorios 1h antes. SMS es upsell de pago para negocios que lo quieran. Si WhatsApp cae, Email sigue funcionando — sin impacto.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔢</div>
+      <h3>Código rotativo de presencia</h3>
+      <p>Al llegar, el cliente introduce un código de 4 dígitos que el negocio tiene en su pantalla. El código cambia cada 5 minutos. Imposible falsificar sin estar físicamente allí — elimina el fraude de ambos lados.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💳</div>
+      <h3>Devoluciones con reglas claras</h3>
+      <p>+24h antes → reembolso a tarjeta. Menos de 24h → crédito Tableo. No-show sin código → crédito parcial. Conflicto → revisión humana, fondos retenidos. Sin sorpresas para nadie.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>Audit trail completo</h3>
+      <p>Cada acción del sistema queda registrada en <code>audit_logs</code>. Si hay una disputa, Tableo tiene timestamp, código usado, y coordenadas GPS como evidencia. Sin evidencia objetiva, ninguna parte puede reclamar automáticamente.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-green">
+    <span class="callout-icon">🛡️</span>
+    <p><strong>Fraude bilateral resuelto con una sola mecánica:</strong> El código rotativo requiere que ambas partes estén físicamente presentes. El negocio no puede marcar un no-show si el cliente tiene el código. El cliente no puede reclamar presencia si nunca estuvo. Cualquier conflicto va a revisión humana — nunca a resolución automática que pueda ser explotada.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════ -->
 <!-- RESUMEN FINAL -->
 <!-- ══════════════════════════════════════════ -->
 <section class="section" style="border-bottom:none">
@@ -910,6 +949,10 @@
     <div class="summary-card">
       <h4>🔑 Google OAuth + Server Actions</h4>
       <p>Un login que da acceso a Tableo y al Google Calendar del negocio. Las operaciones van del formulario al motor sin APIs intermedias.</p>
+    </div>
+    <div class="summary-card">
+      <h4>🔢 Código rotativo anti-fraude</h4>
+      <p>Presencia verificada por ambas partes con un código de 4 dígitos que caduca cada 5 min. Notificaciones a €0 con Email + PWA + WhatsApp como fallback.</p>
     </div>
   </div>
 </div>
