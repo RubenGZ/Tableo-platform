@@ -3,40 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tableo — Análisis de Negocio & Auditoría Final</title>
+<title>Tableo — Análisis de Negocio &amp; Auditoría Final</title>
 <style>
   :root {
-    --bg:        #0d1117;
-    --surface:   #161b22;
-    --surface2:  #21262d;
-    --border:    #30363d;
-    --text:      #e6edf3;
-    --muted:     #8b949e;
-    --blue:      #58a6ff;
-    --green:     #3fb950;
-    --yellow:    #d29922;
-    --orange:    #f0883e;
-    --red:       #f85149;
-    --purple:    #bc8cff;
-    --cyan:      #39c5cf;
-    --gold:      #ffd700;
-    --r:         12px;
+    --bg:      #0d0d0d;
+    --bg2:     #141414;
+    --bg3:     #1a1a1a;
+    --border:  #2a2a2a;
+    --text:    #e8e8e8;
+    --text2:   #999;
+    --accent:  #6c63ff;
+    --accent2: #9d97ff;
+    --green:   #22c55e;
+    --yellow:  #f5a623;
+    --red:     #ef4444;
+    --blue:    #3b82f6;
+    --purple:  #a855f7;
+    --cyan:    #06b6d4;
+    --gold:    #fbbf24;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-size: 15px;
-    line-height: 1.6;
-  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.7; }
 
   /* ── HERO ── */
   .hero {
-    background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 50%, #0d1117 100%);
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a1230 50%, #0d0d0d 100%);
     border-bottom: 1px solid var(--border);
-    padding: 64px 32px 48px;
+    padding: 64px 40px 56px;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -44,672 +40,523 @@
   .hero::before {
     content: '';
     position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(88,166,255,0.08), transparent);
+    top: -100px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
   }
-  .hero-label {
+  .hero-badge {
     display: inline-block;
-    background: rgba(88,166,255,0.12);
-    color: var(--blue);
-    border: 1px solid rgba(88,166,255,0.25);
-    border-radius: 20px;
-    padding: 4px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: .08em;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.3);
+    color: var(--accent2);
+    font-size: 11px; font-weight: 600; letter-spacing: 2px;
     text-transform: uppercase;
+    padding: 4px 14px; border-radius: 20px;
     margin-bottom: 20px;
   }
   .hero h1 {
-    font-size: clamp(2rem, 5vw, 3.2rem);
-    font-weight: 800;
-    letter-spacing: -.03em;
-    background: linear-gradient(135deg, #e6edf3 0%, #58a6ff 60%, #bc8cff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 12px;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800; letter-spacing: -1.5px; margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
-  .hero-sub {
-    color: var(--muted);
-    font-size: 1.05rem;
-    max-width: 560px;
-    margin: 0 auto 40px;
-  }
+  .hero-sub { color: var(--text2); font-size: 16px; max-width: 580px; margin: 0 auto 32px; }
+  .meta-row { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
+  .meta-item { display: flex; align-items: center; gap: 8px; color: var(--text2); font-size: 13px; }
+  .meta-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 
-  /* ── SCORE BADGE ── */
-  .score-hero {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,215,0,0.04));
-    border: 2px solid rgba(255,215,0,0.35);
-    border-radius: 20px;
-    padding: 28px 56px;
-    position: relative;
+  /* ── SCORE BANNER ── */
+  .score-banner {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; padding: 32px 24px;
+    background: var(--bg2); border-bottom: 1px solid var(--border);
   }
-  .score-hero::after {
-    content: '★';
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--bg);
-    padding: 0 8px;
-    color: var(--gold);
-    font-size: 20px;
+  .score-item { text-align: center; padding: 20px 16px; border-radius: 12px; border: 1px solid var(--border); }
+  .score-num { font-size: 36px; font-weight: 900; letter-spacing: -2px; }
+  .score-label { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+  @media (max-width: 600px) { .score-banner { grid-template-columns: 1fr 1fr; } }
+
+  /* ── NAV ── */
+  .toc {
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    padding: 0 40px; display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;
   }
-  .score-number {
-    font-size: 5rem;
-    font-weight: 900;
-    color: var(--gold);
-    line-height: 1;
-    letter-spacing: -.04em;
+  .toc::-webkit-scrollbar { display: none; }
+  .toc-item {
+    padding: 16px 18px; color: var(--text2); font-size: 13px; font-weight: 500;
+    white-space: nowrap; text-decoration: none; border-bottom: 2px solid transparent; transition: all 0.2s;
   }
-  .score-denom { font-size: 2rem; color: var(--muted); font-weight: 400; }
-  .score-label { color: var(--muted); font-size: .85rem; margin-top: 6px; letter-spacing: .05em; text-transform: uppercase; }
-  .score-verdict {
-    margin-top: 12px;
-    background: rgba(63,185,80,0.15);
-    color: var(--green);
-    border-radius: 8px;
-    padding: 6px 20px;
-    font-weight: 700;
-    font-size: .95rem;
-  }
+  .toc-item:hover { color: var(--text); border-bottom-color: var(--accent); }
 
   /* ── LAYOUT ── */
-  .page { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
-
-  /* ── SECTION ── */
-  .section { margin-top: 64px; }
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 28px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
+  .container { max-width: 960px; margin: 0 auto; padding: 0 32px; }
+  .pillar { border-bottom: 1px solid var(--border); padding: 56px 0; }
+  .pillar-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 36px; }
+  .pillar-letter {
+    flex-shrink: 0; width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 900; color: white;
   }
-  .section-num {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: .9rem;
-    flex-shrink: 0;
-    background: rgba(88,166,255,0.12);
-    color: var(--blue);
-    border: 1px solid rgba(88,166,255,0.25);
-  }
-  .section h2 { font-size: 1.4rem; font-weight: 700; }
-  .section-desc { color: var(--muted); font-size: .9rem; margin-top: 2px; }
+  .pillar-title-block h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .pillar-title-block p { color: var(--text2); font-size: 14px; }
 
   /* ── CARDS ── */
-  .cards { display: grid; gap: 16px; }
-  .cards-3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-  .cards-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-  .cards-2 { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 20px 22px;
-  }
-  .card-icon { font-size: 1.6rem; margin-bottom: 10px; }
-  .card h3 { font-size: .95rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
-  .card p, .card li { font-size: .88rem; color: var(--muted); line-height: 1.5; }
-  .card ul { padding-left: 16px; }
-  .card .tag {
-    display: inline-block;
-    background: rgba(88,166,255,0.1);
-    color: var(--blue);
-    border-radius: 4px;
-    padding: 2px 8px;
-    font-size: .75rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .card p, .card li { color: var(--text2); font-size: 14px; line-height: 1.7; }
+  .card ul { padding-left: 20px; margin-top: 8px; }
+  .card li { margin-bottom: 4px; }
 
-  /* ── STAT CARDS ── */
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 24px;
-    text-align: center;
-  }
-  .stat-card .stat-val {
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: -.03em;
-  }
-  .stat-card .stat-label {
-    font-size: .8rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    margin-top: 4px;
-  }
-  .stat-card .stat-sub {
-    font-size: .82rem;
-    color: var(--muted);
-    margin-top: 6px;
-  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 700px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
 
-  /* ── TAM/SAM/SOM FUNNEL ── */
-  .funnel {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-items: center;
-    padding: 24px 0;
-  }
-  .funnel-item {
-    border-radius: 8px;
-    padding: 14px 24px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-  }
-  .funnel-tam { background: rgba(88,166,255,0.12); border: 1px solid rgba(88,166,255,0.25); width: 100%; }
-  .funnel-sam { background: rgba(63,185,80,0.10); border: 1px solid rgba(63,185,80,0.25); width: 78%; }
-  .funnel-som { background: rgba(255,215,0,0.10); border: 1px solid rgba(255,215,0,0.25); width: 56%; }
-  .funnel-item .f-label { font-weight: 700; font-size: .95rem; }
-  .funnel-item .f-val { font-size: 1.4rem; font-weight: 800; }
-  .funnel-item .f-desc { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+  /* ── CALLOUT ── */
+  .callout { border-radius: 10px; padding: 18px 22px; margin-bottom: 16px; display: flex; gap: 14px; align-items: flex-start; }
+  .callout-warn { background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.25); }
+  .callout-good { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); }
+  .callout-info { background: rgba(108,99,255,0.08); border: 1px solid rgba(108,99,255,0.25); }
+  .callout-bad  { background: rgba(239,68,68,0.08);  border: 1px solid rgba(239,68,68,0.25); }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { font-size: 14px; line-height: 1.65; color: var(--text2); }
+  .callout-body strong { color: var(--text); }
 
-  /* ── COMPETITION TABLE ── */
-  .comp-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-  .comp-table th {
-    background: var(--surface2);
-    color: var(--muted);
-    padding: 10px 14px;
-    text-align: left;
-    font-weight: 600;
-    letter-spacing: .04em;
-    font-size: .78rem;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-  }
-  .comp-table td {
-    padding: 11px 14px;
-    border-bottom: 1px solid var(--border);
-    vertical-align: middle;
-  }
-  .comp-table tr:last-child td { border-bottom: none; }
-  .comp-table tr:hover td { background: rgba(255,255,255,0.02); }
-  .comp-table .tableo-row td { background: rgba(88,166,255,0.05); }
-  .comp-table .tableo-row td:first-child { font-weight: 700; color: var(--blue); }
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { background: var(--bg3); color: var(--text2); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 12px 16px; border-bottom: 1px solid #1f1f1f; color: var(--text2); vertical-align: top; }
+  td strong { color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  tr.tableo-row td { background: rgba(108,99,255,0.05); }
+  tr.tableo-row td:first-child { color: var(--accent2); font-weight: 700; }
   .check { color: var(--green); font-weight: 700; }
   .cross { color: var(--red); }
   .partial { color: var(--yellow); }
 
-  /* ── ADR AUDIT TABLE ── */
-  .adr-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-  .adr-table th {
-    background: var(--surface2);
-    color: var(--muted);
-    padding: 10px 14px;
-    text-align: left;
-    font-weight: 600;
-    letter-spacing: .04em;
-    font-size: .78rem;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-  }
-  .adr-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
-  .adr-table tr:last-child td { border-bottom: none; }
-  .adr-id { color: var(--blue); font-weight: 700; font-family: 'SF Mono', 'Fira Code', monospace; font-size: .82rem; }
-  .badge {
-    display: inline-block;
-    border-radius: 4px;
-    padding: 2px 10px;
-    font-size: .75rem;
-    font-weight: 700;
-  }
-  .badge-green { background: rgba(63,185,80,0.15); color: var(--green); }
-  .badge-yellow { background: rgba(210,153,34,0.15); color: var(--yellow); }
-  .badge-blue { background: rgba(88,166,255,0.12); color: var(--blue); }
-  .adr-verdict { font-size: .83rem; color: var(--muted); }
-  .adr-risk { font-size: .8rem; color: var(--orange); margin-top: 3px; }
+  /* ── BADGE ── */
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; vertical-align: middle; }
+  .badge-green  { background: rgba(34,197,94,0.15);  color: var(--green); }
+  .badge-yellow { background: rgba(245,166,35,0.15); color: var(--yellow); }
+  .badge-red    { background: rgba(239,68,68,0.15);  color: var(--red); }
+  .badge-blue   { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .badge-purple { background: rgba(108,99,255,0.15); color: var(--accent2); }
+  .badge-cyan   { background: rgba(6,182,212,0.15);  color: var(--cyan); }
+
+  /* ── KPI CARDS ── */
+  .kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+  .kpi-value { font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--accent2); margin-bottom: 4px; }
+  .kpi-label { font-size: 12px; color: var(--text2); font-weight: 500; }
+  .kpi-desc { font-size: 11px; color: #666; margin-top: 4px; }
+
+  /* ── RISK CARDS ── */
+  .risk-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
+  .risk-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .risk-title { font-size: 15px; font-weight: 700; flex: 1; }
+  .risk-badge { font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; flex-shrink: 0; }
+  .risk-alto   { background: rgba(239,68,68,0.15); color: var(--red); }
+  .risk-medio  { background: rgba(245,166,35,0.15); color: var(--yellow); }
+  .risk-bajo   { background: rgba(34,197,94,0.15); color: var(--green); }
+  .risk-body { padding: 14px 20px; }
+  .risk-body p { font-size: 13.5px; color: var(--text2); line-height: 1.6; margin-bottom: 8px; }
+  .risk-body p:last-child { margin-bottom: 0; }
+  .risk-mit { color: var(--cyan); font-size: 13px; }
+  .risk-mit::before { content: '→ Mitigación: '; font-weight: 600; }
 
   /* ── SCORE BREAKDOWN ── */
-  .score-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
-  }
+  .score-row { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
   .score-row:last-child { border-bottom: none; }
   .score-row-name { flex: 1; font-size: .9rem; font-weight: 600; }
-  .score-row-sub { font-size: .8rem; color: var(--muted); font-weight: 400; display: block; }
-  .score-row-weight { color: var(--muted); font-size: .8rem; width: 36px; text-align: center; }
-  .score-bar-wrap { width: 180px; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; flex-shrink: 0; }
-  .score-bar { height: 100%; border-radius: 4px; }
-  .score-bar-9 { background: var(--green); width: 90%; }
-  .score-bar-8 { background: var(--blue); width: 80%; }
-  .score-bar-7 { background: var(--yellow); width: 70%; }
-  .score-bar-6 { background: var(--orange); width: 60%; }
-  .score-row-val { font-size: 1.1rem; font-weight: 800; width: 28px; text-align: right; }
-  .score-row-contrib { color: var(--muted); font-size: .78rem; width: 44px; text-align: right; }
+  .score-row-sub { font-size: .78rem; color: var(--text2); font-weight: 400; display: block; }
+  .score-weight { color: var(--text2); font-size: .78rem; width: 32px; text-align: center; flex-shrink: 0; }
+  .bar-wrap { width: 160px; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+  .bar { height: 100%; border-radius: 3px; }
+  .bar-9 { background: var(--green); width: 90%; }
+  .bar-8 { background: var(--accent); width: 80%; }
+  .bar-7 { background: var(--yellow); width: 70%; }
+  .bar-6 { background: var(--red); width: 60%; }
+  .score-val { font-size: 1.1rem; font-weight: 800; width: 24px; text-align: right; flex-shrink: 0; }
+  .score-contrib { color: var(--text2); font-size: .75rem; width: 40px; text-align: right; flex-shrink: 0; }
 
-  /* ── RISK MATRIX ── */
-  .risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
-  .risk-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 16px 18px;
-    border-left: 3px solid transparent;
-  }
-  .risk-high { border-left-color: var(--red); }
-  .risk-med { border-left-color: var(--yellow); }
-  .risk-low { border-left-color: var(--green); }
-  .risk-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-  .risk-title { font-weight: 700; font-size: .9rem; }
-  .risk-level { font-size: .75rem; font-weight: 700; padding: 2px 10px; border-radius: 4px; }
-  .risk-high .risk-level { background: rgba(248,81,73,0.15); color: var(--red); }
-  .risk-med .risk-level { background: rgba(210,153,34,0.15); color: var(--yellow); }
-  .risk-low .risk-level { background: rgba(63,185,80,0.15); color: var(--green); }
-  .risk-desc { font-size: .83rem; color: var(--muted); margin-bottom: 6px; }
-  .risk-mitigation { font-size: .8rem; color: var(--cyan); }
-  .risk-mitigation::before { content: '→ '; }
+  /* ── FUNNEL ── */
+  .funnel { display: flex; flex-direction: column; gap: 6px; align-items: center; padding: 20px 0; }
+  .funnel-item { border-radius: 8px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .f-tam { background: rgba(108,99,255,0.1); border: 1px solid rgba(108,99,255,0.25); width: 100%; }
+  .f-sam { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); width: 76%; }
+  .f-som { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); width: 52%; }
+  .f-label { font-weight: 700; font-size: .95rem; }
+  .f-val { font-size: 1.4rem; font-weight: 800; }
+  .f-desc { font-size: .8rem; color: var(--text2); margin-top: 2px; }
 
-  /* ── UNIT ECONOMICS ── */
-  .econ-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-  .econ-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 18px;
-    text-align: center;
-  }
-  .econ-val { font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; }
-  .econ-label { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
-  .econ-note { font-size: .78rem; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+  /* ── ADR TABLE ── */
+  .adr-id { color: var(--accent2); font-weight: 700; font-family: var(--mono); font-size: .82rem; }
 
   /* ── ROADMAP ── */
-  .roadmap { display: flex; flex-direction: column; gap: 0; }
-  .roadmap-item {
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    gap: 0 24px;
-    position: relative;
-  }
-  .roadmap-item::before {
-    content: '';
-    position: absolute;
-    left: 119px;
-    top: 32px;
-    bottom: -12px;
-    width: 2px;
-    background: var(--border);
-  }
-  .roadmap-item:last-child::before { display: none; }
-  .rm-date {
-    text-align: right;
-    padding: 20px 0 32px;
-    color: var(--muted);
-    font-size: .82rem;
-    font-weight: 600;
-  }
-  .rm-dot {
-    position: absolute;
-    left: 110px;
-    top: 22px;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    border: 3px solid var(--bg);
-    z-index: 1;
-  }
-  .rm-done { background: var(--green); }
-  .rm-active { background: var(--blue); box-shadow: 0 0 0 4px rgba(88,166,255,0.2); }
-  .rm-future { background: var(--border); }
-  .rm-body {
-    padding: 16px 0 32px 8px;
-  }
+  .roadmap { display: flex; flex-direction: column; position: relative; }
+  .roadmap::before { content: ''; position: absolute; left: 100px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+  .rm-item { display: grid; grid-template-columns: 100px 1fr; gap: 0 28px; position: relative; padding-bottom: 28px; }
+  .rm-date { text-align: right; padding-top: 14px; color: var(--text2); font-size: .82rem; font-weight: 600; padding-right: 0; }
+  .rm-dot { position: absolute; left: 92px; top: 16px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--bg); z-index: 1; }
+  .rm-active { background: var(--accent); box-shadow: 0 0 0 4px rgba(108,99,255,0.2); }
+  .rm-future  { background: var(--border); }
+  .rm-body { padding-top: 10px; padding-left: 6px; }
   .rm-title { font-weight: 700; font-size: .95rem; margin-bottom: 4px; }
-  .rm-desc { font-size: .83rem; color: var(--muted); }
+  .rm-desc { font-size: .83rem; color: var(--text2); }
   .rm-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .rm-chip {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 2px 10px;
-    font-size: .75rem;
-    color: var(--muted);
-  }
+  .rm-chip { background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 2px 10px; font-size: .74rem; color: var(--text2); }
 
-  /* ── GTM ── */
-  .gtm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-  .gtm-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 20px;
+  /* ── VERDICT ── */
+  .verdict {
+    background: linear-gradient(135deg, rgba(108,99,255,0.08) 0%, rgba(34,197,94,0.05) 100%);
+    border: 1px solid rgba(108,99,255,0.25);
+    border-radius: 16px; padding: 48px 40px; text-align: center; margin: 56px 0;
   }
-  .gtm-phase { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
-  .gtm-card h3 { font-size: .95rem; font-weight: 700; margin-bottom: 8px; }
-  .gtm-card ul { list-style: none; padding: 0; }
-  .gtm-card ul li { font-size: .83rem; color: var(--muted); padding: 4px 0; padding-left: 16px; position: relative; }
-  .gtm-card ul li::before { content: '→'; position: absolute; left: 0; color: var(--blue); font-size: .75rem; }
+  .verdict h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+  .verdict p { color: var(--text2); font-size: 15px; max-width: 640px; margin: 0 auto 24px; line-height: 1.7; }
+  .verdict-score {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25);
+    border-radius: 50px; padding: 10px 28px; font-size: 18px; font-weight: 800; color: var(--green);
+  }
+  .verdict-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
+  .chip { padding: 8px 18px; border-radius: 99px; font-size: 12px; font-weight: 700; border: 1px solid; }
+  .chip-green  { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: var(--green); }
+  .chip-purple { background: rgba(108,99,255,0.1); border-color: rgba(108,99,255,0.3); color: var(--accent2); }
+  .chip-yellow { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.3); color: var(--yellow); }
+  .chip-gold   { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: var(--gold); }
 
-  /* ── FINAL VERDICT ── */
-  .verdict-box {
-    background: linear-gradient(135deg, rgba(63,185,80,0.08), rgba(88,166,255,0.06));
-    border: 1px solid rgba(63,185,80,0.25);
-    border-radius: 16px;
-    padding: 36px;
-    text-align: center;
-    margin-top: 64px;
-  }
-  .verdict-box h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 16px; }
-  .verdict-box p { color: var(--muted); max-width: 680px; margin: 0 auto; line-height: 1.7; }
-  .verdict-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px; }
-  .verdict-tag {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 6px 16px;
-    font-size: .85rem;
-    font-weight: 600;
-  }
-
-  /* ── MISC ── */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
-  .highlight { color: var(--blue); font-weight: 600; }
-  .note {
-    background: rgba(210,153,34,0.08);
-    border: 1px solid rgba(210,153,34,0.2);
-    border-radius: 8px;
-    padding: 12px 16px;
-    font-size: .85rem;
-    color: var(--yellow);
-    margin-top: 16px;
-  }
-  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r); }
-  .meta { text-align: center; color: var(--muted); font-size: .8rem; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .divider { height: 1px; background: var(--border); margin: 32px 0; }
+  footer { text-align: center; padding: 36px; color: var(--text2); font-size: 12px; border-top: 1px solid var(--border); }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
+<!-- ══════════════════════════════════
      HERO
-══════════════════════════════════════════ -->
+══════════════════════════════════ -->
 <div class="hero">
-  <div class="hero-label">Análisis Ejecutivo · 28 Abr 2026</div>
-  <h1>Tableo — Análisis de Negocio<br>& Auditoría Final</h1>
-  <p class="hero-sub">Evaluación integral: mercado, competencia, modelo de negocio, economía unitaria, arquitectura técnica y riesgos</p>
-
-  <div class="score-hero">
-    <div>
-      <span class="score-number">8.0</span><span class="score-denom">/10</span>
-    </div>
-    <div class="score-label">Puntuación Global Ponderada</div>
-    <div class="score-verdict">✅ IDEA VIABLE — RECOMENDADO EJECUTAR</div>
+  <div class="hero-badge">Análisis Ejecutivo · Auditoría Final · 28 Abr 2026</div>
+  <h1>Tableo — Análisis de Negocio<br>&amp; Auditoría Final</h1>
+  <p class="hero-sub">Evaluación integral alineada con los ADRs 001–009 y la estrategia de negocio establecida. Modelo: volumen primero, monetización escalable.</p>
+  <div class="meta-row">
+    <span class="meta-item"><span class="meta-dot"></span>Vertical V1: Belleza &amp; Bienestar · España</span>
+    <span class="meta-item"><span class="meta-dot" style="background:var(--green)"></span>2 personas + Claude Code</span>
+    <span class="meta-item"><span class="meta-dot" style="background:var(--yellow)"></span>9 ADRs · 3 capas de mejora</span>
+    <span class="meta-item"><span class="meta-dot" style="background:var(--blue)"></span>Next.js 15 + Supabase</span>
   </div>
 </div>
 
-<div class="page">
+<!-- SCORE BANNER -->
+<div class="score-banner">
+  <div class="score-item" style="border-color:rgba(251,191,36,0.3)">
+    <div class="score-num" style="color:var(--gold)">8.1</div>
+    <div class="score-label">Puntuación global / 10</div>
+  </div>
+  <div class="score-item" style="border-color:rgba(34,197,94,0.3)">
+    <div class="score-num" style="color:var(--green)">9.2×</div>
+    <div class="score-label">LTV / CAC ratio</div>
+  </div>
+  <div class="score-item" style="border-color:rgba(108,99,255,0.3)">
+    <div class="score-num" style="color:var(--accent2)">5</div>
+    <div class="score-label">Negocios = break-even</div>
+  </div>
+  <div class="score-item" style="border-color:rgba(34,197,94,0.3)">
+    <div class="score-num" style="color:var(--green)">96%</div>
+    <div class="score-label">Margen bruto infraestructura</div>
+  </div>
+</div>
 
-<!-- ══════════════════════════════════════════
-     1. EXECUTIVE SUMMARY
-══════════════════════════════════════════ -->
-<section class="section">
-  <div class="section-header">
-    <div class="section-num">1</div>
-    <div>
-      <h2>Resumen Ejecutivo</h2>
-      <div class="section-desc">Qué es Tableo y por qué merece ejecutarse</div>
+<!-- NAV -->
+<nav class="toc">
+  <a class="toc-item" href="#mercado">📊 Mercado</a>
+  <a class="toc-item" href="#negocio">💰 Modelo de Negocio</a>
+  <a class="toc-item" href="#gtm">🚀 Go-to-Market</a>
+  <a class="toc-item" href="#competencia">⚔️ Competencia</a>
+  <a class="toc-item" href="#economia">📈 Economía Unitaria</a>
+  <a class="toc-item" href="#arquitectura">🏗️ Arquitectura</a>
+  <a class="toc-item" href="#capas">⚡ Capas de Mejora</a>
+  <a class="toc-item" href="#riesgos">⚠️ Riesgos</a>
+  <a class="toc-item" href="#roadmap">🗓️ Roadmap</a>
+  <a class="toc-item" href="#score">★ Puntuación</a>
+  <a class="toc-item" href="#veredicto">✅ Veredicto</a>
+</nav>
+
+<!-- ══════════════════════════════════
+     1. MERCADO
+══════════════════════════════════ -->
+<section id="mercado" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter">M</div>
+    <div class="pillar-title-block">
+      <h2>Mercado — El Problema No Resuelto</h2>
+      <p>95.000 PYMEs en España usando WhatsApp como sistema de reservas</p>
     </div>
   </div>
 
-  <div class="cards cards-3">
-    <div class="card">
-      <div class="card-icon">🎯</div>
-      <div class="tag">PROPUESTA DE VALOR</div>
-      <h3>El problema</h3>
-      <p>Las PYMEs de servicios (belleza, bienestar, fitness, salud) pierden un <strong style="color:var(--text)">15-25% de ingresos</strong> en no-shows, citas no gestionadas y herramientas de reserva obsoletas. El teléfono y WhatsApp siguen siendo el canal principal de reserva para el 70% del mercado español.</p>
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-body"><strong>El diagnóstico real:</strong> El 70% de las PYMEs de servicios en España no usa ningún software de reservas. Gestionan citas por WhatsApp, teléfono y libreta. Pierden un <strong>15-25% de ingresos</strong> en no-shows y huecos no recuperados. El producto que compite con Tableo no es Booksy — es el número de WhatsApp del negocio.</div>
+  </div>
+
+  <div class="funnel" style="margin:24px 0">
+    <div class="funnel-item f-tam">
+      <div><div class="f-label" style="color:var(--accent2)">TAM — Mercado Total Addressable (España)</div><div class="f-desc">Software de gestión + comisiones de pago · beauty, fitness, salud, hostelería</div></div>
+      <div class="f-val" style="color:var(--accent2)">€500M</div>
     </div>
-    <div class="card">
-      <div class="card-icon">💡</div>
-      <div class="tag">SOLUCIÓN</div>
-      <h3>Lo que hace Tableo</h3>
-      <p>Plataforma SaaS de reservas <strong style="color:var(--text)">multi-sector y nativa española</strong>: motor de disponibilidad polimórfico (adapters por sector), capa de confianza anti-fraude bilateral (código rotativo), notificaciones a coste €0, y motor de devoluciones justo para las tres partes.</p>
+    <div class="funnel-item f-sam">
+      <div><div class="f-label" style="color:var(--green)">SAM — PYMEs digitalizables dispuestas a pagar</div><div class="f-desc">Con cashflow positivo y al menos 1 persona dedicada a gestión de citas</div></div>
+      <div class="f-val" style="color:var(--green)">€180M</div>
     </div>
-    <div class="card">
-      <div class="card-icon">🚀</div>
-      <div class="tag">DIFERENCIACIÓN CLAVE</div>
-      <h3>Por qué gana</h3>
-      <p>Ningún competidor tiene los tres pilares juntos: <strong style="color:var(--text)">(1)</strong> multi-sector real desde arquitectura, <strong style="color:var(--text)">(2)</strong> anti-fraude bilateral demostrable (código presencial), <strong style="color:var(--text)">(3)</strong> soporte y UX nativo español.</p>
+    <div class="funnel-item f-som">
+      <div><div class="f-label" style="color:var(--gold)">SOM — Objetivo realista años 1-3</div><div class="f-desc">Penetración beauty V1, expansión fitness V2 en España</div></div>
+      <div class="f-val" style="color:var(--gold)">€3.5M ARR</div>
     </div>
   </div>
 
-  <div class="cards cards-4" style="margin-top:16px">
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--blue)">~95K</div>
-      <div class="stat-label">PYMEs objetivo en España</div>
-      <div class="stat-sub">Sólo beauty + wellness</div>
+  <div class="grid-3" style="margin-top:20px">
+    <div class="card">
+      <h3>💇 Belleza &amp; Bienestar <span class="badge badge-green">V1 ahora</span></h3>
+      <p>~85.000 negocios (peluquerías, estética, spa, barberías, nail salons). El segmento más fragmentado, el de mayor densidad y el más fácil de convencer: el dueño es también el profesional.</p>
     </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--green)">€500M</div>
-      <div class="stat-label">TAM España (booking SaaS)</div>
-      <div class="stat-sub">Software + comisiones de pago</div>
+    <div class="card">
+      <h3>🏋️ Fitness &amp; Deporte <span class="badge badge-yellow">V2 diseñar</span></h3>
+      <p>~18.000 negocios (gimnasios, padel, yoga, pilates). Mayor ticket medio, mayor resistencia al cambio. El mismo AvailabilityAdapter sirve con un nuevo FitnessAdapter.</p>
     </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--yellow)">€29-79</div>
-      <div class="stat-label">Precio mensual SaaS</div>
-      <div class="stat-sub">+ 0.5-1.5% en pagos online</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--purple)">7×</div>
-      <div class="stat-label">LTV / CAC objetivo</div>
-      <div class="stat-sub">Payback ~6 meses</div>
+    <div class="card">
+      <h3>🩺 Salud &amp; Bienestar <span class="badge badge-blue">V3 arquitectura</span></h3>
+      <p>~30.000 negocios (fisioterapeutas, psicólogos, nutricionistas). Requiere gestión de historial clínico. La arquitectura multi-sector lo habilita sin refactoring.</p>
     </div>
   </div>
+
+  <div class="callout callout-info" style="margin-top:20px">
+    <span class="callout-icon">🔑</span>
+    <div class="callout-body"><strong>Estrategia de expansión:</strong> Spain-first beauty → Spain multi-sector → LATAM (México, Colombia). El mismo idioma, la misma arquitectura. El primer mercado valida el modelo; los siguientes escalan sin reescribir nada.</div>
+  </div>
+</div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     2. MARKET ANALYSIS
-══════════════════════════════════════════ -->
-<section class="section">
-  <div class="section-header">
-    <div class="section-num" style="background:rgba(63,185,80,0.12);color:var(--green);border-color:rgba(63,185,80,0.25)">2</div>
-    <div>
-      <h2>Análisis de Mercado</h2>
-      <div class="section-desc">TAM / SAM / SOM · España · Segmentos objetivo</div>
+<!-- ══════════════════════════════════
+     2. MODELO DE NEGOCIO
+══════════════════════════════════ -->
+<section id="negocio" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background:linear-gradient(135deg,var(--green),#16a34a)">€</div>
+    <div class="pillar-title-block">
+      <h2>Modelo de Negocio — Volumen Primero</h2>
+      <p>Entrar con €0, crecer la base, monetizar cuando el negocio depende de Tableo</p>
     </div>
   </div>
 
-  <div class="two-col">
-    <div>
-      <div class="funnel">
-        <div class="funnel-item funnel-tam">
-          <div>
-            <div class="f-label" style="color:var(--blue)">TAM</div>
-            <div class="f-desc">Mercado total addressable — España</div>
-          </div>
-          <div class="f-val" style="color:var(--blue)">€500M</div>
-        </div>
-        <div class="funnel-item funnel-sam">
-          <div>
-            <div class="f-label" style="color:var(--green)">SAM</div>
-            <div class="f-desc">PYMEs digitalizables dispuestas a pagar</div>
-          </div>
-          <div class="f-val" style="color:var(--green)">€200M</div>
-        </div>
-        <div class="funnel-item funnel-som">
-          <div>
-            <div class="f-label" style="color:var(--gold)">SOM</div>
-            <div class="f-desc">Objetivo realista años 1-3</div>
-          </div>
-          <div class="f-val" style="color:var(--gold)">€4.5M ARR</div>
-        </div>
-      </div>
-      <div class="note">🗺️ Estrategia: Spain-first beauty → España multi-sector → LATAM / Europa</div>
+  <div class="callout callout-info">
+    <span class="callout-icon">🎯</span>
+    <div class="callout-body"><strong>La lógica del modelo:</strong> Booksy cobra €35/mes sin tier gratuito. Tableo entra con <strong>€0</strong> y captura el segmento de peluquerías unipersonales — el más numeroso en España — que hoy usan WhatsApp o nada digital. Una vez enganchados, la conversión a Pro es casi automática cuando superan las 50 reservas/mes. No competimos en precio: eliminamos la barrera de entrada.</div>
+  </div>
+
+  <h3 style="margin-bottom:14px;font-size:18px;margin-top:28px">Tiers de precio — Híbrido por capas</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Tier</th><th>Precio</th><th>Límites</th><th>Objetivo estratégico</th><th>Revenue a escala</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Free</strong></td>
+          <td><strong>€0/mes</strong></td>
+          <td>50 reservas/mes · 1 profesional</td>
+          <td>Adquisición masiva, viral loop</td>
+          <td>€0 — inversión en CAC</td>
+        </tr>
+        <tr>
+          <td><strong>Pro</strong> <span class="badge badge-green">Core — 60% revenue</span></td>
+          <td><strong>€14/mes</strong></td>
+          <td>Ilimitadas reservas · 3 profesionales · SMS</td>
+          <td>La masa crítica del revenue</td>
+          <td>€14 × escala</td>
+        </tr>
+        <tr>
+          <td><strong>Business</strong></td>
+          <td><strong>€29/mes</strong></td>
+          <td>Multi-sede · Analytics avanzado · API</td>
+          <td>Upsell natural al crecer el negocio</td>
+          <td>€29 × escala</td>
+        </tr>
+        <tr>
+          <td><strong>Pagos</strong> <span class="badge badge-purple">Multiplicador</span></td>
+          <td><strong>0.9%</strong> por cobro procesado</td>
+          <td>Opcional — Stripe Connect</td>
+          <td>Revenue pasivo escalable con volumen</td>
+          <td>~€450/mes a 100 negocios activos</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-bottom:14px;font-size:18px;margin-top:32px">Revenue proyectado — Escenario base a 100 negocios</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Segmento</th><th>Número</th><th>Precio</th><th>Revenue/mes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Free (adquisición)</td><td>45</td><td>€0</td><td>€0</td></tr>
+        <tr><td>Pro €14</td><td>45</td><td>€14/mes</td><td><strong style="color:var(--text)">€630</strong></td></tr>
+        <tr><td>Business €29</td><td>10</td><td>€29/mes</td><td><strong style="color:var(--text)">€290</strong></td></tr>
+        <tr><td>Comisión pagos (0.9% de ~€60K procesados)</td><td>—</td><td>variable</td><td><strong style="color:var(--text)">€540</strong></td></tr>
+        <tr style="background:rgba(108,99,255,0.05)">
+          <td colspan="3"><strong>Total mensual a 100 negocios</strong></td>
+          <td><strong style="color:var(--accent2);font-size:1.1rem">~€1.460/mes</strong></td>
+        </tr>
+        <tr style="background:rgba(108,99,255,0.05)">
+          <td colspan="3"><strong>Infraestructura (Supabase Pro + hosting + dominios)</strong></td>
+          <td><strong style="color:var(--red)">−€57/mes</strong></td>
+        </tr>
+        <tr style="background:rgba(34,197,94,0.05)">
+          <td colspan="3"><strong>Margen bruto</strong></td>
+          <td><strong style="color:var(--green);font-size:1.1rem">96%</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-good" style="margin-top:4px">
+    <span class="callout-icon">⚡</span>
+    <div class="callout-body"><strong>Break-even inmediato:</strong> Con solo <strong>5 negocios de pago en Pro</strong> (5 × €14 = €70 > €57 de infra), la plataforma se paga sola. El objetivo no es llegar rápido a rentabilidad — es crecer la base de usuarios en Free y dejar que el umbral de 50 reservas/mes los convierta solos a Pro.</div>
+  </div>
+
+  <h3 style="margin-bottom:14px;font-size:18px;margin-top:32px">Proyección ARR — Escenario conservador</h3>
+  <div class="grid-4" style="margin-top:12px">
+    <div class="kpi-card" style="text-align:center">
+      <div class="kpi-value" style="color:var(--text2)">€17K</div>
+      <div class="kpi-label">ARR · Fin Año 1</div>
+      <div class="kpi-desc">100 negocios mixtos · €1.460/mes</div>
     </div>
-    <div>
-      <div class="cards cards-3" style="gap:10px">
-        <div class="card" style="padding:14px 16px">
-          <div style="font-size:1.4rem;margin-bottom:6px">💇</div>
-          <h3 style="font-size:.85rem">Peluquerías</h3>
-          <div style="font-size:1.2rem;font-weight:800;color:var(--blue)">~50K</div>
-          <p>~€80K/año medio</p>
-        </div>
-        <div class="card" style="padding:14px 16px">
-          <div style="font-size:1.4rem;margin-bottom:6px">💆</div>
-          <h3 style="font-size:.85rem">Estética / Spa</h3>
-          <div style="font-size:1.2rem;font-weight:800;color:var(--green)">~25K</div>
-          <p>~€120K/año medio</p>
-        </div>
-        <div class="card" style="padding:14px 16px">
-          <div style="font-size:1.4rem;margin-bottom:6px">✂️</div>
-          <h3 style="font-size:.85rem">Barberías</h3>
-          <div style="font-size:1.2rem;font-weight:800;color:var(--yellow)">~12K</div>
-          <p>~€60K/año medio</p>
-        </div>
-        <div class="card" style="padding:14px 16px">
-          <div style="font-size:1.4rem;margin-bottom:6px">🏋️</div>
-          <h3 style="font-size:.85rem">Fitness (Phase 2+)</h3>
-          <div style="font-size:1.2rem;font-weight:800;color:var(--purple)">~18K</div>
-          <p>~€150K/año medio</p>
-        </div>
-        <div class="card" style="padding:14px 16px">
-          <div style="font-size:1.4rem;margin-bottom:6px">🩺</div>
-          <h3 style="font-size:.85rem">Salud (Phase 3+)</h3>
-          <div style="font-size:1.2rem;font-weight:800;color:var(--cyan)">~30K</div>
-          <p>~€200K/año medio</p>
-        </div>
-        <div class="card" style="padding:14px 16px">
-          <div style="font-size:1.4rem;margin-bottom:6px">📈</div>
-          <h3 style="font-size:.85rem">Penetración digital</h3>
-          <div style="font-size:1.2rem;font-weight:800;color:var(--orange)">30%</div>
-          <p>70% sin digitalizar</p>
-        </div>
-      </div>
+    <div class="kpi-card" style="text-align:center">
+      <div class="kpi-value" style="color:var(--yellow)">€105K</div>
+      <div class="kpi-label">ARR · Fin Año 2</div>
+      <div class="kpi-desc">600 negocios · €8.750/mes</div>
+    </div>
+    <div class="kpi-card" style="text-align:center">
+      <div class="kpi-value" style="color:var(--green)">€520K</div>
+      <div class="kpi-label">ARR · Fin Año 3</div>
+      <div class="kpi-desc">3.000 negocios · fitness incluido</div>
+    </div>
+    <div class="kpi-card" style="text-align:center">
+      <div class="kpi-value" style="color:var(--accent2)">€3.5M</div>
+      <div class="kpi-label">ARR · Fin Año 4-5</div>
+      <div class="kpi-desc">SOM Spain + LATAM entry</div>
     </div>
   </div>
+</div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     3. BUSINESS MODEL
-══════════════════════════════════════════ -->
-<section class="section">
-  <div class="section-header">
-    <div class="section-num" style="background:rgba(255,215,0,0.1);color:var(--gold);border-color:rgba(255,215,0,0.25)">3</div>
-    <div>
-      <h2>Modelo de Negocio</h2>
-      <div class="section-desc">Streams de revenue, pricing y métricas clave</div>
+<!-- ══════════════════════════════════
+     3. GO-TO-MARKET
+══════════════════════════════════ -->
+<section id="gtm" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background:linear-gradient(135deg,#f59e0b,#d97706)">🚀</div>
+    <div class="pillar-title-block">
+      <h2>Go-to-Market — Los Primeros 100 Negocios</h2>
+      <p>Self-serve + migración perfecta + viral loop = CAC &lt;€50</p>
     </div>
   </div>
 
-  <div class="cards cards-3">
+  <div class="callout callout-bad">
+    <span class="callout-icon">🚨</span>
+    <div class="callout-body"><strong>El mayor obstáculo no es técnico:</strong> Los negocios no cambian de plataforma por precio. Cambian cuando perciben que <strong>no van a perder su historial de clientes</strong>. La migración de datos perfecta es el producto más importante del go-to-market.</div>
+  </div>
+
+  <div class="grid-2" style="margin-top:20px">
     <div class="card">
-      <div class="card-icon">💳</div>
-      <div class="tag">PRINCIPAL</div>
-      <h3>SaaS Subscripción</h3>
+      <h3>📥 Fase 1 — Importación de datos</h3>
       <ul>
-        <li><strong style="color:var(--text)">Free</strong> — 1 profesional, funciones básicas → acquisition</li>
-        <li><strong style="color:var(--text)">Starter €29/mes</strong> — hasta 5 profesionales, todas las funciones</li>
-        <li><strong style="color:var(--text)">Pro €79/mes</strong> — ilimitados, analytics avanzado, soporte prioritario</li>
+        <li>Import wizard: subir CSV de Booksy/Treatwell → mapear campos → activar</li>
+        <li>Sincronización Google Calendar bidireccional desde el día 1</li>
+        <li>Soporte WhatsApp directo: "Envíanos tus contactos, los importamos en 24h"</li>
+        <li>Primeros 50 negocios: migración white-glove para aprender los puntos de dolor</li>
       </ul>
-      <div style="margin-top:10px;font-size:.82rem;color:var(--muted)">Facturación anual: 15% de descuento</div>
     </div>
     <div class="card">
-      <div class="card-icon">💸</div>
-      <div class="tag">VARIABLE</div>
-      <h3>Comisión en Pagos Online</h3>
+      <h3>🤝 Fase 2 — Retención de clientes del negocio</h3>
       <ul>
-        <li>0.5% depósito de reserva (plan Starter)</li>
-        <li>1.0% prepago completo (plan Pro)</li>
-        <li>Stripe Connect: negocio recibe los fondos directamente</li>
-        <li>Tableo retiene comisión en la transferencia</li>
-      </ul>
-      <div style="margin-top:10px;font-size:.82rem;color:var(--muted)">Revenue secundario hasta que escalen pagos</div>
-    </div>
-    <div class="card">
-      <div class="card-icon">📱</div>
-      <div class="tag">UPSELL</div>
-      <h3>Add-ons</h3>
-      <ul>
-        <li>SMS recordatorio: €0.05/SMS (pass-through Twilio + margen)</li>
-        <li>Créditos Tableo: los clientes compran packs para devoluciones</li>
-        <li>Branding avanzado (dominio propio, sin logo Tableo)</li>
-        <li>API access (futuro, para integraciones de terceros)</li>
+        <li>Email/SMS automático a sus clientes: "Tu peluquería ha migrado a Tableo, reserva aquí"</li>
+        <li>Período de gracia: 3 meses de Pro gratis al migrar</li>
+        <li>Historial de visitas visible para el cliente final desde el primer acceso</li>
+        <li>El negocio no necesita comunicar nada manualmente: Tableo lo hace</li>
       </ul>
     </div>
   </div>
 
-  <div style="margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px">
-    <h3 style="font-size:.95rem;font-weight:700;margin-bottom:16px">Proyección ARR — Escenario Base</h3>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
-      <div style="text-align:center">
-        <div style="font-size:1.4rem;font-weight:800;color:var(--muted)">€90K</div>
-        <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Fin Año 1</div>
-        <div style="font-size:.78rem;color:var(--muted);margin-top:4px">150 negocios × €600 ARPU</div>
-      </div>
-      <div style="text-align:center;font-size:1.8rem;color:var(--border);font-weight:100;align-self:center">→</div>
-      <div style="text-align:center">
-        <div style="font-size:1.4rem;font-weight:800;color:var(--yellow)">€500K</div>
-        <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Fin Año 2</div>
-        <div style="font-size:.78rem;color:var(--muted);margin-top:4px">700 negocios × €720 ARPU</div>
-      </div>
-      <div style="text-align:center;font-size:1.8rem;color:var(--border);font-weight:100;align-self:center">→</div>
-      <div style="text-align:center">
-        <div style="font-size:1.4rem;font-weight:800;color:var(--green)">€2.1M</div>
-        <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Fin Año 3</div>
-        <div style="font-size:.78rem;color:var(--muted);margin-top:4px">2.500 negocios × €840 ARPU</div>
-      </div>
-      <div style="text-align:center;font-size:1.8rem;color:var(--border);font-weight:100;align-self:center">→</div>
-      <div style="text-align:center">
-        <div style="font-size:1.4rem;font-weight:800;color:var(--blue)">€4.5M</div>
-        <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Fin Año 4</div>
-        <div style="font-size:.78rem;color:var(--muted);margin-top:4px">5.000 negocios × €900 ARPU</div>
-      </div>
+  <h3 style="margin-bottom:14px;font-size:18px;margin-top:28px">Canales de adquisición</h3>
+  <div class="grid-3">
+    <div class="card">
+      <h3>👥 Canal 1 — Comunidades</h3>
+      <p>Grupos de Facebook y Telegram de peluqueros autónomos en España. Alta densidad, bajo CAC, alta credibilidad peer-to-peer. Un caso de éxito auténtico en el grupo vale más que 1.000€ en paid ads.</p>
+    </div>
+    <div class="card">
+      <h3>🔁 Canal 2 — Viral loop</h3>
+      <p>Cada cliente que reserva ve <em>"Reservado con Tableo"</em>. Link a landing de registro para el negocio. El producto se vende solo cuando funciona bien: cada nueva reserva es un nuevo anuncio.</p>
+    </div>
+    <div class="card">
+      <h3>🤝 Canal 3 — Asociaciones</h3>
+      <p>Acuerdos con ANPE, Coiffure EU España, asociaciones de barberos. Un acuerdo da acceso directo a miles de negocios. Coste: presentación + plan de partner con comisión de referido.</p>
     </div>
   </div>
+</div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     4. COMPETITION
-══════════════════════════════════════════ -->
-<section class="section">
-  <div class="section-header">
-    <div class="section-num" style="background:rgba(248,81,73,0.1);color:var(--red);border-color:rgba(248,81,73,0.25)">4</div>
-    <div>
+<!-- ══════════════════════════════════
+     4. COMPETENCIA
+══════════════════════════════════ -->
+<section id="competencia" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background:linear-gradient(135deg,var(--red),#b91c1c)">⚔</div>
+    <div class="pillar-title-block">
       <h2>Análisis Competitivo</h2>
-      <div class="section-desc">Posicionamiento frente a los 6 competidores relevantes en España</div>
+      <p>Posicionamiento frente a los 6 competidores relevantes en España</p>
     </div>
   </div>
 
   <div class="table-wrap">
-    <table class="comp-table">
+    <table>
       <thead>
         <tr>
           <th>Plataforma</th>
           <th>Precio base</th>
           <th>Multi-sector</th>
           <th>Anti-fraude bilateral</th>
-          <th>España nativo</th>
-          <th>Pagos integrados</th>
-          <th>Fortaleza principal</th>
-          <th>Debilidad principal</th>
+          <th>Spain nativo</th>
+          <th>Fortaleza</th>
+          <th>Debilidad para Tableo</th>
         </tr>
       </thead>
       <tbody>
         <tr class="tableo-row">
-          <td>🔷 <strong>Tableo</strong></td>
-          <td>Free + €29/€79</td>
+          <td>🔷 Tableo</td>
+          <td>Free + €14 + €29</td>
           <td class="check">✓ Sí</td>
           <td class="check">✓ Único</td>
           <td class="check">✓ Sí</td>
-          <td class="check">✓ Stripe</td>
-          <td>Trust layer + multi-sector</td>
-          <td>Early stage, brand nueva</td>
+          <td>Trust layer + multi-sector + precio</td>
+          <td>Brand nueva — sin tracción aún</td>
+        </tr>
+        <tr>
+          <td>Booksy</td>
+          <td>€29-79/mes, sin free</td>
+          <td class="partial">~ Beauty/barbería</td>
+          <td class="cross">✗ No</td>
+          <td class="partial">~ Parcial</td>
+          <td>Marketplace + UX limpio</td>
+          <td>Precio sin free tier = fricción entrada</td>
         </tr>
         <tr>
           <td>Fresha</td>
@@ -717,29 +564,17 @@
           <td class="cross">✗ Solo beauty</td>
           <td class="cross">✗ No</td>
           <td class="partial">~ Parcial</td>
-          <td class="check">✓ Nativo</td>
-          <td>Free + marketplace enorme</td>
-          <td>Beauty-only, comisión alta</td>
-        </tr>
-        <tr>
-          <td>Booksy</td>
-          <td>€29-79/mes</td>
-          <td class="partial">~ Beauty/barbería</td>
-          <td class="cross">✗ No</td>
-          <td class="partial">~ Parcial</td>
-          <td class="partial">~ Limitado</td>
-          <td>UX limpio, marketplace</td>
-          <td>Limitado a 2 sectores</td>
+          <td>Free + gran marketplace UK/AU</td>
+          <td>Comisión de pago muy alta, beauty-only</td>
         </tr>
         <tr>
           <td>Treatwell</td>
-          <td>20-25% comisión</td>
+          <td>20-25% comisión marketplace</td>
           <td class="cross">✗ Solo beauty</td>
           <td class="cross">✗ No</td>
           <td class="check">✓ Sí</td>
-          <td class="check">✓ Nativo</td>
           <td>Gran tráfico España</td>
-          <td>Comisión abusiva, no posees al cliente</td>
+          <td>El negocio no posee al cliente</td>
         </tr>
         <tr>
           <td>SimplyBook.me</td>
@@ -747,7 +582,6 @@
           <td class="check">✓ Genérico</td>
           <td class="cross">✗ No</td>
           <td class="cross">✗ No</td>
-          <td class="partial">~ Externo</td>
           <td>Muy configurable</td>
           <td>UX genérico, sin identidad sectorial</td>
         </tr>
@@ -757,585 +591,511 @@
           <td class="partial">~ Fitness/wellness</td>
           <td class="cross">✗ No</td>
           <td class="cross">✗ No</td>
-          <td class="check">✓ Nativo</td>
           <td>Funcionalidad rica</td>
-          <td>Precio excesivo para SMBs</td>
-        </tr>
-        <tr>
-          <td>Acuity / Calendly</td>
-          <td>€15-50/mes</td>
-          <td class="partial">~ Genérico</td>
-          <td class="cross">✗ No</td>
-          <td class="cross">✗ No</td>
-          <td class="partial">~ Básico</td>
-          <td>Precio bajo</td>
-          <td>Sin sector-awareness, para freelancers</td>
+          <td>Precio inaccesible para SMBs</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <div style="margin-top:16px" class="cards cards-3">
-    <div class="card" style="border-color:rgba(63,185,80,0.3)">
-      <h3 style="color:var(--green)">✅ Ventaja vs. Fresha</h3>
-      <p>Multi-sector real desde arquitectura. Anti-fraude bilateral sin precedente. Sin comisión del 1.29% si el negocio no quiere pagos online.</p>
+  <div class="grid-3" style="margin-top:20px">
+    <div class="card" style="border-color:rgba(34,197,94,0.3)">
+      <h3 style="color:var(--green)">✅ Vs. Booksy</h3>
+      <p>Free tier elimina la fricción de entrada. Anti-fraude bilateral es un argumento de venta cuantificable: "reducimos tus no-shows". Multi-sector habilita fitness y salud cuando Booksy no puede.</p>
     </div>
-    <div class="card" style="border-color:rgba(88,166,255,0.3)">
-      <h3 style="color:var(--blue)">✅ Ventaja vs. Treatwell</h3>
-      <p>El negocio <strong style="color:var(--text)">posee la relación con su cliente</strong>. Sin marketplace intermediario que se queda el 20%. Tableo cobra SaaS, no comisión de marketplace.</p>
+    <div class="card" style="border-color:rgba(108,99,255,0.3)">
+      <h3 style="color:var(--accent2)">✅ Vs. Treatwell</h3>
+      <p>El negocio <strong style="color:var(--text)">posee la relación con su cliente</strong>. Sin marketplace intermediario que se queda el 20-25%. Tableo cobra SaaS + 0.9% — no "alquiler de tráfico".</p>
     </div>
-    <div class="card" style="border-color:rgba(210,153,34,0.3)">
+    <div class="card" style="border-color:rgba(245,166,35,0.3)">
       <h3 style="color:var(--yellow)">⚠️ Reto vs. Fresha</h3>
-      <p>Fresha es gratis. El argumento de venta debe centrarse en el <strong style="color:var(--text)">coste real del fraude y los no-shows</strong> (15-25% de ingresos), no en el precio del SaaS.</p>
+      <p>Fresha también es free. El argumento debe ser el <strong style="color:var(--text)">coste real del fraude y los no-shows</strong> (15-25% de ingresos) que Fresha no resuelve. La trust layer es la diferencia.</p>
     </div>
   </div>
+</div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     5. UNIT ECONOMICS
-══════════════════════════════════════════ -->
-<section class="section">
-  <div class="section-header">
-    <div class="section-num" style="background:rgba(188,140,255,0.1);color:var(--purple);border-color:rgba(188,140,255,0.25)">5</div>
-    <div>
+<!-- ══════════════════════════════════
+     5. ECONOMÍA UNITARIA
+══════════════════════════════════ -->
+<section id="economia" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background:linear-gradient(135deg,#06b6d4,#0e7490)">📈</div>
+    <div class="pillar-title-block">
       <h2>Economía Unitaria</h2>
-      <div class="section-desc">LTV / CAC / Payback / Márgenes — escenario conservador</div>
+      <p>LTV / CAC / Payback / Margen — self-serve, sin equipo de ventas</p>
     </div>
   </div>
 
-  <div class="econ-grid">
-    <div class="econ-card">
-      <div class="econ-val" style="color:var(--red)">€150</div>
-      <div class="econ-label">CAC (Coste Adquisición)</div>
-      <div class="econ-note">Inside sales €80 + content + referral €70. Sin paid ads en Year 1.</div>
+  <div class="grid-4">
+    <div class="kpi-card">
+      <div class="kpi-value" style="color:var(--red)">&lt;€50</div>
+      <div class="kpi-label">CAC (Coste Adquisición)</div>
+      <div class="kpi-desc">100% self-serve + viral loop + comunidades. Sin paid ads en Year 1. Sin equipo comercial.</div>
     </div>
-    <div class="econ-card">
-      <div class="econ-val" style="color:var(--green)">€1.044</div>
-      <div class="econ-label">LTV Starter (36 meses)</div>
-      <div class="econ-note">€29/mes × 36 meses (churn ~3%/mes, vida media ~33 meses)</div>
+    <div class="kpi-card">
+      <div class="kpi-value" style="color:var(--green)">€462</div>
+      <div class="kpi-label">LTV · Pro €14/mes</div>
+      <div class="kpi-desc">€14 × 33 meses (churn ~3%/mes, vida media estimada). Aumenta con comisiones de pago.</div>
     </div>
-    <div class="econ-card">
-      <div class="econ-val" style="color:var(--blue)">7×</div>
-      <div class="econ-label">LTV / CAC ratio</div>
-      <div class="econ-note">Objetivo SaaS B2B sano: >3x. Tableo está en zona excelente.</div>
+    <div class="kpi-card">
+      <div class="kpi-value" style="color:var(--accent2)">9.2×</div>
+      <div class="kpi-label">LTV / CAC ratio</div>
+      <div class="kpi-desc">Benchmark SaaS B2B sano: &gt;3×. 9.2× es nivel excelente. Mejora cuando el tier Business (€29) escala.</div>
     </div>
-    <div class="econ-card">
-      <div class="econ-val" style="color:var(--yellow)">~6 meses</div>
-      <div class="econ-label">Payback Period</div>
-      <div class="econ-note">€150 CAC / €29 MRR × margen 75% = 6.9 meses</div>
-    </div>
-    <div class="econ-card">
-      <div class="econ-val" style="color:var(--cyan)">75%</div>
-      <div class="econ-label">Margen Bruto SaaS</div>
-      <div class="econ-note">Supabase Pro €25 + infra €5 + soporte €3 = €33 coste variable / cliente Starter</div>
-    </div>
-    <div class="econ-card">
-      <div class="econ-val" style="color:var(--orange)">&lt;3%</div>
-      <div class="econ-label">Churn Mensual Target</div>
-      <div class="econ-note">Benchmarks SaaS beauty: Fresha 2.1%, Booksy 2.8%. Alcanzable.</div>
+    <div class="kpi-card">
+      <div class="kpi-value" style="color:var(--yellow)">~4 meses</div>
+      <div class="kpi-label">Payback Period</div>
+      <div class="kpi-desc">€50 CAC / (€14 × 96% margen) = 3.7 meses. Recuperación casi inmediata.</div>
     </div>
   </div>
 
-  <div class="note" style="margin-top:20px">
-    💡 <strong>Insight clave:</strong> el CAC baja drásticamente cuando la trust layer es activa — el argumento "reducimos tus no-shows un 40%" es cuantificable por el negocio antes de pagar. Eso convierte el onboarding en ROI demostrable en la primera semana.
+  <div class="grid-2" style="margin-top:16px">
+    <div class="card">
+      <h3>💡 Efecto red en las comisiones de pago</h3>
+      <p style="margin-top:4px">A medida que los negocios activan Stripe Connect, el 0.9% de comisión crece de forma no lineal: más negocios → más volumen de reservas confirmadas → más pagos online → más comisiones. Sin incremento de costes de infraestructura. Este es el motor de monetización a escala.</p>
+    </div>
+    <div class="card">
+      <h3>📊 El margen del 96% es la ventaja competitiva más subestimada</h3>
+      <p style="margin-top:4px">Booksy y Mindbody necesitan equipos de ventas, soporte y oficinas para sus precios. Tableo es 100% self-serve con Claude Code para el producto. Con 96% de margen bruto, se puede crecer sin inversión externa hasta miles de negocios y sin comprometer la calidad del producto.</p>
+    </div>
   </div>
+</div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     6. ARCHITECTURE AUDIT
-══════════════════════════════════════════ -->
-<section class="section">
-  <div class="section-header">
-    <div class="section-num" style="background:rgba(57,197,207,0.1);color:var(--cyan);border-color:rgba(57,197,207,0.25)">6</div>
-    <div>
+<!-- ══════════════════════════════════
+     6. AUDITORÍA DE ARQUITECTURA
+══════════════════════════════════ -->
+<section id="arquitectura" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">🏗</div>
+    <div class="pillar-title-block">
       <h2>Auditoría de Arquitectura Técnica</h2>
-      <div class="section-desc">Revisión de los 9 ADRs — calidad, riesgos y decisiones pendientes</div>
+      <p>Revisión de los 9 ADRs — calidad, riesgos y decisiones pendientes</p>
     </div>
   </div>
 
   <div class="table-wrap">
-    <table class="adr-table">
+    <table>
       <thead>
-        <tr>
-          <th>ADR</th>
-          <th>Título</th>
-          <th>Calidad</th>
-          <th>Valoración</th>
-          <th>Riesgo / Observación</th>
-        </tr>
+        <tr><th>ADR</th><th>Título</th><th>Calidad</th><th>Valoración</th><th>Riesgo / Acción</th></tr>
       </thead>
       <tbody>
         <tr>
           <td class="adr-id">ADR-001</td>
           <td>Monolito Modular</td>
           <td><span class="badge badge-green">Excelente</span></td>
-          <td class="adr-verdict">Correcto para MVP y años 1-2. Next.js 15 App Router bien elegido. La decisión de evitar microservicios prematuros es acertada.</td>
-          <td class="adr-risk">Sin riesgo. Revisar cuando ≥10 devs o monolito supere 200 módulos.</td>
+          <td style="color:var(--text2);font-size:.85rem">Next.js 15 App Router. Correcto para MVP y años 1-2. Evita microservicios prematuros sin sacrificar extensibilidad.</td>
+          <td style="color:var(--yellow);font-size:.82rem">Revisar cuando el equipo supere 5 personas o el monolito 200 módulos.</td>
         </tr>
         <tr>
           <td class="adr-id">ADR-002</td>
           <td>Motor Disponibilidad Polimórfico</td>
           <td><span class="badge badge-green">Excelente</span></td>
-          <td class="adr-verdict">Patrón Strategy + Factory es textbook para este caso. Añadir sector = crear un archivo. Sin condicionales en el core.</td>
-          <td class="adr-risk">BeautyAdapter es el único implementado. Validar interfaz con 2 sectores antes de escalar.</td>
+          <td style="color:var(--text2);font-size:.85rem">Strategy + Factory. Añadir sector = crear 1 archivo. Sin condicionales en el core. La misma interfaz sirve para beauty, fitness y salud.</td>
+          <td style="color:var(--yellow);font-size:.82rem">Validar AvailabilityAdapter con 2 sectores reales antes de escalar a V3.</td>
         </tr>
         <tr>
           <td class="adr-id">ADR-003</td>
           <td>Schema DB Unificado</td>
           <td><span class="badge badge-green">Excelente</span></td>
-          <td class="adr-verdict">metadata JSONB con discriminated union por tipo de negocio. Escalable sin migraciones por cada sector nuevo.</td>
-          <td class="adr-risk">Sin riesgo estructural. Indexar metadata->>'type' cuando tabla businesses supere 50K filas.</td>
+          <td style="color:var(--text2);font-size:.85rem">metadata JSONB con discriminated union. Escalable sin nuevas migraciones por sector.</td>
+          <td style="color:var(--text2);font-size:.82rem">Indexar metadata->>'type' al superar 50K filas en businesses.</td>
         </tr>
         <tr>
           <td class="adr-id">ADR-004</td>
           <td>Two-Phase Booking</td>
           <td><span class="badge badge-green">Excelente</span></td>
-          <td class="adr-verdict">SELECT FOR UPDATE NOWAIT + reserve_slot() + pg_cron cleanup. Patrón industrial estándar. Elimina race conditions por diseño.</td>
-          <td class="adr-risk">pg_cron cada minuto tiene coste mínimo. Monitorizar con Supabase Metrics en producción.</td>
+          <td style="color:var(--text2);font-size:.85rem">SELECT FOR UPDATE NOWAIT + reserve_slot() + pg_cron cleanup. Patrón industrial. Elimina race conditions por diseño.</td>
+          <td style="color:var(--text2);font-size:.82rem">Monitorizar pg_cron (minuto) con Supabase Metrics en producción.</td>
         </tr>
         <tr>
           <td class="adr-id">ADR-005</td>
           <td>Multi-tenancy via RLS</td>
           <td><span class="badge badge-green">Excelente</span></td>
-          <td class="adr-verdict">Seguridad por defecto. "Toda tabla tiene RLS sin excepciones" es un principio impecable. Sin fugas de datos entre tenants por diseño.</td>
-          <td class="adr-risk">RLS añade latencia ~5-8ms por query. Aceptable. Usar EXPLAIN ANALYZE antes de cualquier query crítica.</td>
+          <td style="color:var(--text2);font-size:.85rem">Toda tabla tiene RLS sin excepciones. Sin fugas de datos entre tenants por diseño arquitectónico.</td>
+          <td style="color:var(--text2);font-size:.82rem">RLS añade ~5-8ms/query. Usar EXPLAIN ANALYZE en queries críticas.</td>
         </tr>
         <tr>
           <td class="adr-id">ADR-006</td>
           <td>Timezones + UI por Sector</td>
           <td><span class="badge badge-green">Bueno</span></td>
-          <td class="adr-verdict">date-fns/tz bien elegido. Almacenar siempre en UTC, mostrar en tz del negocio. UI adapter por sector es consistente con ADR-002.</td>
-          <td class="adr-risk">España tiene 2 zonas horarias (Canarias UTC-1). Verificar edge case en seed de Canarias.</td>
+          <td style="color:var(--text2);font-size:.85rem">date-fns/tz, UTC siempre, mostrar en tz del negocio. UI adapter por sector coherente con ADR-002.</td>
+          <td style="color:var(--yellow);font-size:.82rem">Canarias (UTC-1) es edge case — verificar en seed data.</td>
         </tr>
         <tr>
           <td class="adr-id">ADR-007</td>
           <td>UX Mobile-First + A11y</td>
           <td><span class="badge badge-green">Bueno</span></td>
-          <td class="adr-verdict">shadcn/ui + Tailwind v3 + eslint-plugin-jsx-a11y. Branding dinámico cargado por slug. Decisiones estándar del mercado.</td>
-          <td class="adr-risk">Branding dinámico necesita cache (ISR o Redis) para evitar waterfall en cada load del slug.</td>
+          <td style="color:var(--text2);font-size:.85rem">shadcn/ui + Tailwind v3 + eslint-plugin-jsx-a11y. Branding dinámico por slug. El dueño de peluquería gestiona desde el móvil entre clientes.</td>
+          <td style="color:var(--yellow);font-size:.82rem">Branding dinámico necesita ISR o cache para evitar waterfall en cada slug load.</td>
         </tr>
         <tr>
           <td class="adr-id">ADR-008</td>
           <td>Stack Técnico + Auth + Data Layer</td>
           <td><span class="badge badge-green">Excelente</span></td>
-          <td class="adr-verdict">3 blockers pre-desarrollo resueltos: Server Actions como data layer (sin API route innecesaria), Google OAuth (reusa Calendar token), stack cerrado sin ambigüedad.</td>
-          <td class="adr-risk">Google OAuth depende de aprobación de Google Cloud Console. Tiempo de review: 1-5 días hábiles.</td>
+          <td style="color:var(--text2);font-size:.85rem">3 blockers pre-desarrollo resueltos: Server Actions como data layer, Google OAuth (reusa token Calendar), stack cerrado sin ambigüedad. Cero decisiones abiertas.</td>
+          <td style="color:var(--yellow);font-size:.82rem">Google OAuth requiere aprobación Google Cloud Console: 1-5 días hábiles.</td>
         </tr>
         <tr>
           <td class="adr-id">ADR-009</td>
           <td>Trust Layer: Notificaciones + Presencia + Devoluciones</td>
           <td><span class="badge badge-yellow">Bueno*</span></td>
-          <td class="adr-verdict">Diseño anti-fraude bilateral único en el mercado. Motor de devoluciones con política clara. NotificationProvider patrón idéntico a ADR-002.</td>
-          <td class="adr-risk">⚠️ Baileys (WhatsApp unofficial) puede ser baneado. Email+PWA deben estar operativos ANTES de activar Baileys. ⚠️ Refund engine scaffolded: Stripe pendiente.</td>
+          <td style="color:var(--text2);font-size:.85rem">Anti-fraude bilateral único en el mercado. Código rotativo 4 dígitos (5 min TTL). NotificationProvider adapter idéntico a ADR-002. Motor de devoluciones con política clara pre-conflicto.</td>
+          <td style="color:var(--red);font-size:.82rem">⚠️ Baileys (WhatsApp unofficial) puede ser baneado — Email+PWA son el canal primario. ⚠️ Stripe integration pendiente para activar refund engine.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <div class="cards cards-4" style="margin-top:20px">
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--green)">9/9</div>
-      <div class="stat-label">ADRs documentados</div>
-      <div class="stat-sub">Todos en estado Accepted</div>
+  <div class="grid-4" style="margin-top:20px">
+    <div class="kpi-card" style="text-align:center">
+      <div class="kpi-value" style="color:var(--green)">9/9</div>
+      <div class="kpi-label">ADRs documentados</div>
+      <div class="kpi-desc">Todos en estado Accepted</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--blue)">9.0</div>
-      <div class="stat-label">Puntuación arquitectura</div>
-      <div class="stat-sub">Sobre 10 — nivel producción</div>
+    <div class="kpi-card" style="text-align:center">
+      <div class="kpi-value" style="color:var(--accent2)">9.0</div>
+      <div class="kpi-label">Puntuación arquitectura</div>
+      <div class="kpi-desc">Nivel producción desde el día 1</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--yellow)">2</div>
-      <div class="stat-label">Riesgos técnicos activos</div>
-      <div class="stat-sub">Baileys + Stripe pendiente</div>
+    <div class="kpi-card" style="text-align:center">
+      <div class="kpi-value" style="color:var(--yellow)">2</div>
+      <div class="kpi-label">Riesgos técnicos activos</div>
+      <div class="kpi-desc">Baileys + Stripe pendiente</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-val" style="color:var(--green)">0</div>
-      <div class="stat-label">Decisiones técnicas abiertas</div>
-      <div class="stat-sub">Stack 100% cerrado</div>
+    <div class="kpi-card" style="text-align:center">
+      <div class="kpi-value" style="color:var(--green)">0</div>
+      <div class="kpi-label">Decisiones técnicas abiertas</div>
+      <div class="kpi-desc">Stack 100% cerrado</div>
     </div>
   </div>
+</div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     7. RISK MATRIX
-══════════════════════════════════════════ -->
-<section class="section">
-  <div class="section-header">
-    <div class="section-num" style="background:rgba(248,81,73,0.1);color:var(--red);border-color:rgba(248,81,73,0.25)">7</div>
-    <div>
+<!-- ══════════════════════════════════
+     7. CAPAS DE MEJORA A/B/C
+══════════════════════════════════ -->
+<section id="capas" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background:linear-gradient(135deg,var(--cyan),#0e7490)">⚡</div>
+    <div class="pillar-title-block">
+      <h2>Capas de Mejora — Grupos A · B · C</h2>
+      <p>Las 9 capacidades avanzadas ordenadas por prioridad de implementación</p>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">🗂️</span>
+    <div class="callout-body">La arquitectura tiene capacidad para 9 subsistemas avanzados agrupados en tres oleadas. <strong>Grupo A está en implementación activa</strong>. Grupos B y C esperan a tener negocios reales operando para validar su diseño con datos.</div>
+  </div>
+
+  <div class="grid-3" style="margin-top:20px">
+    <div class="card" style="border-color:rgba(34,197,94,0.4)">
+      <h3 style="color:var(--green)">Grupo A — En curso ✅</h3>
+      <p style="color:var(--text2);margin-bottom:10px;font-size:.82rem">Trust Layer y Notificaciones</p>
+      <ul>
+        <li><strong style="color:var(--text)">Capa de Notificaciones</strong> — Email/PWA/WhatsApp(Baileys)/SMS adapter</li>
+        <li><strong style="color:var(--text)">Verificación de Presencia</strong> — código rotativo 4 dígitos, anti-fraude bilateral</li>
+        <li><strong style="color:var(--text)">Motor de Devoluciones</strong> — política híbrida, resolución humana en disputas</li>
+      </ul>
+      <p style="margin-top:10px"><span class="badge badge-green">15 tasks · TDD · Subagent-driven</span></p>
+    </div>
+    <div class="card" style="border-color:rgba(245,166,35,0.4)">
+      <h3 style="color:var(--yellow)">Grupo B — Siguiente ⏳</h3>
+      <p style="color:var(--text2);margin-bottom:10px;font-size:.82rem">Business Rules Engine</p>
+      <ul>
+        <li><strong style="color:var(--text)">Motor de Excepciones</strong> — festivos, reservas off-schedule, días cerrados</li>
+        <li><strong style="color:var(--text)">Smart Selector</strong> — servicios pre-configurados por sector vs. personalizables</li>
+      </ul>
+      <p style="margin-top:10px"><span class="badge badge-yellow">Diseñar cuando A esté live</span></p>
+    </div>
+    <div class="card" style="border-color:rgba(108,99,255,0.4)">
+      <h3 style="color:var(--accent2)">Grupo C — Futuro 🔮</h3>
+      <p style="color:var(--text2);margin-bottom:10px;font-size:.82rem">Intelligence Layer — necesita datos reales</p>
+      <ul>
+        <li><strong style="color:var(--text)">Smart Waiting List</strong> — gestión automática de cancelaciones</li>
+        <li><strong style="color:var(--text)">Reputation Score</strong> — puntuación bilateral negocio/cliente</li>
+        <li><strong style="color:var(--text)">Yield Management</strong> — precios dinámicos (3-6 meses de histórico)</li>
+      </ul>
+      <p style="margin-top:10px"><span class="badge badge-purple">Post-MVP · Feature-flagged</span></p>
+    </div>
+  </div>
+
+  <div class="callout callout-good" style="margin-top:20px">
+    <span class="callout-icon">💡</span>
+    <div class="callout-body"><strong>Por qué este orden:</strong> El Grupo A es el que transforma el pitch de "otra app de reservas" en "el único sistema que elimina el fraude bilateral". Sin A, los grupos B y C son diferenciadores menores. Con A, Tableo tiene algo que ningún competidor tiene.</div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════
+     8. RIESGOS
+══════════════════════════════════ -->
+<section id="riesgos" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background:linear-gradient(135deg,var(--red),#b91c1c)">⚠</div>
+    <div class="pillar-title-block">
       <h2>Matriz de Riesgos</h2>
-      <div class="section-desc">Probabilidad × Impacto · Mitigaciones definidas</div>
+      <p>Probabilidad × Impacto · Mitigaciones definidas</p>
     </div>
   </div>
 
-  <div class="risk-grid">
-    <div class="risk-card risk-high">
-      <div class="risk-header">
-        <div class="risk-title">Fresha lanza modo anti-fraude</div>
-        <div class="risk-level">ALTO</div>
-      </div>
-      <div class="risk-desc">Fresha tiene recursos para copiar la trust layer en 3-6 meses si ve tracción.</div>
-      <div class="risk-mitigation">Lanzar multi-sector (fitness) antes de que Fresha lo copie. Moat = sectores, no solo la feature.</div>
-    </div>
-    <div class="risk-card risk-high">
-      <div class="risk-header">
-        <div class="risk-title">Baileys / WhatsApp ban</div>
-        <div class="risk-level">ALTO</div>
-      </div>
-      <div class="risk-desc">Meta puede banear el número en cualquier momento. Viola ToS.</div>
-      <div class="risk-mitigation">Email + PWA Push son los canales primarios. Baileys es bonus. Ban = reemplazar SIM en 10 min.</div>
-    </div>
-    <div class="risk-card risk-med">
-      <div class="risk-header">
-        <div class="risk-title">Churn alto por curva de adopción</div>
-        <div class="risk-level">MEDIO</div>
-      </div>
-      <div class="risk-desc">El dueño de la peluquería no está acostumbrado a SaaS. Onboarding difícil puede disparar el churn a >5%.</div>
-      <div class="risk-mitigation">Onboarding con video de 3 minutos + plantilla preconfigurada por sector. Sin fricción el día 1.</div>
-    </div>
-    <div class="risk-card risk-med">
-      <div class="risk-header">
-        <div class="risk-title">Integración Stripe retrasada</div>
-        <div class="risk-level">MEDIO</div>
-      </div>
-      <div class="risk-desc">Sin pagos online, la trust layer pierde valor (no hay dinero retenido en disputas).</div>
-      <div class="risk-mitigation">Stripe Connect es la Phase de pagos. Planificar como sprint separado. Sin Stripe = modo básico, trust layer activa para presencia sin dinero.</div>
-    </div>
-    <div class="risk-card risk-med">
-      <div class="risk-header">
-        <div class="risk-title">Founder único — bus factor 1</div>
-        <div class="risk-level">MEDIO</div>
-      </div>
-      <div class="risk-desc">Si el founder está ocupado, el desarrollo para. No hay equipo técnico aún.</div>
-      <div class="risk-mitigation">Arquitectura con ADRs explícitos + AI-assisted dev reduce el bus factor. Objetivo: contratar 1 dev junior en Año 1.</div>
-    </div>
-    <div class="risk-card risk-low">
-      <div class="risk-header">
-        <div class="risk-title">GDPR / datos de clientes</div>
-        <div class="risk-level">BAJO</div>
-      </div>
-      <div class="risk-desc">Supabase EU region + RLS by design + audit logs. Riesgo controlado desde arquitectura.</div>
-      <div class="risk-mitigation">Añadir Privacy Policy + DPA template para negocios en Phase de pagos. Supabase ya está en EU.</div>
-    </div>
-    <div class="risk-card risk-low">
-      <div class="risk-header">
-        <div class="risk-title">Supabase como proveedor único</div>
-        <div class="risk-level">BAJO</div>
-      </div>
-      <div class="risk-desc">Vendor lock-in con Supabase. Si cambian precios o discontinúan, migración costosa.</div>
-      <div class="risk-mitigation">Supabase es PostgreSQL estándar. Migrar a RDS / Neon es trabajo de 1-2 semanas. Riesgo aceptable para MVP.</div>
-    </div>
-    <div class="risk-card risk-low">
-      <div class="risk-header">
-        <div class="risk-title">Negocios usan Treatwell + Tableo</div>
-        <div class="risk-level">BAJO</div>
-      </div>
-      <div class="risk-desc">Algunos negocios querrán mantener presencia en Treatwell mientras usan Tableo para reservas directas.</div>
-      <div class="risk-mitigation">Esto es una ventaja: Tableo = reservas directas + fidelización. Treatwell = discovery. No son mutuamente excluyentes al principio.</div>
+  <div class="risk-card">
+    <div class="risk-header"><div class="risk-title">Fresha lanza funcionalidad anti-fraude</div><span class="risk-badge risk-alto">ALTO</span></div>
+    <div class="risk-body">
+      <p>Fresha tiene recursos para copiar la trust layer en 3-6 meses si detecta tracción de Tableo en España.</p>
+      <p class="risk-mit">Lanzar multi-sector (fitness) antes de que Fresha lo copie. El moat no es la feature — es el conjunto sector agnostic + trust layer + Spain nativo. Fresha no puede ser multi-sector sin reescribir su core.</p>
     </div>
   </div>
+  <div class="risk-card">
+    <div class="risk-header"><div class="risk-title">Baileys / WhatsApp ban del número</div><span class="risk-badge risk-alto">ALTO</span></div>
+    <div class="risk-body">
+      <p>Meta puede banear el número de Tableo en cualquier momento. Viola ToS de WhatsApp Web unofficial.</p>
+      <p class="risk-mit">Email + PWA Push son los canales primarios. WhatsApp es un bonus que mejora el recordatorio. Un ban se resuelve en minutos reemplazando la SIM. Ningún cliente se queda sin notificación.</p>
+    </div>
+  </div>
+  <div class="risk-card">
+    <div class="risk-header"><div class="risk-title">Churn alto por curva de adopción digital</div><span class="risk-badge risk-medio">MEDIO</span></div>
+    <div class="risk-body">
+      <p>El dueño de la peluquería no está acostumbrado a SaaS. Si el onboarding tiene fricción, el churn puede superar el 5% mensual.</p>
+      <p class="risk-mit">Import wizard + onboarding en vídeo de 3 minutos + plantilla de sector preconfigurada. Sin fricción el día 1: el negocio ve su calendario con sus servicios antes de pagar un euro.</p>
+    </div>
+  </div>
+  <div class="risk-card">
+    <div class="risk-header"><div class="risk-title">Stripe integration retrasada — trust layer inactiva</div><span class="risk-badge risk-medio">MEDIO</span></div>
+    <div class="risk-body">
+      <p>Sin pagos, la capa de devoluciones no tiene dinero que retener en disputas. El anti-fraude funciona a medias (presencia sí, dinero no).</p>
+      <p class="risk-mit">La verificación de presencia funciona sin Stripe: el código rotativo elimina los no-shows. Stripe es la fase de pagos — planificada, no bloqueante para el lanzamiento.</p>
+    </div>
+  </div>
+  <div class="risk-card">
+    <div class="risk-header"><div class="risk-title">Equipo de 2 personas — bus factor bajo</div><span class="risk-badge risk-medio">MEDIO</span></div>
+    <div class="risk-body">
+      <p>Con 2 personas + Claude Code, una baja o una decisión bloqueada paraliza el desarrollo.</p>
+      <p class="risk-mit">9 ADRs explícitos + planes TDD + subagent-driven development reducen el bus factor técnico. Objetivo: contratar 1 dev junior o colaborador externo antes del lanzamiento beta.</p>
+    </div>
+  </div>
+  <div class="risk-card">
+    <div class="risk-header"><div class="risk-title">GDPR + privacidad de datos de clientes</div><span class="risk-badge risk-bajo">BAJO</span></div>
+    <div class="risk-body">
+      <p>Supabase EU region + RLS por diseño + audit_logs completos. El riesgo está controlado desde la arquitectura.</p>
+      <p class="risk-mit">Añadir Privacy Policy + DPA template para negocios en la fase de pagos. Supabase ya cumple GDPR desde la infraestructura.</p>
+    </div>
+  </div>
+</div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     8. GO-TO-MARKET
-══════════════════════════════════════════ -->
-<section class="section">
-  <div class="section-header">
-    <div class="section-num" style="background:rgba(240,136,62,0.1);color:var(--orange);border-color:rgba(240,136,62,0.25)">8</div>
-    <div>
-      <h2>Estrategia Go-to-Market</h2>
-      <div class="section-desc">Canal de adquisición · Retención · Expansión</div>
-    </div>
-  </div>
-
-  <div class="gtm-grid">
-    <div class="gtm-card">
-      <div class="gtm-phase" style="color:var(--blue)">Fase 1 · Meses 1-4</div>
-      <h3>Early Adopters (Beta)</h3>
-      <ul>
-        <li>5-10 peluquerías Barcelona/Madrid (relaciones directas)</li>
-        <li>Onboarding manual 1-a-1 por el founder</li>
-        <li>Feedback continuo → iteración rápida</li>
-        <li>Sin cobro — validar retención y NPS</li>
-        <li>Objetivo: 0 churns, NPS &gt;50</li>
-      </ul>
-    </div>
-    <div class="gtm-card">
-      <div class="gtm-phase" style="color:var(--green)">Fase 2 · Meses 5-9</div>
-      <h3>Inside Sales + Content</h3>
-      <ul>
-        <li>LinkedIn + Instagram targeting dueños de salón</li>
-        <li>SEO: "software gestión peluquería España"</li>
-        <li>Vídeo demo 3 min (antes/después sin-shows)</li>
-        <li>Referral: 1 mes gratis por cada negocio referido</li>
-        <li>Objetivo: 100 negocios de pago</li>
-      </ul>
-    </div>
-    <div class="gtm-card">
-      <div class="gtm-phase" style="color:var(--yellow)">Fase 3 · Meses 10-18</div>
-      <h3>Expansión Vertical</h3>
-      <ul>
-        <li>Abrir sector fitness (FitnessAdapter)</li>
-        <li>Partnership con distribuidores de TPV (datáfono)</li>
-        <li>Programa de revendedores (freelance consultores)</li>
-        <li>Webinars con asociaciones de peluquería España</li>
-        <li>Objetivo: 500 negocios, €29K MRR</li>
-      </ul>
-    </div>
-    <div class="gtm-card">
-      <div class="gtm-phase" style="color:var(--purple)">Fase 4 · Año 2+</div>
-      <h3>Escala + LATAM</h3>
-      <ul>
-        <li>México / Colombia (mismo idioma, misma arquitectura)</li>
-        <li>Sector salud (médicos, fisioterapeutas)</li>
-        <li>Marketplace de profesionales (lead gen upsell)</li>
-        <li>Fundraising seed si tracción lo justifica</li>
-        <li>Objetivo: €500K ARR, break-even</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════════
-     9. ROADMAP TÉCNICO
-══════════════════════════════════════════ -->
-<section class="section">
-  <div class="section-header">
-    <div class="section-num" style="background:rgba(88,166,255,0.1);color:var(--blue);border-color:rgba(88,166,255,0.25)">9</div>
-    <div>
-      <h2>Roadmap Técnico</h2>
-      <div class="section-desc">5 fases de desarrollo — estado actual y próximos hitos</div>
+<!-- ══════════════════════════════════
+     9. ROADMAP
+══════════════════════════════════ -->
+<section id="roadmap" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background:linear-gradient(135deg,#f59e0b,#92400e)">🗓</div>
+    <div class="pillar-title-block">
+      <h2>Roadmap Técnico — 5 Fases</h2>
+      <p>Abril 2026 → Beta live con clientes reales</p>
     </div>
   </div>
 
   <div class="roadmap">
-    <div class="roadmap-item">
-      <div class="rm-date">Abr 2026<br>En curso</div>
+    <div class="rm-item">
+      <div class="rm-date">Abr 2026<br><span style="color:var(--accent2)">En curso</span></div>
       <div class="rm-dot rm-active"></div>
       <div class="rm-body">
-        <div class="rm-title" style="color:var(--blue)">Phase 0 + 1 · Fundación & Trust Layer</div>
-        <div class="rm-desc">ADRs 001-009 documentados. Plan Phase 1 (scaffold + DB) escrito. Grupo A (notificaciones, presencia, devoluciones) en implementación activa con subagent-driven development.</div>
+        <div class="rm-title" style="color:var(--accent2)">Phase 0+1 · Fundación + Grupo A (Trust Layer)</div>
+        <div class="rm-desc">9 ADRs documentados. Plan Phase 1 escrito (scaffold + DB). Grupo A en implementación activa con subagent-driven development: notificaciones multi-canal, presencia rotativa, motor de devoluciones.</div>
         <div class="rm-chips">
-          <span class="rm-chip">9 ADRs ✅</span>
-          <span class="rm-chip">Migration 001-004 plan ✅</span>
-          <span class="rm-chip">Trust layer plan ✅</span>
-          <span class="rm-chip">TDD + Vitest</span>
+          <span class="rm-chip">9 ADRs ✅</span><span class="rm-chip">Migration 001-004</span><span class="rm-chip">Trust layer Grupo A</span><span class="rm-chip">TDD + Vitest</span>
         </div>
       </div>
     </div>
-    <div class="roadmap-item">
+    <div class="rm-item">
       <div class="rm-date">May 2026</div>
       <div class="rm-dot rm-future"></div>
       <div class="rm-body">
         <div class="rm-title">Phase 2 · Motor de Disponibilidad</div>
-        <div class="rm-desc">AvailabilityAdapter interface + BeautyAdapter implementado. reserve_slot() PostgreSQL. Booking flow completo sin UI.</div>
+        <div class="rm-desc">AvailabilityAdapter + BeautyAdapter. reserve_slot() PostgreSQL. Booking flow completo sin UI. Primer test de carga concurrente.</div>
         <div class="rm-chips">
-          <span class="rm-chip">BeautyAdapter</span>
-          <span class="rm-chip">reserve_slot()</span>
-          <span class="rm-chip">Two-phase booking</span>
+          <span class="rm-chip">BeautyAdapter</span><span class="rm-chip">reserve_slot()</span><span class="rm-chip">Two-phase booking live</span>
         </div>
       </div>
     </div>
-    <div class="roadmap-item">
+    <div class="rm-item">
       <div class="rm-date">Jun 2026</div>
       <div class="rm-dot rm-future"></div>
       <div class="rm-body">
         <div class="rm-title">Phase 3 · UI Pública de Reserva</div>
-        <div class="rm-desc">Página /book/[slug] pública. SlotPicker, BookingCountdown, código de presencia del cliente. Primera demo funcional end-to-end.</div>
+        <div class="rm-desc">Página /book/[slug] pública. SlotPicker, BookingCountdown, código de presencia del cliente. Primera demo funcional end-to-end con negocio real.</div>
         <div class="rm-chips">
-          <span class="rm-chip">SlotPicker</span>
-          <span class="rm-chip">BookingCountdown</span>
-          <span class="rm-chip">Presencia cliente</span>
+          <span class="rm-chip">SlotPicker</span><span class="rm-chip">Código presencia cliente</span><span class="rm-chip">Branding dinámico</span>
         </div>
       </div>
     </div>
-    <div class="roadmap-item">
+    <div class="rm-item">
       <div class="rm-date">Jul 2026</div>
       <div class="rm-dot rm-future"></div>
       <div class="rm-body">
-        <div class="rm-title">Phase 4 · Dashboard del Negocio</div>
-        <div class="rm-desc">CalendarDesktop + CalendarMobile con dnd-kit. Código de presencia rotativo. Gestión de profesionales y servicios. Google Calendar sync.</div>
+        <div class="rm-title">Phase 4 · Dashboard + Import Wizard</div>
+        <div class="rm-desc">CalendarDesktop + CalendarMobile (dnd-kit). Código de presencia rotativo en dashboard. Import wizard para migración desde Booksy/Google Calendar. Google Calendar sync bidireccional.</div>
         <div class="rm-chips">
-          <span class="rm-chip">CalendarDesktop</span>
-          <span class="rm-chip">dnd-kit</span>
-          <span class="rm-chip">Google Calendar</span>
-          <span class="rm-chip">Código rotativo UI</span>
+          <span class="rm-chip">CalendarDesktop</span><span class="rm-chip">Import wizard</span><span class="rm-chip">Google Calendar sync</span>
         </div>
       </div>
     </div>
-    <div class="roadmap-item">
+    <div class="rm-item">
       <div class="rm-date">Ago 2026</div>
       <div class="rm-dot rm-future"></div>
       <div class="rm-body">
-        <div class="rm-title">Phase 5 · Pagos + Beta Launch</div>
-        <div class="rm-desc">Stripe Connect integrado. Depósitos de reserva. Motor de devoluciones activo. Beta con 5-10 negocios reales en España.</div>
+        <div class="rm-title">Phase 5 · Pagos + Beta Live</div>
+        <div class="rm-desc">Stripe Connect integrado. Depósitos de reserva (0.9% comisión activa). Motor de devoluciones fully operational. Beta con 5-10 negocios reales. Período de gracia: 3 meses Pro gratis.</div>
         <div class="rm-chips">
-          <span class="rm-chip">Stripe Connect</span>
-          <span class="rm-chip">Refund engine live</span>
-          <span class="rm-chip">Beta negocios reales</span>
+          <span class="rm-chip">Stripe Connect</span><span class="rm-chip">Refund engine live</span><span class="rm-chip">5-10 negocios beta</span><span class="rm-chip">Break-even</span>
         </div>
       </div>
     </div>
   </div>
+</div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     10. FINAL SCORE BREAKDOWN
-══════════════════════════════════════════ -->
-<section class="section">
-  <div class="section-header">
-    <div class="section-num" style="background:rgba(255,215,0,0.1);color:var(--gold);border-color:rgba(255,215,0,0.25)">10</div>
-    <div>
+<!-- ══════════════════════════════════
+     10. PUNTUACIÓN FINAL
+══════════════════════════════════ -->
+<section id="score" class="pillar">
+<div class="container">
+  <div class="pillar-header">
+    <div class="pillar-letter" style="background:linear-gradient(135deg,var(--gold),#b45309)">★</div>
+    <div class="pillar-title-block">
       <h2>Puntuación Final Detallada</h2>
-      <div class="section-desc">10 dimensiones ponderadas → nota global 8.0 / 10</div>
+      <p>10 dimensiones ponderadas → nota global 8.1 / 10</p>
     </div>
   </div>
 
-  <div class="card" style="padding:28px">
+  <div class="card">
     <div class="score-row">
-      <div class="score-row-name">
-        Oportunidad de Mercado
-        <span class="score-row-sub">TAM €500M en España, mercado fragmentado, 70% sin digitalizar</span>
-      </div>
-      <div class="score-row-weight">20%</div>
-      <div class="score-bar-wrap"><div class="score-bar score-bar-8"></div></div>
-      <div class="score-row-val" style="color:var(--blue)">8</div>
-      <div class="score-row-contrib">1.60</div>
+      <div class="score-row-name">Problem-Solution Fit<span class="score-row-sub">No-shows, fraude bilateral, WhatsApp como sistema de reservas: pain real y cuantificable</span></div>
+      <div class="score-weight">20%</div>
+      <div class="bar-wrap"><div class="bar bar-9"></div></div>
+      <div class="score-val" style="color:var(--green)">9</div>
+      <div class="score-contrib">1.80</div>
     </div>
     <div class="score-row">
-      <div class="score-row-name">
-        Problem-Solution Fit
-        <span class="score-row-sub">No-shows, fraude, citas por WhatsApp: pain points cuantificables y reales</span>
-      </div>
-      <div class="score-row-weight">15%</div>
-      <div class="score-bar-wrap"><div class="score-bar score-bar-9"></div></div>
-      <div class="score-row-val" style="color:var(--green)">9</div>
-      <div class="score-row-contrib">1.35</div>
+      <div class="score-row-name">Calidad de Arquitectura<span class="score-row-sub">9 ADRs, TDD, RLS sin excepciones, two-phase booking, patrones extensibles. Nivel producción.</span></div>
+      <div class="score-weight">15%</div>
+      <div class="bar-wrap"><div class="bar bar-9"></div></div>
+      <div class="score-val" style="color:var(--green)">9</div>
+      <div class="score-contrib">1.35</div>
     </div>
     <div class="score-row">
-      <div class="score-row-name">
-        Modelo de Negocio
-        <span class="score-row-sub">SaaS + comisión opt-in es modelo probado. Unit economics sólidos (LTV/CAC 7×)</span>
-      </div>
-      <div class="score-row-weight">15%</div>
-      <div class="score-bar-wrap"><div class="score-bar score-bar-8"></div></div>
-      <div class="score-row-val" style="color:var(--blue)">8</div>
-      <div class="score-row-contrib">1.20</div>
+      <div class="score-row-name">Oportunidad de Mercado<span class="score-row-sub">€500M TAM en España, 70% sin digitalizar, expansión multi-sector + LATAM planificada</span></div>
+      <div class="score-weight">15%</div>
+      <div class="bar-wrap"><div class="bar bar-8"></div></div>
+      <div class="score-val" style="color:var(--accent)">8</div>
+      <div class="score-contrib">1.20</div>
     </div>
     <div class="score-row">
-      <div class="score-row-name">
-        Diferenciación Competitiva
-        <span class="score-row-sub">Multi-sector + anti-fraude bilateral son únicos. Fresha tiene mucho terreno ganado</span>
-      </div>
-      <div class="score-row-weight">15%</div>
-      <div class="score-bar-wrap"><div class="score-bar score-bar-7"></div></div>
-      <div class="score-row-val" style="color:var(--yellow)">7</div>
-      <div class="score-row-contrib">1.05</div>
+      <div class="score-row-name">Modelo de Negocio<span class="score-row-sub">€0/€14/€29 + 0.9% pagos. Volumen primero, monetización escalable. LTV/CAC 9.2×, margen 96%.</span></div>
+      <div class="score-weight">15%</div>
+      <div class="bar-wrap"><div class="bar bar-9"></div></div>
+      <div class="score-val" style="color:var(--green)">9</div>
+      <div class="score-contrib">1.35</div>
     </div>
     <div class="score-row">
-      <div class="score-row-name">
-        Viabilidad Técnica
-        <span class="score-row-sub">Stack maduro, patrones sólidos. Única deuda: Baileys (mitigado) y Stripe (planificado)</span>
-      </div>
-      <div class="score-row-weight">10%</div>
-      <div class="score-bar-wrap"><div class="score-bar score-bar-8"></div></div>
-      <div class="score-row-val" style="color:var(--blue)">8</div>
-      <div class="score-row-contrib">0.80</div>
+      <div class="score-row-name">Diferenciación Competitiva<span class="score-row-sub">Multi-sector + trust layer + Spain nativo. Fresha tiene terreno, pero ninguno tiene los 3 juntos.</span></div>
+      <div class="score-weight">10%</div>
+      <div class="bar-wrap"><div class="bar bar-8"></div></div>
+      <div class="score-val" style="color:var(--accent)">8</div>
+      <div class="score-contrib">0.80</div>
     </div>
     <div class="score-row">
-      <div class="score-row-name">
-        Calidad de Arquitectura
-        <span class="score-row-sub">9 ADRs, TDD, RLS sin excepciones, two-phase booking, patrones extensibles</span>
-      </div>
-      <div class="score-row-weight">10%</div>
-      <div class="score-bar-wrap"><div class="score-bar score-bar-9"></div></div>
-      <div class="score-row-val" style="color:var(--green)">9</div>
-      <div class="score-row-contrib">0.90</div>
+      <div class="score-row-name">Timing de Mercado<span class="score-row-sub">Post-COVID digitalización acelerada. El sector beauty sigue lento: ventana abierta 18-24 meses.</span></div>
+      <div class="score-weight">8%</div>
+      <div class="bar-wrap"><div class="bar bar-9"></div></div>
+      <div class="score-val" style="color:var(--green)">9</div>
+      <div class="score-contrib">0.72</div>
     </div>
     <div class="score-row">
-      <div class="score-row-name">
-        Timing de Mercado
-        <span class="score-row-sub">Post-COVID digitalización acelerada; sector beauty aún lento = ventana abierta</span>
-      </div>
-      <div class="score-row-weight">5%</div>
-      <div class="score-bar-wrap"><div class="score-bar score-bar-9"></div></div>
-      <div class="score-row-val" style="color:var(--green)">9</div>
-      <div class="score-row-contrib">0.45</div>
+      <div class="score-row-name">Viabilidad Técnica<span class="score-row-sub">Stack maduro y cerrado. Deuda técnica: Baileys (mitigado) y Stripe (planificado, no bloqueante)</span></div>
+      <div class="score-weight">7%</div>
+      <div class="bar-wrap"><div class="bar bar-8"></div></div>
+      <div class="score-val" style="color:var(--accent)">8</div>
+      <div class="score-contrib">0.56</div>
     </div>
     <div class="score-row">
-      <div class="score-row-name">
-        Riesgo de Ejecución
-        <span class="score-row-sub">Founder único + AI-assisted = lean pero vulnerable. Sin equipo aún</span>
-      </div>
-      <div class="score-row-weight">5%</div>
-      <div class="score-bar-wrap"><div class="score-bar score-bar-6"></div></div>
-      <div class="score-row-val" style="color:var(--orange)">6</div>
-      <div class="score-row-contrib">0.30</div>
+      <div class="score-row-name">Go-to-Market<span class="score-row-sub">Viral loop + comunidades + import wizard. Canal validado conceptualmente. Falta la ejecución.</span></div>
+      <div class="score-weight">5%</div>
+      <div class="bar-wrap"><div class="bar bar-7"></div></div>
+      <div class="score-val" style="color:var(--yellow)">7</div>
+      <div class="score-contrib">0.35</div>
     </div>
     <div class="score-row">
-      <div class="score-row-name">
-        Go-to-Market
-        <span class="score-row-sub">Spain-first es correcto. Canal de ventas claro pero requiere validación con primeros clientes</span>
-      </div>
-      <div class="score-row-weight">3%</div>
-      <div class="score-bar-wrap"><div class="score-bar score-bar-7"></div></div>
-      <div class="score-row-val" style="color:var(--yellow)">7</div>
-      <div class="score-row-contrib">0.21</div>
+      <div class="score-row-name">Riesgo de Ejecución<span class="score-row-sub">2 personas + Claude Code. Lean pero con bus factor bajo. Sin equipo aún. ADRs reducen el riesgo.</span></div>
+      <div class="score-weight">3%</div>
+      <div class="bar-wrap"><div class="bar bar-6"></div></div>
+      <div class="score-val" style="color:var(--red)">6</div>
+      <div class="score-contrib">0.18</div>
     </div>
     <div class="score-row" style="border-bottom:none">
-      <div class="score-row-name">
-        Escalabilidad
-        <span class="score-row-sub">Multi-sector desde día 1, RLS por tenant, AvailabilityAdapter extensible</span>
-      </div>
-      <div class="score-row-weight">2%</div>
-      <div class="score-bar-wrap"><div class="score-bar score-bar-8"></div></div>
-      <div class="score-row-val" style="color:var(--blue)">8</div>
-      <div class="score-row-contrib">0.16</div>
+      <div class="score-row-name">Escalabilidad<span class="score-row-sub">Multi-sector desde día 1, RLS por tenant, AvailabilityAdapter extensible. LATAM sin refactoring.</span></div>
+      <div class="score-weight">2%</div>
+      <div class="bar-wrap"><div class="bar bar-9"></div></div>
+      <div class="score-val" style="color:var(--green)">9</div>
+      <div class="score-contrib">0.18</div>
     </div>
 
-    <div style="border-top:2px solid var(--border);margin-top:20px;padding-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+    <div style="border-top:2px solid var(--border);margin-top:20px;padding-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
       <div>
-        <div style="font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Puntuación Global Ponderada</div>
-        <div style="font-size:2.4rem;font-weight:900;color:var(--gold);letter-spacing:-.03em">8.0 <span style="font-size:1.2rem;color:var(--muted);font-weight:400">/ 10</span></div>
+        <div style="font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.08em">Puntuación Global Ponderada</div>
+        <div style="font-size:2.4rem;font-weight:900;color:var(--gold);letter-spacing:-.03em">8.1 <span style="font-size:1.2rem;color:var(--text2);font-weight:400">/ 10</span></div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;text-align:right">
-        <div style="font-size:.85rem;color:var(--green);font-weight:600">✅ Idea sólida con mercado real</div>
-        <div style="font-size:.85rem;color:var(--blue);font-weight:600">✅ Arquitectura de nivel producción</div>
-        <div style="font-size:.85rem;color:var(--yellow);font-weight:600">⚡ Riesgo principal: ejecución con equipo mínimo</div>
+      <div style="text-align:right">
+        <div style="font-size:.85rem;color:var(--green);font-weight:600;margin-bottom:4px">✅ Problem-solution fit 9/10 · Arquitectura 9/10</div>
+        <div style="font-size:.85rem;color:var(--accent2);font-weight:600;margin-bottom:4px">✅ Modelo de negocio 9/10 · Timing 9/10</div>
+        <div style="font-size:.85rem;color:var(--yellow);font-weight:600">⚡ Riesgo principal: ejecución con equipo mínimo (6/10)</div>
       </div>
     </div>
   </div>
+</div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     FINAL VERDICT
-══════════════════════════════════════════ -->
-<div class="verdict-box">
-  <h2>Veredicto Final ✅</h2>
-  <p>
-    Tableo es una <strong style="color:var(--text)">idea de negocio sólida con mercado real, problema cuantificable y arquitectura técnica de nivel producción</strong>.
-    La combinación multi-sector + trust layer anti-fraude bilateral es única en el mercado español.
-    El principal riesgo no es técnico ni de mercado: es <strong style="color:var(--text)">la velocidad de ejecución con equipo mínimo</strong>.
-    La arquitectura con AI-assisted development compensa parcialmente este riesgo — los ADRs, planes TDD y subagent-driven development
-    están diseñados precisamente para maximizar la productividad del founder.
-    <br><br>
-    <strong style="color:var(--text)">Recomendación:</strong> ejecutar. Llegar a los primeros 10 negocios de pago antes de Septiembre 2026 es el objetivo crítico. Ese milestone valida el modelo, genera los primeros €290/mes de ARR y, más importante, prueba que el trust layer reduce los no-shows en datos reales.
-  </p>
-  <div class="verdict-tags">
-    <span class="verdict-tag" style="color:var(--green)">✅ Mercado €500M TAM</span>
-    <span class="verdict-tag" style="color:var(--blue)">✅ Arquitectura 9.0/10</span>
-    <span class="verdict-tag" style="color:var(--purple)">✅ Anti-fraude único</span>
-    <span class="verdict-tag" style="color:var(--cyan)">✅ Multi-sector diferenciador</span>
-    <span class="verdict-tag" style="color:var(--yellow)">⚡ Ejecutar antes de Sep 2026</span>
-    <span class="verdict-tag" style="color:var(--gold)">★ 8.0 / 10</span>
+<!-- ══════════════════════════════════
+     VEREDICTO FINAL
+══════════════════════════════════ -->
+<section id="veredicto">
+<div class="container">
+  <div class="verdict">
+    <h2>Veredicto Final ✅</h2>
+    <p>
+      Tableo es una <strong style="color:var(--text)">idea de negocio sólida con mercado real, problema cuantificable y arquitectura técnica de nivel producción</strong>.
+      El modelo de negocio está correctamente diseñado para maximizar el número de clientes primero — Free tier que elimina la barrera de entrada, conversión automática cuando el negocio supera las 50 reservas/mes, comisión de pagos que escala de forma no lineal sin aumentar costes de infraestructura.
+      <br><br>
+      La combinación <strong style="color:var(--text)">multi-sector + trust layer anti-fraude bilateral + Spain nativo + margen del 96%</strong> no tiene equivalente en el mercado actual.
+      El mayor riesgo no es técnico ni de mercado: es la velocidad de ejecución con 2 personas. La arquitectura con Claude Code y el subagent-driven development están diseñados exactamente para maximizar esa velocidad.
+      <br><br>
+      <strong style="color:var(--text)">Objetivo crítico:</strong> 5 negocios de pago antes de Septiembre 2026. Ese milestone cubre la infraestructura, valida el viral loop y genera los primeros datos reales para activar el Grupo C.
+    </p>
+    <div class="verdict-score">✅ IDEA VIABLE — RECOMENDADO EJECUTAR</div>
+    <div class="verdict-chips">
+      <span class="chip chip-green">✅ €500M TAM · 70% sin digitalizar</span>
+      <span class="chip chip-purple">✅ Arquitectura 9.0/10</span>
+      <span class="chip chip-green">✅ 9.2× LTV/CAC · Margen 96%</span>
+      <span class="chip chip-purple">✅ Anti-fraude bilateral único</span>
+      <span class="chip chip-yellow">⚡ Break-even en 5 negocios</span>
+      <span class="chip chip-gold">★ 8.1 / 10</span>
+    </div>
   </div>
 </div>
+</section>
 
-<div class="meta">
+<footer>
   Generado el 28 de Abril de 2026 · Tableo Platform · Branch <code>feature/phase1-foundation</code><br>
-  ADRs: 001–009 · Specs: Phase 1 (15 tasks) · Grupo A (15 tasks) · Grupos B+C pendientes
-</div>
+  Alineado con: GSTACK Viabilidad · Arquitectura Visual · ADRs 001–009 · Grupos A+B+C · Phase 1-5 Roadmap
+</footer>
 
-</div>
 </body>
 </html>
