@@ -45,6 +45,13 @@ describe('normalizeDateTime', () => {
     expect(result.getUTCDate()).toBe(18)
   })
 
+  it('parsea ISO con offset explícito +HH:MM como UTC correcto', () => {
+    // 10:00+02:00 = 08:00 UTC
+    const result = normalizeDateTime('2024-06-17T10:00:00+02:00', UTC_TZ)
+    expect(result.getUTCHours()).toBe(8)
+    expect(result.getUTCDate()).toBe(17)
+  })
+
   it('lanza ParseError si el input no puede parsearse', () => {
     expect(() => normalizeDateTime('xyzzy foo bar', UTC_TZ)).toThrow(ParseError)
   })

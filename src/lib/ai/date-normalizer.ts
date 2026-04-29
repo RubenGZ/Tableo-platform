@@ -13,6 +13,8 @@ type DatetimeInput = string | { date: string; time: string }
  * @param input        Input del LLM — puede ser ISO, relativo o objeto
  * @param timezoneId   IANA timezone del negocio (para interpretar fechas locales)
  * @param referenceDate Fecha de referencia para "mañana", "el viernes", etc. (default: now)
+ * @remarks Past dates are only rejected for relative string inputs (e.g. "yesterday").
+ *          Explicit ISO datetimes are accepted as-is — past validation is the caller's responsibility.
  */
 export function normalizeDateTime(
   input: DatetimeInput,
@@ -62,7 +64,8 @@ export function normalizeDateTime(
   }
 
   if (isNaN(result.getTime())) {
-    throw new ParseError(`Invalid date produced from input: "${String(input)}"`, input)
+    const inputStr = typeof input === 'object' ? JSON.stringify(input) : String(input)
+    throw new ParseError(`Invalid date produced from input: ${inputStr}`, input)
   }
 
   // Solo rechazar pasado para inputs relativos (no para ISO explícitos).
