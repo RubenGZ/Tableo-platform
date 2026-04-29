@@ -1,0 +1,220 @@
+openapi: 3.1.0
+info:
+  title: Tableo AI Booking API
+  version: 1.0.0
+  description: |
+    API para integración con LLMs (Gemini, Claude, GPT, Siri, Google Voice).
+    Permite realizar reservas mediante lenguaje natural con manejo conversacional de errores.
+    Todas las reservas de IA se crean con status `pending_ai_confirmation` —
+    el dueño del negocio las aprueba desde el dashboard.
+
+servers:
+  - url: https://tableo.app
+    description: Producción
+  - url: http://localhost:3000
+    description: Desarrollo local
+
+security:
+  - AiTokenAuth: []
+
+paths:
+  /api/ai/book:
+    post:
+      operationId: createAiBooking
+      summary: Crear reserva desde LLM
+      description: |
+        Crea una reserva con status `pending_ai_confirmation`.
+        Si el slot no está disponible, devuelve hasta 3 alternativas.
+        Todos los errores incluyen `suggested_user_prompt` listo para que la IA lo diga al usuario.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiBookingRequest'
+            example:
+              business_slug: salon-luna
+              resource_id: 550e8400-e29b-41d4-a716-446655440000
+              datetime: "mañana a las 10 de la mañana"
+              customer:
+                name: María García
+                phone: "+34666555444"
+              service: Corte de pelo
+      responses:
+        '201':
+          description: Reserva creada (pendiente de confirmación del negocio)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiSuccessResponse'
+        '401':
+          description: Token inválido o ausente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiErrorResponse'
+              example:
+                code: ERROR_INVALID_TOKEN
+                message_for_ai: "Invalid or missing x-tableo-ai-token header."
+                suggested_user_prompt: "No tengo autorización para hacer reservas. Contacta directamente con el negocio."
+        '404':
+          description: Negocio no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiErrorResponse'
+        '409':
+          description: Slot ocupado o reserva duplicada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiErrorResponse'
+              examples:
+                capacity_full:
+                  value:
+                    code: ERROR_CAPACITY_FULL
+                    message_for_ai: "Slot 10:00 not available. 3 alternatives found."
+                    suggested_user_prompt: "Lo siento, a las 10:00 ya no hay disponibilidad. ¿Te vendría bien a las 10:30, 11:00 o las 11:30?"
+                    alternative_slots:
+                      - start_at: "2024-06-17T08:30:00Z"
+                        end_at: "2024-06-17T09:30:00Z"
+                        formatted: "10:30"
+                      - start_at: "2024-06-17T09:00:00Z"
+                        end_at: "2024-06-17T10:00:00Z"
+                        formatted: "11:00"
+                      - start_at: "2024-06-17T09:30:00Z"
+                        end_at: "2024-06-17T10:30:00Z"
+                        formatted: "11:30"
+        '422':
+          description: Datos inválidos o fecha no parseada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiErrorResponse'
+
+components:
+  securitySchemes:
+    AiTokenAuth:
+      type: apiKey
+      in: header
+      name: x-tableo-ai-token
+      description: Token secreto compartido. Variable de entorno TABLEO_AI_TOKEN.
+
+  schemas:
+    AiBookingRequest:
+      type: object
+      required: [business_slug, resource_id, datetime, customer]
+      properties:
+        business_slug:
+          type: string
+          description: Identificador URL del negocio (ej. "salon-luna")
+          example: salon-luna
+        resource_id:
+          type: string
+          format: uuid
+          description: UUID del recurso (profesional, mesa, etc.) a reservar
+        datetime:
+          oneOf:
+            - type: string
+              description: Fecha/hora en cualquier formato — ISO 8601, relativo español/inglés ('mañana a las 10', 'tomorrow at 3pm')
+            - type: object
+              description: Objeto estructurado de Siri o Google Assistant
+              required: [date, time]
+              properties:
+                date:
+                  type: string
+                  pattern: '^\d{4}-\d{2}-\d{2}$'
+                  example: "2024-06-17"
+                time:
+                  type: string
+                  example: "10:00"
+        duration_minutes:
+          type: integer
+          description: Duración en minutos (opcional — si no se envía, se usa el default del recurso)
+          example: 60
+        customer:
+          type: object
+          required: [name]
+          properties:
+            name:
+              type: string
+              description: Nombre completo del cliente
+              example: María García
+            phone:
+              type: string
+              description: Teléfono en formato E.164. Necesario para identificar al cliente.
+              example: "+34666555444"
+            email:
+              type: string
+              format: email
+              example: maria@example.com
+        service:
+          type: string
+          description: Nombre del servicio solicitado
+          example: Corte de pelo
+        notes:
+          type: string
+          description: Notas adicionales del cliente
+          example: Pelo corto, sin flequillo
+
+    AiSuccessResponse:
+      type: object
+      properties:
+        booking_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending_ai_confirmation]
+        start_at:
+          type: string
+          format: date-time
+        end_at:
+          type: string
+          format: date-time
+        message_for_ai:
+          type: string
+          description: Explicación técnica del resultado para el LLM
+        suggested_user_prompt:
+          type: string
+          description: Frase amigable lista para que el LLM diga al usuario final
+
+    AlternativeSlot:
+      type: object
+      properties:
+        start_at:
+          type: string
+          format: date-time
+        end_at:
+          type: string
+          format: date-time
+        formatted:
+          type: string
+          description: Hora formateada en la timezone del negocio (ej. "10:30")
+          example: "10:30"
+
+    AiErrorResponse:
+      type: object
+      required: [code, message_for_ai, suggested_user_prompt]
+      properties:
+        code:
+          type: string
+          enum:
+            - ERROR_CAPACITY_FULL
+            - ERROR_MISSING_DATA
+            - ERROR_INVALID_DATETIME
+            - ERROR_DUPLICATE_BOOKING
+            - ERROR_BUSINESS_NOT_FOUND
+            - ERROR_INVALID_TOKEN
+          description: Código de error estructurado para que el LLM determine la acción
+        message_for_ai:
+          type: string
+          description: Descripción técnica del error para el LLM
+        suggested_user_prompt:
+          type: string
+          description: Frase en español lista para comunicar el error al usuario final
+        alternative_slots:
+          type: array
+          description: Solo presente cuando code = ERROR_CAPACITY_FULL. Máximo 3 slots.
+          items:
+            $ref: '#/components/schemas/AlternativeSlot'

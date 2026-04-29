@@ -1,0 +1,86 @@
+{
+  "_comment": "Gemini Function Calling / OpenAI Tool Definition para Tableo booking API. Compatible con Google AI Studio, OpenAI function_calling, Anthropic tool_use y Apple Siri Shortcuts.",
+  "name": "book_appointment",
+  "description": "Crea una reserva en un negocio de Tableo (peluquería, restaurante, etc.) a través de la API. Usa esta función cuando el usuario quiera hacer, solicitar o pedir una cita o reserva. La reserva queda pendiente de confirmación por parte del negocio. Si el horario solicitado no está disponible, la respuesta incluirá hasta 3 alternativas.",
+  "parameters": {
+    "type": "object",
+    "required": ["business_slug", "resource_id", "datetime", "customer_name"],
+    "properties": {
+      "business_slug": {
+        "type": "string",
+        "description": "Identificador único del negocio en formato URL (slug). Ejemplo: 'salon-luna', 'restaurante-casa-pepe'. Extraer del contexto o preguntar al usuario si no se conoce."
+      },
+      "resource_id": {
+        "type": "string",
+        "description": "UUID del profesional, mesa u otro recurso a reservar. Si el usuario no especifica con quién quiere la cita, usar el UUID del recurso disponible más próximo al horario solicitado."
+      },
+      "datetime": {
+        "type": "string",
+        "description": "Fecha y hora de la reserva. Puede ser: (1) ISO 8601 con timezone: '2024-06-17T10:00:00Z'. (2) ISO 8601 sin timezone: '2024-06-17T10:00:00' (se interpreta como hora local del negocio). (3) Texto relativo en español: 'mañana a las 10', 'el viernes a las 3 de la tarde', 'pasado mañana por la mañana'. (4) Texto relativo en inglés: 'tomorrow at 10am', 'next friday at 3pm'. IMPORTANTE: enviar el texto tal como lo dijo el usuario si no hay ambigüedad de zona horaria."
+      },
+      "customer_name": {
+        "type": "string",
+        "description": "Nombre completo del cliente. Extraer del contexto de la conversación o preguntar si no se sabe."
+      },
+      "customer_phone": {
+        "type": "string",
+        "description": "Número de teléfono del cliente en formato E.164 (ej. '+34666555444'). Muy recomendable incluirlo para identificar clientes recurrentes. Preguntar si no se dispone de él."
+      },
+      "customer_email": {
+        "type": "string",
+        "description": "Email del cliente. Alternativa al teléfono para identificación. Incluir si está disponible."
+      },
+      "service": {
+        "type": "string",
+        "description": "Nombre del servicio solicitado (ej. 'Corte de pelo', 'Manicura', 'Mesa para 4'). Extraer de lo que dijo el usuario."
+      },
+      "notes": {
+        "type": "string",
+        "description": "Notas adicionales que el cliente quiere que sepa el negocio (ej. 'pelo corto sin flequillo', 'alergia a ciertos productos', 'cumpleaños')."
+      },
+      "duration_minutes": {
+        "type": "integer",
+        "description": "Duración del servicio en minutos. Solo incluir si el usuario especificó una duración concreta. Si no, omitir y el sistema usará el tiempo estándar del servicio."
+      }
+    }
+  },
+  "example_calls": [
+    {
+      "description": "Usuario: 'Pídeme cita en el salón luna con Laura para mañana a las 10'",
+      "call": {
+        "business_slug": "salon-luna",
+        "resource_id": "<uuid-laura>",
+        "datetime": "mañana a las 10",
+        "customer_name": "María García",
+        "customer_phone": "+34666555444"
+      }
+    },
+    {
+      "description": "Usuario: 'Reserva una mesa para 4 el viernes a las 9 de la noche'",
+      "call": {
+        "business_slug": "restaurante-casa-pepe",
+        "resource_id": "<uuid-mesa-4>",
+        "datetime": "el viernes a las 9 de la noche",
+        "customer_name": "Carlos Ruiz",
+        "customer_phone": "+34677888999",
+        "service": "Mesa para 4 personas"
+      }
+    }
+  ],
+  "error_handling": {
+    "ERROR_CAPACITY_FULL": "El slot solicitado no está disponible. Usar alternative_slots[] para ofrecer alternativas. Decir el suggested_user_prompt al usuario.",
+    "ERROR_MISSING_DATA": "Faltan datos. Preguntar al usuario los campos indicados en missing[].",
+    "ERROR_INVALID_DATETIME": "No se pudo interpretar la fecha. Pedir al usuario que la reformule.",
+    "ERROR_DUPLICATE_BOOKING": "El cliente ya tiene cita. Preguntar si quiere cambiarla.",
+    "ERROR_BUSINESS_NOT_FOUND": "Negocio no encontrado. Verificar el slug con el usuario.",
+    "ERROR_INVALID_TOKEN": "Error de configuración. No informar al usuario del token."
+  },
+  "api_config": {
+    "endpoint": "https://tableo.app/api/ai/book",
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-tableo-ai-token": "<TABLEO_AI_TOKEN>"
+    }
+  }
+}
