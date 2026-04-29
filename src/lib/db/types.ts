@@ -97,6 +97,7 @@ export interface Booking {
   start_at: string             // ISO 8601 UTC
   end_at: string               // ISO 8601 UTC
   status: BookingStatus
+  ai_source: boolean
   metadata: BookingMetadata
   reserved_until: string | null
   session_id: string | null
