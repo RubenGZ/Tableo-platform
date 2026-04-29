@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AvailabilityAdapter, Slot, LockResult } from './types'
 import type { SectorType, BookingMetadata } from '@/lib/db/types'
 import { dayBoundsUTC } from '@/lib/dates'
+import { TZDate } from '@date-fns/tz'
 import { createEvent } from '@/lib/calendar-sync'
 
 interface TimeRange {
@@ -81,7 +82,6 @@ export class BeautyAdapter implements AvailabilityAdapter {
       const [openH, openM] = window.open_time.split(':').map(Number)
       const [closeH, closeM] = window.close_time.split(':').map(Number)
 
-      const { TZDate } = await import('@date-fns/tz')
       const [year, month, day] = date.split('-').map(Number)
       const openUTC = new Date(
         new TZDate(year, month - 1, day, openH, openM, 0, timezoneId).getTime()
