@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tableo — Technical Reference</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0d0d0d;
+    --card:      #111827;
+    --border:    #1f2937;
+    --purple:    #6c63ff;
+    --purple2:   #a78bfa;
+    --green:     #10b981;
+    --yellow:    #f59e0b;
+    --red:       #ef4444;
+    --text:      #e2e8f0;
+    --muted:     #9ca3af;
+    --code-bg:   #1e1e2e;
+    --code-text: #e2e8f0;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ──────────────────────────────────────────────────────────────── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 240px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #0a0a0f;
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    z-index: 100;
+  }
+  .sidebar-logo {
+    padding: 0 20px 20px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--purple);
+    letter-spacing: -0.5px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .sidebar-logo span { color: var(--purple2); font-weight: 400; font-size: 12px; display: block; margin-top: 2px; }
+  .nav-section {
+    padding: 8px 20px 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .nav-link {
+    display: block;
+    padding: 6px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color .15s, background .15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-link:hover { color: var(--text); background: rgba(108,99,255,.08); border-left-color: var(--purple); }
+  .nav-link.active { color: var(--purple2); border-left-color: var(--purple); background: rgba(108,99,255,.1); }
+
+  .main {
+    margin-left: 240px;
+    padding: 40px 48px 80px;
+    max-width: 1100px;
+  }
+
+  /* ── Header ─────────────────────────────────────────────────────────────── */
+  .page-header {
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--purple2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .page-header p { color: var(--muted); margin-top: 8px; font-size: 15px; }
+  .badge-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .badge {
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid;
+  }
+  .badge-purple { background: rgba(108,99,255,.15); color: var(--purple2); border-color: rgba(108,99,255,.3); }
+  .badge-green  { background: rgba(16,185,129,.15);  color: var(--green);   border-color: rgba(16,185,129,.3); }
+  .badge-yellow { background: rgba(245,158,11,.15);  color: var(--yellow);  border-color: rgba(245,158,11,.3); }
+
+  /* ── Sections ────────────────────────────────────────────────────────────── */
+  .section {
+    margin-bottom: 56px;
+    scroll-margin-top: 24px;
+  }
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: rgba(108,99,255,.2);
+    color: var(--purple2);
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .subsection { margin-bottom: 32px; }
+  .subsection-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--purple2);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .subsection-title::before { content: ''; display: block; width: 3px; height: 16px; background: var(--purple); border-radius: 2px; }
+
+  /* ── Card ────────────────────────────────────────────────────────────────── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .card-sm { padding: 14px 18px; }
+
+  /* ── Architecture Diagram ─────────────────────────────────────────────────── */
+  .arch-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 24px;
+  }
+  .arch-layer {
+    width: 100%;
+    max-width: 680px;
+    border-radius: 8px;
+    padding: 14px 20px;
+    border: 1px solid;
+    text-align: center;
+  }
+  .arch-layer-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .arch-layer-content { font-size: 13px; color: var(--muted); }
+  .arch-layer-content code { color: var(--purple2); font-family: monospace; }
+  .arch-layer.layer-app   { border-color: rgba(108,99,255,.5); background: rgba(108,99,255,.07); }
+  .arch-layer.layer-app .arch-layer-label { color: var(--purple2); }
+  .arch-layer.layer-mod   { border-color: rgba(167,139,250,.4); background: rgba(167,139,250,.06); }
+  .arch-layer.layer-mod .arch-layer-label { color: #c4b5fd; }
+  .arch-layer.layer-db    { border-color: rgba(16,185,129,.4);  background: rgba(16,185,129,.06); }
+  .arch-layer.layer-db .arch-layer-label { color: var(--green); }
+  .arch-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 680px;
+    height: 28px;
+    color: var(--muted);
+    font-size: 18px;
+  }
+
+  /* ── Tables ──────────────────────────────────────────────────────────────── */
+  .table-wrap { overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: rgba(108,99,255,.1); }
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+    color: var(--purple2);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(31,41,55,.7);
+    vertical-align: top;
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(108,99,255,.04); }
+  .table-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+
+  /* ── Code ─────────────────────────────────────────────────────────────────── */
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", "Consolas", monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+  code {
+    font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", "Consolas", monospace;
+    font-size: 12px;
+    background: rgba(108,99,255,.12);
+    color: var(--purple2);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; border-radius: 0; }
+
+  /* syntax highlights — minimal hand-coded */
+  .kw  { color: #c792ea; }
+  .str { color: #c3e88d; }
+  .cmt { color: #546e7a; font-style: italic; }
+  .fn  { color: #82aaff; }
+  .typ { color: #ffcb6b; }
+  .num { color: #f78c6c; }
+  .op  { color: #89ddff; }
+  .ok  { color: var(--green); font-weight: 600; }
+  .err { color: var(--red); font-weight: 600; }
+
+  /* ── Status pills ─────────────────────────────────────────────────────────── */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .pill-green  { background: rgba(16,185,129,.15);  color: var(--green);  border: 1px solid rgba(16,185,129,.3); }
+  .pill-yellow { background: rgba(245,158,11,.15);  color: var(--yellow); border: 1px solid rgba(245,158,11,.3); }
+  .pill-purple { background: rgba(108,99,255,.15);  color: var(--purple2);border: 1px solid rgba(108,99,255,.3); }
+  .pill-red    { background: rgba(239,68,68,.15);   color: #fca5a5;       border: 1px solid rgba(239,68,68,.3); }
+  .pill-muted  { background: rgba(156,163,175,.1);  color: var(--muted);  border: 1px solid rgba(156,163,175,.2); }
+
+  /* ── Two-phase flow diagram ──────────────────────────────────────────────── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    max-width: 560px;
+  }
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .flow-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .flow-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--purple);
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .flow-line {
+    width: 2px;
+    flex: 1;
+    min-height: 28px;
+    background: linear-gradient(to bottom, var(--purple), transparent);
+    margin: 2px 0;
+  }
+  .flow-content { padding-bottom: 20px; }
+  .flow-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .flow-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .flow-alt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .flow-branch {
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 8px;
+    background: rgba(31,41,55,.4);
+  }
+
+  /* ── Warning / note box ───────────────────────────────────────────────────── */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    border-left: 3px solid;
+    font-size: 13px;
+  }
+  .callout-purple { border-color: var(--purple); background: rgba(108,99,255,.08); }
+  .callout-yellow { border-color: var(--yellow); background: rgba(245,158,11,.08); }
+  .callout-green  { border-color: var(--green);  background: rgba(16,185,129,.08); }
+  .callout-red    { border-color: var(--red);    background: rgba(239,68,68,.08); }
+  .callout-title  { font-weight: 700; margin-bottom: 4px; }
+
+  /* ── Misc ─────────────────────────────────────────────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+  .tag-required { color: var(--green); font-weight: 700; }
+  .tag-optional { color: var(--yellow); font-weight: 700; }
+  .mono { font-family: monospace; font-size: 12px; }
+  .text-muted { color: var(--muted); }
+  .text-green  { color: var(--green); }
+  .text-yellow { color: var(--yellow); }
+  .text-purple { color: var(--purple2); }
+  hr.sep { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">Tableo<span>Technical Reference · 2026-04-29</span></div>
+
+  <div class="nav-section">Overview</div>
+  <a class="nav-link" href="#arquitectura">1. Arquitectura General</a>
+  <a class="nav-link" href="#schema">2. Schema de Base de Datos</a>
+  <a class="nav-link" href="#pg-functions">3. Funciones PostgreSQL</a>
+  <a class="nav-link" href="#types">4. Tipos TypeScript</a>
+
+  <div class="nav-section">Fases</div>
+  <a class="nav-link" href="#phase1">5. Phase 1 — Foundation</a>
+  <a class="nav-link" href="#group-a">6. Group A — Trust Layer</a>
+  <a class="nav-link" href="#phase2">7. Phase 2 — Disponibilidad</a>
+
+  <div class="nav-section">Referencia</div>
+  <a class="nav-link" href="#patrones">8. Patrones Críticos</a>
+  <a class="nav-link" href="#env">9. Variables de Entorno</a>
+  <a class="nav-link" href="#estado">10. Estado del Proyecto</a>
+</nav>
+
+<!-- ═══════════════════════════════ MAIN ══════════════════════════════════ -->
+<main class="main">
+
+  <!-- ── HEADER ──────────────────────────────────────────────────────────── -->
+  <header class="page-header">
+    <h1>Tableo — Technical Reference</h1>
+    <p>Referencia técnica completa del proyecto. Fases 1-2 + Group A (Trust Layer). Generado el 2026-04-29.</p>
+    <div class="badge-row">
+      <span class="badge badge-purple">Next.js 15</span>
+      <span class="badge badge-purple">TypeScript strict</span>
+      <span class="badge badge-purple">Supabase JS v2</span>
+      <span class="badge badge-green">67 tests passing</span>
+      <span class="badge badge-yellow">Phase 3 — Pendiente</span>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SECTION 1 — ARQUITECTURA GENERAL
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="arquitectura">
+    <h2 class="section-title"><span class="section-num">1</span>Arquitectura General</h2>
+
+    <div class="arch-diagram">
+      <div class="arch-layer layer-app">
+        <div class="arch-layer-label">Next.js 15 App Router</div>
+        <div class="arch-layer-content">
+          <code>(dashboard)</code> &nbsp;|&nbsp; <code>(booking/[slug])</code> &nbsp;|&nbsp; <code>api/webhooks</code>
+        </div>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer layer-mod">
+        <div class="arch-layer-label">Modules Layer</div>
+        <div class="arch-layer-content">
+          <code>availability/</code> &nbsp;|&nbsp; <code>notifications/</code> &nbsp;|&nbsp; <code>presence/</code> &nbsp;|&nbsp; <code>refunds/</code>
+        </div>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer layer-db">
+        <div class="arch-layer-label">Supabase / PostgreSQL</div>
+        <div class="arch-layer-content">
+          <code>RLS</code> &nbsp;+&nbsp; <code>pg_cron</code> &nbsp;+&nbsp; <code>PG Functions</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Stack tecnológico</div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Herramienta</th><th>Versión</th><th>Rol</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">pnpm</td><td>9</td><td>Package manager</td></tr>
+              <tr><td class="mono">Next.js</td><td>15</td><td>App framework (App Router, RSC)</td></tr>
+              <tr><td class="mono">TypeScript</td><td>strict</td><td>Tipos end-to-end</td></tr>
+              <tr><td class="mono">@supabase/ssr + supabase-js</td><td>v2</td><td>Auth, DB, RLS, Storage</td></tr>
+              <tr><td class="mono">Vitest</td><td>2</td><td>Unit testing</td></tr>
+              <tr><td class="mono">@date-fns/tz</td><td>—</td><td>Timezone-aware dates (TZDate)</td></tr>
+              <tr><td class="mono">Tailwind CSS</td><td>v3</td><td>Utility-first styles</td></tr>
+              <tr><td class="mono">shadcn/ui</td><td>—</td><td>Component primitives</td></tr>
+              <tr><td class="mono">Resend</td><td>—</td><td>Email transaccional</td></tr>
+              <tr><td class="mono">web-push</td><td>—</td><td>Push notifications PWA</td></tr>
+              <tr><td class="mono">Twilio</td><td>—</td><td>SMS</td></tr>
+              <tr><td class="mono">@whiskeysockets/baileys</td><td>—</td><td>WhatsApp (1h reminder)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SECTION 2 — SCHEMA DE BASE DE DATOS
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="schema">
+    <h2 class="section-title"><span class="section-num">2</span>Schema de Base de Datos</h2>
+
+    <div class="callout callout-purple">
+      <div class="callout-title">ADR-003 · ADR-005</div>
+      Schema unificado sector-agnostic. Todas las tablas tienen RLS habilitado. Sin excepciones. Las fechas se almacenan siempre en UTC (<code>timestamptz</code>).
+    </div>
+
+    <!-- businesses -->
+    <div class="subsection">
+      <div class="subsection-title">businesses</div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Columna</th><th>Tipo</th><th>Restricción</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">id</td><td class="mono">uuid</td><td>PK · DEFAULT gen_random_uuid()</td></tr>
+              <tr><td class="mono">name</td><td class="mono">text</td><td>NOT NULL</td></tr>
+              <tr><td class="mono">slug</td><td class="mono">text</td><td>UNIQUE · NOT NULL</td></tr>
+              <tr><td class="mono">sector_type</td><td class="mono">text</td><td>CHECK IN ('beauty','restaurant','real_estate')</td></tr>
+              <tr><td class="mono">timezone_id</td><td class="mono">text</td><td>NOT NULL · DEFAULT 'Europe/Madrid'</td></tr>
+              <tr><td class="mono">config</td><td class="mono">jsonb</td><td>NOT NULL · DEFAULT '{}'</td></tr>
+              <tr><td class="mono">owner_id</td><td class="mono">uuid</td><td>FK → auth.users ON DELETE CASCADE</td></tr>
+              <tr><td class="mono">created_at</td><td class="mono">timestamptz</td><td>DEFAULT now()</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- resources -->
+    <div class="subsection">
+      <div class="subsection-title">resources</div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Columna</th><th>Tipo</th><th>Restricción</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">id</td><td class="mono">uuid</td><td>PK</td></tr>
+              <tr><td class="mono">business_id</td><td class="mono">uuid</td><td>FK → businesses ON DELETE CASCADE</td></tr>
+              <tr><td class="mono">resource_type</td><td class="mono">text</td><td>CHECK IN ('staff','table','asset')</td></tr>
+              <tr><td class="mono">name</td><td class="mono">text</td><td>NOT NULL</td></tr>
+              <tr><td class="mono">active</td><td class="mono">boolean</td><td>DEFAULT true</td></tr>
+              <tr><td class="mono">metadata</td><td class="mono">jsonb</td><td>NOT NULL · DEFAULT '{}' · contiene duration_default (beauty)</td></tr>
+              <tr><td class="mono">created_at</td><td class="mono">timestamptz</td><td>DEFAULT now()</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- availability_windows -->
+    <div class="subsection">
+      <div class="subsection-title">availability_windows</div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Columna</th><th>Tipo</th><th>Restricción</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">id</td><td class="mono">uuid</td><td>PK</td></tr>
+              <tr><td class="mono">resource_id</td><td class="mono">uuid</td><td>FK → resources ON DELETE CASCADE</td></tr>
+              <tr><td class="mono">day_of_week</td><td class="mono">smallint</td><td>CHECK BETWEEN 0 AND 6 · <strong>0=Lunes, 6=Domingo</strong></td></tr>
+              <tr><td class="mono">open_time</td><td class="mono">time</td><td>NOT NULL</td></tr>
+              <tr><td class="mono">close_time</td><td class="mono">time</td><td>NOT NULL · CHECK open_time &lt; close_time</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- blocking_rules -->
+    <div class="subsection">
+      <div class="subsection-title">blocking_rules</div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Columna</th><th>Tipo</th><th>Restricción</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">id</td><td class="mono">uuid</td><td>PK</td></tr>
+              <tr><td class="mono">resource_id</td><td class="mono">uuid</td><td>FK → resources ON DELETE CASCADE</td></tr>
+              <tr><td class="mono">start_at</td><td class="mono">timestamptz</td><td>NOT NULL · CHECK start_at &lt; end_at</td></tr>
+              <tr><td class="mono">end_at</td><td class="mono">timestamptz</td><td>NOT NULL</td></tr>
+              <tr><td class="mono">reason</td><td class="mono">text</td><td>nullable</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- customers -->
+    <div class="subsection">
+      <div class="subsection-title">customers</div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Columna</th><th>Tipo</th><th>Restricción</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">id</td><td class="mono">uuid</td><td>PK</td></tr>
+              <tr><td class="mono">business_id</td><td class="mono">uuid</td><td>FK → businesses ON DELETE CASCADE</td></tr>
+              <tr><td class="mono">name</td><td class="mono">text</td><td>NOT NULL</td></tr>
+              <tr><td class="mono">phone</td><td class="mono">text</td><td>nullable · UNIQUE (business_id, phone)</td></tr>
+              <tr><td class="mono">email</td><td class="mono">text</td><td>nullable</td></tr>
+              <tr><td class="mono">notes</td><td class="mono">text</td><td>nullable</td></tr>
+              <tr><td class="mono">metadata</td><td class="mono">jsonb</td><td>NOT NULL · DEFAULT '{}'</td></tr>
+              <tr><td class="mono">created_at</td><td class="mono">timestamptz</td><td>DEFAULT now()</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- bookings -->
+    <div class="subsection">
+      <div class="subsection-title">bookings <span style="font-size:11px; color: var(--muted); font-weight:400;">(incluye columnas de migraciones 005 y 006)</span></div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Columna</th><th>Tipo</th><th>Restricción / Nota</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">id</td><td class="mono">uuid</td><td>PK</td></tr>
+              <tr><td class="mono">resource_id</td><td class="mono">uuid</td><td>FK → resources</td></tr>
+              <tr><td class="mono">customer_id</td><td class="mono">uuid</td><td>FK → customers · <strong>nullable</strong> desde migración 006 (asignado en confirmBooking)</td></tr>
+              <tr><td class="mono">start_at</td><td class="mono">timestamptz</td><td>NOT NULL · UTC</td></tr>
+              <tr><td class="mono">end_at</td><td class="mono">timestamptz</td><td>NOT NULL · UTC</td></tr>
+              <tr><td class="mono">status</td><td class="mono">text</td><td>CHECK IN ('pending','reserved','confirmed','cancelled','completed','no_show','disputed')</td></tr>
+              <tr><td class="mono">metadata</td><td class="mono">jsonb</td><td>NOT NULL · DEFAULT '{}'</td></tr>
+              <tr><td class="mono">reserved_until</td><td class="mono">timestamptz</td><td>nullable · TTL de reserva temporal</td></tr>
+              <tr><td class="mono">session_id</td><td class="mono">text</td><td>nullable · identifica sesión de booking</td></tr>
+              <tr><td class="mono">notification_sent_1h</td><td class="mono">boolean</td><td>DEFAULT false · migración 005</td></tr>
+              <tr><td class="mono">created_at</td><td class="mono">timestamptz</td><td>DEFAULT now()</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="callout callout-yellow">
+        <div class="callout-title">Constraint migración 006</div>
+        <code>bookings_customer_required</code>: <code>status NOT IN ('confirmed','completed') OR customer_id IS NOT NULL</code><br>
+        Garantiza que los estados finales siempre tengan cliente asignado.
+      </div>
+    </div>
+
+    <!-- extra tables migration 005 -->
+    <div class="subsection">
+      <div class="subsection-title">Tablas extra (migración 005)</div>
+      <div class="card-grid">
+        <div class="card card-sm">
+          <div style="color:var(--purple2); font-weight:600; margin-bottom:6px; font-size:13px;">notification_log</div>
+          <div class="text-muted" style="font-size:12px;">Registro de notificaciones enviadas. booking_id, channel, template, sent_at, success.</div>
+        </div>
+        <div class="card card-sm">
+          <div style="color:var(--purple2); font-weight:600; margin-bottom:6px; font-size:13px;">presence_codes</div>
+          <div class="text-muted" style="font-size:12px;">Código activo por negocio. business_id (UNIQUE), code, expires_at. UPSERT cada 5min.</div>
+        </div>
+        <div class="card card-sm">
+          <div style="color:var(--purple2); font-weight:600; margin-bottom:6px; font-size:13px;">presence_checks</div>
+          <div class="text-muted" style="font-size:12px;">Intentos de verificación. booking_id, code_used, valid, lat, lng, checked_at.</div>
+        </div>
+        <div class="card card-sm">
+          <div style="color:var(--purple2); font-weight:600; margin-bottom:6px; font-size:13px;">disputes</div>
+          <div class="text-muted" style="font-size:12px;">Disputas abiertas. booking_id, reason, status ('open'/'resolved'), evidence (jsonb).</div>
+        </div>
+        <div class="card card-sm">
+          <div style="color:var(--purple2); font-weight:600; margin-bottom:6px; font-size:13px;">audit_logs</div>
+          <div class="text-muted" style="font-size:12px;">Trazabilidad de acciones. entity_type, entity_id, action, actor_type, metadata (jsonb).</div>
+        </div>
+        <div class="card card-sm">
+          <div style="color:var(--purple2); font-weight:600; margin-bottom:6px; font-size:13px;">refund_transactions</div>
+          <div class="text-muted" style="font-size:12px;">Registro de devoluciones. booking_id, type, percentage, executed_at, stripe_refund_id.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- indexes -->
+    <div class="subsection">
+      <div class="subsection-title">Índices críticos</div>
+      <pre><code><span class="cmt">-- Búsquedas de disponibilidad por recurso+tiempo (excluye canceladas)</span>
+<span class="kw">CREATE INDEX</span> idx_bookings_resource_time
+  <span class="kw">ON</span> bookings (resource_id, start_at, end_at)
+  <span class="kw">WHERE</span> status <span class="kw">NOT IN</span> (<span class="str">'cancelled'</span>);
+
+<span class="cmt">-- pg_cron: limpieza de reservas expiradas</span>
+<span class="kw">CREATE INDEX</span> idx_bookings_status_reserved
+  <span class="kw">ON</span> bookings (reserved_until)
+  <span class="kw">WHERE</span> status = <span class="str">'reserved'</span>;
+
+<span class="cmt">-- Lookup de ventanas por recurso+día</span>
+<span class="kw">CREATE INDEX</span> idx_availability_resource
+  <span class="kw">ON</span> availability_windows (resource_id, day_of_week);
+
+<span class="cmt">-- Bloqueos por recurso+tiempo</span>
+<span class="kw">CREATE INDEX</span> idx_blocking_resource_time
+  <span class="kw">ON</span> blocking_rules (resource_id, start_at, end_at);</code></pre>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SECTION 3 — FUNCIONES POSTGRESQL
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="pg-functions">
+    <h2 class="section-title"><span class="section-num">3</span>Funciones PostgreSQL</h2>
+
+    <div class="table-card" style="margin-bottom:24px;">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Función</th><th>Firma</th><th>Retorna</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="mono text-purple">reserve_slot</td>
+              <td class="mono" style="font-size:11px;">(slot_id uuid, session_id text, ttl_minutes int)</td>
+              <td class="mono">jsonb</td>
+              <td>SELECT FOR UPDATE NOWAIT sobre fila 'available' existente; actualiza a 'reserved' con TTL.</td>
+            </tr>
+            <tr>
+              <td class="mono text-purple">confirm_booking</td>
+              <td class="mono" style="font-size:11px;">(session_id text)</td>
+              <td class="mono">jsonb</td>
+              <td>Actualiza 'reserved' → 'confirmed'; limpia session_id y reserved_until.</td>
+            </tr>
+            <tr>
+              <td class="mono text-purple">release_slot</td>
+              <td class="mono" style="font-size:11px;">(session_id text)</td>
+              <td class="mono">void</td>
+              <td>Revierte 'reserved' → elimina la fila de booking (slot vuelve a estar disponible).</td>
+            </tr>
+            <tr>
+              <td class="mono text-purple">claim_slot</td>
+              <td class="mono" style="font-size:11px;">(p_resource_id uuid, p_start_at timestamptz, p_end_at timestamptz, p_session_id text, p_ttl_minutes int DEFAULT 5)</td>
+              <td class="mono">jsonb</td>
+              <td>Check atómico de conflicto + INSERT 'reserved'. Para generación dinámica de slots (Phase 2). Retorna {success, booking_id, reserved_until}.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">claim_slot — implementación completa (migración 006)</div>
+      <pre><code><span class="kw">CREATE OR REPLACE FUNCTION</span> <span class="fn">claim_slot</span>(
+  p_resource_id  <span class="typ">uuid</span>,
+  p_start_at     <span class="typ">timestamptz</span>,
+  p_end_at       <span class="typ">timestamptz</span>,
+  p_session_id   <span class="typ">text</span>,
+  p_ttl_minutes  <span class="typ">int</span> <span class="kw">DEFAULT</span> <span class="num">5</span>
+)
+<span class="kw">RETURNS</span> <span class="typ">jsonb</span>
+<span class="kw">LANGUAGE</span> plpgsql <span class="kw">SECURITY DEFINER</span>
+<span class="kw">AS</span> $$
+<span class="kw">DECLARE</span>
+  v_id <span class="typ">uuid</span>;
+<span class="kw">BEGIN</span>
+  <span class="cmt">-- Conflict check (overlap formula: a.start &lt; b.end AND a.end &gt; b.start)</span>
+  <span class="kw">IF EXISTS</span> (
+    <span class="kw">SELECT</span> <span class="num">1</span> <span class="kw">FROM</span> bookings
+    <span class="kw">WHERE</span> resource_id = p_resource_id
+      <span class="kw">AND</span> status <span class="kw">IN</span> (<span class="str">'reserved'</span>, <span class="str">'confirmed'</span>)
+      <span class="kw">AND</span> start_at &lt; p_end_at
+      <span class="kw">AND</span> end_at   &gt; p_start_at
+  ) <span class="kw">THEN</span>
+    <span class="kw">RETURN</span> jsonb_build_object(<span class="str">'success'</span>, <span class="kw">false</span>, <span class="str">'reason'</span>, <span class="str">'not_available'</span>);
+  <span class="kw">END IF</span>;
+
+  <span class="kw">INSERT INTO</span> bookings (resource_id, start_at, end_at, status, reserved_until, session_id, metadata)
+  <span class="kw">VALUES</span> (p_resource_id, p_start_at, p_end_at, <span class="str">'reserved'</span>,
+          NOW() + (p_ttl_minutes || <span class="str">' minutes'</span>)::<span class="typ">interval</span>,
+          p_session_id, <span class="str">'{}'</span>::<span class="typ">jsonb</span>)
+  <span class="kw">RETURNING</span> id <span class="kw">INTO</span> v_id;
+
+  <span class="kw">RETURN</span> jsonb_build_object(
+    <span class="str">'success'</span>,        <span class="kw">true</span>,
+    <span class="str">'booking_id'</span>,     v_id,
+    <span class="str">'reserved_until'</span>, NOW() + (p_ttl_minutes || <span class="str">' minutes'</span>)::<span class="typ">interval</span>
+  );
+
+<span class="kw">EXCEPTION</span>
+  <span class="kw">WHEN</span> unique_violation <span class="kw">THEN</span>
+    <span class="kw">RETURN</span> jsonb_build_object(<span class="str">'success'</span>, <span class="kw">false</span>, <span class="str">'reason'</span>, <span class="str">'concurrent_lock'</span>);
+<span class="kw">END</span>;
+$$;</code></pre>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SECTION 4 — TIPOS TYPESCRIPT
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="types">
+    <h2 class="section-title"><span class="section-num">4</span>Tipos TypeScript Core <span style="font-size:13px; color:var(--muted); font-weight:400;">src/lib/db/types.ts</span></h2>
+
+    <div class="callout callout-purple">
+      <div class="callout-title">ADR-003</div>
+      Tipos que reflejan el schema de Supabase. Se actualizarán a tipos generados por <code>supabase gen types</code> en un paso posterior.
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="subsection-title">Enums / Union Types</div>
+        <pre><code><span class="kw">type</span> <span class="typ">SectorType</span> =
+  | <span class="str">'beauty'</span>
+  | <span class="str">'restaurant'</span>
+  | <span class="str">'real_estate'</span>
+
+<span class="kw">type</span> <span class="typ">ResourceType</span> =
+  | <span class="str">'staff'</span>
+  | <span class="str">'table'</span>
+  | <span class="str">'asset'</span>
+
+<span class="kw">type</span> <span class="typ">BookingStatus</span> =
+  | <span class="str">'pending'</span>
+  | <span class="str">'reserved'</span>
+  | <span class="str">'confirmed'</span>
+  | <span class="str">'cancelled'</span>
+  | <span class="str">'completed'</span>
+  | <span class="str">'no_show'</span>
+  | <span class="str">'disputed'</span>   <span class="cmt">// añadido en Group A</span></code></pre>
+      </div>
+      <div>
+        <div class="subsection-title">Config interfaces</div>
+        <pre><code><span class="kw">interface</span> <span class="typ">BusinessBranding</span> {
+  logo_url<span class="op">?</span>:    <span class="typ">string</span>
+  accent_color<span class="op">?</span>: <span class="typ">string</span>  <span class="cmt">// "#e91e8c"</span>
+  accent_dark<span class="op">?</span>:  <span class="typ">string</span>  <span class="cmt">// "#c2185b"</span>
+  cover_url<span class="op">?</span>:    <span class="typ">string</span>
+}
+
+<span class="kw">interface</span> <span class="typ">BusinessBookingConfig</span> {
+  min_advance_hours<span class="op">?</span>:  <span class="typ">number</span>  <span class="cmt">// def: 2</span>
+  max_advance_days<span class="op">?</span>:   <span class="typ">number</span>  <span class="cmt">// def: 30</span>
+  cancellation_hours<span class="op">?</span>: <span class="typ">number</span>  <span class="cmt">// def: 24</span>
+  buffer_minutes<span class="op">?</span>:     <span class="typ">number</span>  <span class="cmt">// def: 0</span>
+}
+
+<span class="kw">interface</span> <span class="typ">BusinessConfig</span> {
+  branding<span class="op">?</span>: <span class="typ">BusinessBranding</span>
+  booking<span class="op">?</span>:  <span class="typ">BusinessBookingConfig</span>
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="subsection-title">Entidades principales</div>
+    <div class="two-col">
+      <div>
+        <pre><code><span class="kw">interface</span> <span class="typ">Business</span> {
+  id:          <span class="typ">string</span>
+  name:        <span class="typ">string</span>
+  slug:        <span class="typ">string</span>
+  sector_type: <span class="typ">SectorType</span>
+  timezone_id: <span class="typ">string</span>   <span class="cmt">// "Europe/Madrid"</span>
+  config:      <span class="typ">BusinessConfig</span>
+  owner_id:    <span class="typ">string</span>
+  created_at:  <span class="typ">string</span>
+}
+
+<span class="kw">interface</span> <span class="typ">Resource</span> {
+  id:            <span class="typ">string</span>
+  business_id:   <span class="typ">string</span>
+  resource_type: <span class="typ">ResourceType</span>
+  name:          <span class="typ">string</span>
+  active:        <span class="typ">boolean</span>
+  metadata:      <span class="typ">ResourceMetadata</span>
+  created_at:    <span class="typ">string</span>
+}
+
+<span class="kw">interface</span> <span class="typ">Customer</span> {
+  id:          <span class="typ">string</span>
+  business_id: <span class="typ">string</span>
+  name:        <span class="typ">string</span>
+  phone:       <span class="typ">string</span> | <span class="kw">null</span>
+  email:       <span class="typ">string</span> | <span class="kw">null</span>
+  notes:       <span class="typ">string</span> | <span class="kw">null</span>
+  metadata:    <span class="typ">Record</span>&lt;<span class="typ">string</span>, <span class="typ">unknown</span>&gt;
+  created_at:  <span class="typ">string</span>
+}</code></pre>
+      </div>
+      <div>
+        <pre><code><span class="kw">interface</span> <span class="typ">Booking</span> {
+  id:             <span class="typ">string</span>
+  resource_id:    <span class="typ">string</span>
+  customer_id:    <span class="typ">string</span>    <span class="cmt">// nullable en DB</span>
+  start_at:       <span class="typ">string</span>    <span class="cmt">// ISO 8601 UTC</span>
+  end_at:         <span class="typ">string</span>    <span class="cmt">// ISO 8601 UTC</span>
+  status:         <span class="typ">BookingStatus</span>
+  metadata:       <span class="typ">BookingMetadata</span>
+  reserved_until: <span class="typ">string</span> | <span class="kw">null</span>
+  session_id:     <span class="typ">string</span> | <span class="kw">null</span>
+  created_at:     <span class="typ">string</span>
+}
+
+<span class="kw">interface</span> <span class="typ">AvailabilityWindow</span> {
+  id:          <span class="typ">string</span>
+  resource_id: <span class="typ">string</span>
+  day_of_week: <span class="num">0</span>|<span class="num">1</span>|<span class="num">2</span>|<span class="num">3</span>|<span class="num">4</span>|<span class="num">5</span>|<span class="num">6</span>   <span class="cmt">// 0=Lunes</span>
+  open_time:   <span class="typ">string</span>   <span class="cmt">// "HH:MM:SS"</span>
+  close_time:  <span class="typ">string</span>   <span class="cmt">// "HH:MM:SS"</span>
+}
+
+<span class="kw">interface</span> <span class="typ">BlockingRule</span> {
+  id:          <span class="typ">string</span>
+  resource_id: <span class="typ">string</span>
+  start_at:    <span class="typ">string</span>         <span class="cmt">// ISO 8601 UTC</span>
+  end_at:      <span class="typ">string</span>         <span class="cmt">// ISO 8601 UTC</span>
+  reason:      <span class="typ">string</span> | <span class="kw">null</span>
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SECTION 5 — PHASE 1 FOUNDATION
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="phase1">
+    <h2 class="section-title"><span class="section-num">5</span>Phase 1 — Foundation <span class="pill pill-green" style="margin-left:8px;">✓ Completo · 49 tests</span></h2>
+
+    <div class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Archivo</th><th>Propósito</th><th>Exports principales</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">src/lib/supabase/client.ts</td>
+              <td>Browser Supabase client (<code>@supabase/ssr</code>)</td>
+              <td class="mono text-purple">createBrowserClient()</td>
+            </tr>
+            <tr>
+              <td class="mono">src/lib/supabase/server.ts</td>
+              <td>Server Supabase client async — gestiona cookies SSR</td>
+              <td class="mono text-purple">createServerClient()</td>
+            </tr>
+            <tr>
+              <td class="mono">src/middleware.ts</td>
+              <td>Session refresh + auth guard: redirige /dashboard → /login si no hay usuario</td>
+              <td class="text-muted">—</td>
+            </tr>
+            <tr>
+              <td class="mono">src/lib/auth/google-scopes.ts</td>
+              <td>Constante de OAuth scopes para Google Calendar (Phase 5)</td>
+              <td class="mono text-purple">GOOGLE_SCOPES</td>
+            </tr>
+            <tr>
+              <td class="mono">src/lib/dates.ts</td>
+              <td>Utilidades timezone con TZDate. Solo para capa de presentación.</td>
+              <td class="mono text-purple">toBusinessLocal() · formatSlotTime() · dayBoundsUTC()</td>
+            </tr>
+            <tr>
+              <td class="mono">src/lib/calendar-sync.ts</td>
+              <td>Stub Google Calendar. Phase 5 implementa la llamada real.</td>
+              <td class="mono text-purple">createEvent() · deleteEvent()</td>
+            </tr>
+            <tr>
+              <td class="mono">src/app/(dashboard)/layout.tsx</td>
+              <td>Auth guard — redirige a /login si no hay sesión activa</td>
+              <td class="text-muted">—</td>
+            </tr>
+            <tr>
+              <td class="mono">src/app/(booking)/[slug]/layout.tsx</td>
+              <td>Inyecta CSS vars de branding (<code>--accent-color</code>, etc.) desde business.config.branding</td>
+              <td class="text-muted">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">src/lib/dates.ts — funciones clave</div>
+      <pre><code><span class="cmt">// Usa TZDate parts-constructor (ver sección 8 para el ADR)</span>
+
+<span class="kw">function</span> <span class="fn">toBusinessLocal</span>(utcDate: <span class="typ">Date</span>, timezoneId: <span class="typ">string</span>): <span class="typ">string</span>
+  <span class="cmt">// Formatea fecha UTC a string legible en la zona horaria del negocio (es-ES)</span>
+
+<span class="kw">function</span> <span class="fn">formatSlotTime</span>(utcDate: <span class="typ">Date</span>, timezoneId: <span class="typ">string</span>): <span class="typ">string</span>
+  <span class="cmt">// Devuelve "HH:mm" en la zona horaria local</span>
+
+<span class="kw">function</span> <span class="fn">dayBoundsUTC</span>(date: <span class="typ">string</span>, timezoneId: <span class="typ">string</span>):
+  <span class="op">{</span> startOfDay: <span class="typ">Date</span>; endOfDay: <span class="typ">Date</span> <span class="op">}</span>
+  <span class="cmt">// 00:00:00 local → UTC y 23:59:59 local → UTC</span>
+  <span class="cmt">// Usa TZDate(year, month-1, day, hour, min, sec, timezoneId)</span></code></pre>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">src/middleware.ts — matcher config</div>
+      <pre><code><span class="kw">export const</span> config = {
+  matcher: [
+    <span class="str">'/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'</span>,
+  ],
+}
+<span class="cmt">// El middleware refresca la sesión en CADA request no-estático.
+// NO eliminar el `await supabase.auth.getUser()` — es necesario para SSR.</span></code></pre>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SECTION 6 — GROUP A — TRUST LAYER
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="group-a">
+    <h2 class="section-title"><span class="section-num">6</span>Group A — Trust Layer <span class="pill pill-green" style="margin-left:8px;">✓ Completo · 29 tests</span></h2>
+
+    <!-- ── 6a Notificaciones ──────────────────────────────────────────── -->
+    <div class="subsection" id="notificaciones">
+      <div class="subsection-title">6a — Notificaciones</div>
+
+      <pre><code><span class="cmt">// src/modules/notifications/types.ts</span>
+
+<span class="kw">interface</span> <span class="typ">NotificationPayload</span> {
+  to:          <span class="typ">string</span>   <span class="cmt">// email, E.164 phone, o JSON de push subscription</span>
+  bookingId:   <span class="typ">string</span>
+  templateKey: <span class="typ">NotificationTemplate</span>
+  variables:   <span class="typ">Record</span>&lt;<span class="typ">string</span>, <span class="typ">string</span>&gt;
+}
+
+<span class="kw">interface</span> <span class="typ">NotificationProvider</span> {
+  <span class="kw">readonly</span> channel: <span class="typ">NotificationChannel</span>
+  send(payload: <span class="typ">NotificationPayload</span>): <span class="typ">Promise</span>&lt;<span class="typ">NotificationResult</span>&gt;
+  isAvailable(): <span class="typ">boolean</span>
+}
+
+<span class="kw">type</span> <span class="typ">NotificationTemplate</span> =
+  | <span class="str">'booking_confirmed'</span>   | <span class="str">'booking_reminder_1h'</span>
+  | <span class="str">'booking_cancelled'</span>   | <span class="str">'booking_reminder_24h'</span>
+  | <span class="str">'dispute_opened'</span>      | <span class="str">'refund_processed'</span></code></pre>
+
+      <div class="subsection-title" style="margin-top:16px;">Routing de providers</div>
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Condición del campo <code>to</code></th><th>Template</th><th>Provider</th></tr></thead>
+            <tbody>
+              <tr><td>Contiene <code>@</code> (no es push)</td><td>cualquiera</td><td><span class="pill pill-purple">EmailProvider (Resend)</span></td></tr>
+              <tr><td>JSON válido con campo <code>endpoint</code></td><td>cualquiera</td><td><span class="pill pill-purple">PwaProvider (web-push)</span></td></tr>
+              <tr><td>Empieza con <code>+</code></td><td><code>booking_reminder_1h</code></td><td><span class="pill pill-green">WhatsAppBaileysProvider</span></td></tr>
+              <tr><td>Empieza con <code>+</code></td><td>cualquier otro</td><td><span class="pill pill-yellow">SmsProvider (Twilio)</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection-title" style="margin-top:16px;">Funciones exportadas</div>
+      <pre><code><span class="cmt">// src/modules/notifications/factory.ts</span>
+
+<span class="cmt">// Selecciona 1+ providers según el payload y ejecuta en paralelo</span>
+<span class="kw">async function</span> <span class="fn">sendNotification</span>(
+  payload: <span class="typ">NotificationPayload</span>
+): <span class="typ">Promise</span>&lt;<span class="typ">NotificationResult</span>[]&gt;
+
+<span class="cmt">// Scheduler: query bookings WHERE notification_sent_1h=false AND start_at ~1h,
+// envía email+phone, actualiza notification_sent_1h=true</span>
+<span class="kw">async function</span> <span class="fn">processPendingNotifications</span>(): <span class="typ">Promise</span>&lt;<span class="kw">void</span>&gt;</code></pre>
+    </div>
+
+    <!-- ── 6b Presencia ─────────────────────────────────────────────── -->
+    <div class="subsection" id="presencia">
+      <div class="subsection-title">6b — Presencia</div>
+
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Función</th><th>Parámetros</th><th>Retorna</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono text-purple">generateCode()</td>
+                <td class="text-muted">—</td>
+                <td class="mono">string (4 dígitos)</td>
+                <td><code>Math.floor(1000 + Math.random() * 9000)</code></td>
+              </tr>
+              <tr>
+                <td class="mono text-purple">upsertPresenceCode(businessId)</td>
+                <td class="mono">businessId: string</td>
+                <td class="mono">Promise&lt;string&gt;</td>
+                <td>UPSERT en <code>presence_codes</code> con TTL 5 minutos. Conflict on <code>business_id</code>.</td>
+              </tr>
+              <tr>
+                <td class="mono text-purple">verifyPresenceCode(input)</td>
+                <td class="mono" style="font-size:11px;">{ bookingId, code, lat?, lng? }</td>
+                <td class="mono">Promise&lt;VerifyResult&gt;</td>
+                <td>Ventana ±30min + expiración del código + coincidencia. Siempre inserta en <code>presence_checks</code>.</td>
+              </tr>
+              <tr>
+                <td class="mono text-purple">openDispute(input)</td>
+                <td class="mono" style="font-size:11px;">{ bookingId, reason, evidence }</td>
+                <td class="mono">Promise&lt;void&gt;</td>
+                <td>Inserta en <code>disputes</code> + booking → 'disputed' + <code>audit_logs</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <pre><code><span class="cmt">// verifyPresenceCode: lógica completa</span>
+<span class="kw">const</span> WINDOW_MS = <span class="num">30</span> * <span class="num">60</span> * <span class="num">1000</span>  <span class="cmt">// ±30 minutos</span>
+
+<span class="cmt">// 1. Fetch booking → start_at + business_id via join resources</span>
+<span class="cmt">// 2. Verificar delta = |start_at - now| &lt;= WINDOW_MS</span>
+<span class="cmt">// 3. Fetch presence_codes WHERE business_id</span>
+<span class="cmt">// 4. Verificar expires_at > now</span>
+<span class="cmt">// 5. Verificar code match</span>
+<span class="cmt">// 6. INSERT presence_checks con valid=true/false (siempre)</span>
+
+<span class="kw">type</span> <span class="typ">DisputeReason</span> = <span class="str">'presence_conflict'</span> | <span class="str">'refund_claim'</span> | <span class="str">'cash_discrepancy'</span></code></pre>
+    </div>
+
+    <!-- ── 6c Reembolsos ─────────────────────────────────────────────── -->
+    <div class="subsection" id="reembolsos">
+      <div class="subsection-title">6c — Reembolsos</div>
+
+      <div class="table-card" style="margin-bottom:20px;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Escenario</th><th>Condición extra</th><th>Tipo</th><th>%</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono">cancelled</td>
+                <td><code>hoursUntilStart &gt;= 24</code></td>
+                <td><span class="pill pill-green">stripe_refund</span></td>
+                <td class="text-green">100%</td>
+              </tr>
+              <tr>
+                <td class="mono">cancelled</td>
+                <td><code>hoursUntilStart &lt; 24</code></td>
+                <td><span class="pill pill-purple">tableo_credit</span></td>
+                <td class="text-purple">100%</td>
+              </tr>
+              <tr>
+                <td class="mono">no_show_client</td>
+                <td>—</td>
+                <td><span class="pill pill-purple">tableo_credit</span></td>
+                <td class="text-purple">50%</td>
+              </tr>
+              <tr>
+                <td class="mono">no_show_business</td>
+                <td>—</td>
+                <td><span class="pill pill-yellow">human_review</span></td>
+                <td class="text-muted">—</td>
+              </tr>
+              <tr>
+                <td class="mono">dispute_resolved_client</td>
+                <td>—</td>
+                <td><span class="pill pill-green">stripe_refund</span></td>
+                <td class="text-green">100%</td>
+              </tr>
+              <tr>
+                <td class="mono">dispute_resolved_business</td>
+                <td>—</td>
+                <td><span class="pill pill-muted">none</span></td>
+                <td class="text-muted">0%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <pre><code><span class="cmt">// src/modules/refunds/policy.ts</span>
+
+<span class="kw">type</span> <span class="typ">RefundScenario</span> =
+  | <span class="str">'cancelled'</span>             <span class="cmt">// requires hoursUntilStart</span>
+  | <span class="str">'no_show_client'</span>
+  | <span class="str">'no_show_business'</span>
+  | <span class="str">'dispute_resolved_client'</span>
+  | <span class="str">'dispute_resolved_business'</span>
+
+<span class="kw">type</span> <span class="typ">RefundType</span> =
+  | <span class="str">'stripe_refund'</span> | <span class="str">'tableo_credit'</span>
+  | <span class="str">'partial_credit'</span> | <span class="str">'human_review'</span> | <span class="str">'none'</span>
+
+<span class="cmt">// Función pura — sin efectos secundarios</span>
+<span class="kw">function</span> <span class="fn">determineRefundPolicy</span>(input: {
+  scenario: <span class="typ">RefundScenario</span>
+  hoursUntilStart: <span class="typ">number</span>
+}): <span class="typ">RefundPolicy</span>
+
+<span class="cmt">// Orquesta: fetch booking → policy → execute → log en refund_transactions</span>
+<span class="kw">async function</span> <span class="fn">executeRefund</span>(
+  bookingId: <span class="typ">string</span>,
+  scenario: <span class="typ">RefundScenario</span>
+): <span class="typ">Promise</span>&lt;<span class="kw">void</span>&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SECTION 7 — PHASE 2 — MOTOR DE DISPONIBILIDAD
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="phase2">
+    <h2 class="section-title"><span class="section-num">7</span>Phase 2 — Motor de Disponibilidad <span class="pill pill-green" style="margin-left:8px;">✓ Completo · 18 tests</span></h2>
+
+    <!-- 7a Interface -->
+    <div class="subsection">
+      <div class="subsection-title">7a — AvailabilityAdapter (interfaz)</div>
+      <pre><code><span class="cmt">// src/modules/availability/types.ts</span>
+
+<span class="kw">interface</span> <span class="typ">Slot</span> {
+  startAt:         <span class="typ">Date</span>
+  endAt:           <span class="typ">Date</span>
+  durationMinutes: <span class="typ">number</span>
+}
+
+<span class="kw">interface</span> <span class="typ">LockResult</span> {
+  success:       <span class="typ">boolean</span>
+  bookingId<span class="op">?</span>:    <span class="typ">string</span>
+  reservedUntil<span class="op">?</span>:<span class="typ">Date</span>
+  reason<span class="op">?</span>:       <span class="str">'not_available'</span> | <span class="str">'concurrent_lock'</span>
+}
+
+<span class="kw">interface</span> <span class="typ">AvailabilityAdapter</span> {
+  <span class="kw">readonly</span> sectorType: <span class="typ">SectorType</span>
+  getSlots(resourceId: <span class="typ">string</span>, date: <span class="typ">string</span>, timezoneId: <span class="typ">string</span>): <span class="typ">Promise</span>&lt;<span class="typ">Slot</span>[]&gt;
+  claimSlot(resourceId: <span class="typ">string</span>, startAt: <span class="typ">Date</span>, endAt: <span class="typ">Date</span>, sessionId: <span class="typ">string</span>): <span class="typ">Promise</span>&lt;<span class="typ">LockResult</span>&gt;
+  confirmBooking(bookingId: <span class="typ">string</span>, customerId: <span class="typ">string</span>, metadata: <span class="typ">BookingMetadata</span>): <span class="typ">Promise</span>&lt;<span class="typ">string</span>&gt;
+  releaseSlot(sessionId: <span class="typ">string</span>): <span class="typ">Promise</span>&lt;<span class="kw">void</span>&gt;
+}</code></pre>
+    </div>
+
+    <!-- 7b Algorithm -->
+    <div class="subsection">
+      <div class="subsection-title">7b — BeautyAdapter.getSlots() — Algoritmo paso a paso</div>
+      <div class="card">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <span style="background:rgba(108,99,255,.2); color:var(--purple2); font-weight:700; font-size:12px; padding:2px 8px; border-radius:4px; flex-shrink:0; margin-top:1px;">1</span>
+            <div><strong>Calcular bounds del día en UTC</strong><br><span class="text-muted">Llamar <code>dayBoundsUTC(date, timezoneId)</code> → obtener <code>startOfDay</code> y <code>endOfDay</code> como objetos <code>Date</code> en UTC.</span></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <span style="background:rgba(108,99,255,.2); color:var(--purple2); font-weight:700; font-size:12px; padding:2px 8px; border-radius:4px; flex-shrink:0; margin-top:1px;">2</span>
+            <div><strong>Convertir day_of_week</strong><br><span class="text-muted">JS <code>getDay()</code>: 0=Dom, 1=Lun, …, 6=Sáb. DB: 0=Lun, 6=Dom.<br>Conversión: <code>dbDayOfWeek = jsDay === 0 ? 6 : jsDay - 1</code></span></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <span style="background:rgba(108,99,255,.2); color:var(--purple2); font-weight:700; font-size:12px; padding:2px 8px; border-radius:4px; flex-shrink:0; margin-top:1px;">3</span>
+            <div><strong>Query availability_windows</strong><br><span class="text-muted">WHERE <code>resource_id = ? AND day_of_week = dbDayOfWeek</code>. Si no hay ventanas → return [].</span></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <span style="background:rgba(108,99,255,.2); color:var(--purple2); font-weight:700; font-size:12px; padding:2px 8px; border-radius:4px; flex-shrink:0; margin-top:1px;">4</span>
+            <div><strong>Leer duración del recurso</strong><br><span class="text-muted"><code>resources.metadata.duration_default</code> (minutos). Default: 60 min si no está definido.</span></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <span style="background:rgba(108,99,255,.2); color:var(--purple2); font-weight:700; font-size:12px; padding:2px 8px; border-radius:4px; flex-shrink:0; margin-top:1px;">5</span>
+            <div><strong>Query blocking_rules</strong><br><span class="text-muted">WHERE <code>resource_id = ? AND start_at &lt; endOfDay AND end_at &gt; startOfDay</code></span></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <span style="background:rgba(108,99,255,.2); color:var(--purple2); font-weight:700; font-size:12px; padding:2px 8px; border-radius:4px; flex-shrink:0; margin-top:1px;">6</span>
+            <div><strong>Query bookings ocupadas</strong><br><span class="text-muted">WHERE <code>resource_id = ? AND status IN ('reserved','confirmed') AND</code> overlap con el día.</span></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <span style="background:rgba(108,99,255,.2); color:var(--purple2); font-weight:700; font-size:12px; padding:2px 8px; border-radius:4px; flex-shrink:0; margin-top:1px;">7</span>
+            <div><strong>Generar slots por ventana</strong><br><span class="text-muted">Para cada window: construir <code>openUTC</code>/<code>closeUTC</code> con <code>new TZDate(year, month-1, day, H, M, 0, tz)</code>. Iterar <code>cursor += durationMs</code> mientras <code>cursor + durationMs &lt;= closeUTC</code>.</span></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <span style="background:rgba(108,99,255,.2); color:var(--purple2); font-weight:700; font-size:12px; padding:2px 8px; border-radius:4px; flex-shrink:0; margin-top:1px;">8</span>
+            <div><strong>Filtrar slots ocupados</strong><br><span class="text-muted">Overlap formula: <code>a.start &lt; b.end &amp;&amp; a.end &gt; b.start</code>. Aplica sobre blocks + bookings combinados.</span></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <span style="background:rgba(108,99,255,.2); color:var(--purple2); font-weight:700; font-size:12px; padding:2px 8px; border-radius:4px; flex-shrink:0; margin-top:1px;">9</span>
+            <div><strong>Return Slot[]</strong><br><span class="text-muted">Todas las fechas en UTC. La capa de presentación usa <code>formatSlotTime()</code> para mostrar hora local.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7c Two-phase flow -->
+    <div class="subsection">
+      <div class="subsection-title">7c — Flujo Two-Phase Booking</div>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-dot" style="background:var(--purple2);"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">getSlots(resourceId, date, timezoneId)</div>
+            <div class="flow-sub">Devuelve array de Slot[] libres. UI muestra al usuario.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-dot"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">Usuario selecciona un slot</div>
+            <div class="flow-sub">El cliente elige fecha y hora.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-dot" style="background:var(--yellow);"></div>
+            <div class="flow-line"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">claimSlot() → claim_slot() PG</div>
+            <div class="flow-sub">Crea booking 'reserved' con TTL 5 min. Countdown empieza en UI.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-dot"></div>
+            <div class="flow-line" style="background: linear-gradient(to bottom, var(--green), transparent);"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">Usuario completa formulario</div>
+            <div class="flow-sub">Nombre, email/teléfono, servicio.</div>
+            <div class="flow-alt">
+              <div class="flow-branch">OK: confirmBooking()</div>
+              <div class="flow-branch" style="color:var(--red); border-color:rgba(239,68,68,.3);">Timeout: releaseSlot()</div>
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-left">
+            <div class="flow-dot" style="background:var(--green);"></div>
+            <div class="flow-line" style="background:transparent;"></div>
+          </div>
+          <div class="flow-content">
+            <div class="flow-title">confirmBooking(bookingId, customerId, metadata)</div>
+            <div class="flow-sub">UPDATE 'confirmed' + asigna customer_id + createEvent() stub (Google Calendar Phase 5).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7d Factory -->
+    <div class="subsection">
+      <div class="subsection-title">7d — Factory Pattern</div>
+      <pre><code><span class="cmt">// src/modules/availability/factory.ts
+// El motor NUNCA importa BeautyAdapter directamente — siempre pasa por aquí.</span>
+
+<span class="kw">function</span> <span class="fn">getAdapter</span>(sectorType: <span class="typ">SectorType</span>, supabase: <span class="typ">SupabaseClient</span>): <span class="typ">AvailabilityAdapter</span>
+
+<span class="fn">getAdapter</span>(<span class="str">'beauty'</span>, supabase)      <span class="cmt">// → BeautyAdapter ✅</span>
+<span class="fn">getAdapter</span>(<span class="str">'restaurant'</span>, supabase) <span class="cmt">// → throws NotImplementedError (V2)</span>
+<span class="fn">getAdapter</span>(<span class="str">'real_estate'</span>, supabase)<span class="cmt">// → throws NotImplementedError (V2)</span>
+
+<span class="cmt">// Exhaustive check — TypeScript garantiza que se cubran todos los SectorType:
+// default: { const _exhaustive: never = sectorType; throw ... }</span></code></pre>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SECTION 8 — PATRONES CRÍTICOS
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="patrones">
+    <h2 class="section-title"><span class="section-num">8</span>Patrones Críticos</h2>
+
+    <!-- Supabase Mock -->
+    <div class="subsection">
+      <div class="subsection-title">Supabase Mock en Vitest — patrón correcto</div>
+      <div class="callout callout-red">
+        <div class="callout-title">Advertencia: mock incorrecto causa hangs infinitos en tests</div>
+        Usar <code>vi.fn().mockResolvedValue()</code> en el campo <code>then</code> de la chain de Supabase rompe el patrón thenable y hace que los tests con <code>await</code> no resuelvan nunca.
+      </div>
+      <div class="two-col">
+        <div>
+          <div style="color:var(--green); font-weight:600; font-size:12px; margin-bottom:6px;">CORRECTO — thenable real</div>
+          <pre><code><span class="cmt">// ✅ Thenable real — resuelve correctamente</span>
+chain.then = (fn) =>
+  <span class="typ">Promise</span>.resolve({ data, error: <span class="kw">null</span> }).then(fn)
+
+<span class="cmt">// Así se construye un mock de query chain:</span>
+<span class="kw">const</span> chain = {
+  select: vi.fn().mockReturnThis(),
+  eq:     vi.fn().mockReturnThis(),
+  single: vi.fn().mockReturnThis(),
+  then: (fn) =>
+    <span class="typ">Promise</span>.resolve({ data: mockData, error: <span class="kw">null</span> }).then(fn),
+}</code></pre>
+        </div>
+        <div>
+          <div style="color:var(--red); font-weight:600; font-size:12px; margin-bottom:6px;">INCORRECTO — causa hangs</div>
+          <pre><code><span class="cmt">// ❌ NUNCA hacer esto:</span>
+chain.then = vi.fn().mockResolvedValue({
+  data: mockData, error: <span class="kw">null</span>
+})
+
+<span class="cmt">// vi.fn() no implementa correctamente
+// el protocolo Promise/A+.
+// El await nunca resuelve → timeout
+// del test runner.</span></code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- TZDate Constructor -->
+    <div class="subsection">
+      <div class="subsection-title">TZDate Constructor — ADR-006</div>
+      <div class="two-col">
+        <div>
+          <div style="color:var(--green); font-weight:600; font-size:12px; margin-bottom:6px;">CORRECTO — parts constructor</div>
+          <pre><code><span class="cmt">// ✅ Interpreta como hora local del timezone</span>
+<span class="kw">new</span> <span class="typ">TZDate</span>(
+  year, month - <span class="num">1</span>, day,
+  hour, min, <span class="num">0</span>,
+  timezoneId
+)
+
+<span class="cmt">// Ejemplo: 9:00 hora Madrid
+// → la hora UTC depende del DST</span>
+<span class="kw">new</span> <span class="typ">TZDate</span>(<span class="num">2024</span>, <span class="num">5</span>, <span class="num">17</span>, <span class="num">9</span>, <span class="num">0</span>, <span class="num">0</span>,
+  <span class="str">'Europe/Madrid'</span>
+)</code></pre>
+        </div>
+        <div>
+          <div style="color:var(--red); font-weight:600; font-size:12px; margin-bottom:6px;">INCORRECTO — string constructor</div>
+          <pre><code><span class="cmt">// ❌ Interpreta como hora de la MÁQUINA,
+// no del timezone indicado</span>
+<span class="kw">new</span> <span class="typ">TZDate</span>(
+  <span class="str">'2024-06-17T09:00:00'</span>,
+  <span class="str">'Europe/Madrid'</span>
+)
+
+<span class="cmt">// En un servidor en UTC, '09:00:00' se
+// interpreta como 09:00 UTC, no 09:00 Madrid
+// → offset incorrecto en producción</span></code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timezone ADR -->
+    <div class="subsection">
+      <div class="subsection-title">Regla de Timezones — ADR-006</div>
+      <div class="card">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+          <div>
+            <div style="color:var(--green); font-weight:700; font-size:12px; margin-bottom:6px;">DB / Almacenamiento</div>
+            <div class="text-muted" style="font-size:13px;">Siempre UTC (<code>timestamptz</code>). Sin excepciones.</div>
+          </div>
+          <div>
+            <div style="color:var(--yellow); font-weight:700; font-size:12px; margin-bottom:6px;">Capa de negocio / Módulos</div>
+            <div class="text-muted" style="font-size:13px;">Operan en UTC. Nunca convierten a zona local.</div>
+          </div>
+          <div>
+            <div style="color:var(--purple2); font-weight:700; font-size:12px; margin-bottom:6px;">Presentación (UI)</div>
+            <div class="text-muted" style="font-size:13px;">Única capa que llama a <code>dates.ts</code> para mostrar hora local.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RLS ADR -->
+    <div class="subsection">
+      <div class="subsection-title">RLS — ADR-005</div>
+      <div class="callout callout-green">
+        <div class="callout-title">Regla: todas las tablas tienen RLS habilitado</div>
+        Cualquier tabla nueva debe activar RLS antes de merge a main. No existe excepción documentada.
+        <code>ALTER TABLE x ENABLE ROW LEVEL SECURITY;</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SECTION 9 — ENV VARS
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="env">
+    <h2 class="section-title"><span class="section-num">9</span>Variables de Entorno</h2>
+
+    <div class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>Módulo</th><th>Obligatoria</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="mono">NEXT_PUBLIC_SUPABASE_URL</td>
+              <td>supabase/client + server</td>
+              <td><span class="tag-required">✅ Sí</span></td>
+            </tr>
+            <tr>
+              <td class="mono">NEXT_PUBLIC_SUPABASE_ANON_KEY</td>
+              <td>supabase/client + server</td>
+              <td><span class="tag-required">✅ Sí</span></td>
+            </tr>
+            <tr>
+              <td class="mono">SUPABASE_SERVICE_ROLE_KEY</td>
+              <td>server actions, scheduler, pg_cron</td>
+              <td><span class="tag-required">✅ Sí</span></td>
+            </tr>
+            <tr>
+              <td class="mono">RESEND_API_KEY</td>
+              <td>EmailProvider (Resend)</td>
+              <td><span class="tag-required">✅ Sí</span></td>
+            </tr>
+            <tr>
+              <td class="mono">VAPID_PUBLIC_KEY</td>
+              <td>PwaProvider (web-push)</td>
+              <td><span class="tag-required">✅ Sí</span></td>
+            </tr>
+            <tr>
+              <td class="mono">VAPID_PRIVATE_KEY</td>
+              <td>PwaProvider (web-push)</td>
+              <td><span class="tag-required">✅ Sí</span></td>
+            </tr>
+            <tr>
+              <td class="mono">TWILIO_ACCOUNT_SID</td>
+              <td>SmsProvider (Twilio)</td>
+              <td><span class="tag-optional">⚡ Opcional</span></td>
+            </tr>
+            <tr>
+              <td class="mono">TWILIO_AUTH_TOKEN</td>
+              <td>SmsProvider (Twilio)</td>
+              <td><span class="tag-optional">⚡ Opcional</span></td>
+            </tr>
+            <tr>
+              <td class="mono">TWILIO_PHONE_FROM</td>
+              <td>SmsProvider (Twilio)</td>
+              <td><span class="tag-optional">⚡ Opcional</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout callout-yellow">
+      <div class="callout-title">Nota sobre providers opcionales</div>
+      Los providers con variables opcionales (Twilio, WhatsApp Baileys) implementan <code>isAvailable(): boolean</code> que comprueba la presencia de las vars antes de intentar enviar. Si no están configuradas, el provider se omite silenciosamente del routing.
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SECTION 10 — ESTADO DEL PROYECTO
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="estado">
+    <h2 class="section-title"><span class="section-num">10</span>Estado del Proyecto</h2>
+
+    <div class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Phase</th><th>Estado</th><th>Tests</th><th>Próximo paso</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Group A — Trust Layer</td>
+              <td><span class="pill pill-green">✓ Completo</span></td>
+              <td><strong>29</strong></td>
+              <td class="text-muted">—</td>
+            </tr>
+            <tr>
+              <td>Phase 1 — Foundation</td>
+              <td><span class="pill pill-green">✓ Completo</span></td>
+              <td><strong>49</strong></td>
+              <td class="text-muted">—</td>
+            </tr>
+            <tr>
+              <td>Phase 2 — Availability Engine</td>
+              <td><span class="pill pill-green">✓ Completo</span></td>
+              <td><strong>18</strong></td>
+              <td class="text-muted">—</td>
+            </tr>
+            <tr>
+              <td>Phase 3 — UI Pública</td>
+              <td><span class="pill pill-yellow">🔜 Pendiente</span></td>
+              <td class="text-muted">—</td>
+              <td>/book/[slug], SlotPicker, Countdown timer</td>
+            </tr>
+            <tr>
+              <td>Phase 4 — Dashboard UI</td>
+              <td><span class="pill pill-yellow">🔜 Pendiente</span></td>
+              <td class="text-muted">—</td>
+              <td>Calendar desktop+mobile, dnd-kit</td>
+            </tr>
+            <tr>
+              <td>Phase 5 — Google Calendar</td>
+              <td><span class="pill pill-yellow">🔜 Pendiente</span></td>
+              <td class="text-muted">—</td>
+              <td>calendarSync real, OAuth tokens, refresh flow</td>
+            </tr>
+            <tr style="background: rgba(108,99,255,.06);">
+              <td><strong>Total</strong></td>
+              <td>—</td>
+              <td><strong style="color:var(--green); font-size:16px;">67</strong></td>
+              <td class="text-muted">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card-grid" style="margin-top:8px;">
+      <div class="card card-sm">
+        <div style="color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.8px; font-weight:600; margin-bottom:6px;">Branch actual</div>
+        <code>feature/phase1-foundation</code>
+      </div>
+      <div class="card card-sm">
+        <div style="color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.8px; font-weight:600; margin-bottom:6px;">Generado</div>
+        <span style="color:var(--text);">2026-04-29</span>
+      </div>
+      <div class="card card-sm">
+        <div style="color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.8px; font-weight:600; margin-bottom:6px;">Arquitectura</div>
+        <span style="color:var(--text);">Sector-agnostic · ADR-003</span>
+      </div>
+      <div class="card card-sm">
+        <div style="color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.8px; font-weight:600; margin-bottom:6px;">Auth</div>
+        <span style="color:var(--text);">Supabase Auth + RLS · ADR-005</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Active nav link on scroll
+  const sections = document.querySelectorAll('.section')
+  const links = document.querySelectorAll('.nav-link')
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'))
+        const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`)
+        if (active) active.classList.add('active')
+      }
+    })
+  }, { rootMargin: '-20% 0px -70% 0px' })
+
+  sections.forEach(s => observer.observe(s))
+</script>
+
+</body>
+</html>
