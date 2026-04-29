@@ -111,19 +111,73 @@ export class BeautyAdapter implements AvailabilityAdapter {
     return slots
   }
 
-  // Stub implementations — completed in Task 6
-  async claimSlot(_resourceId: string, _startAt: Date, _endAt: Date, _sessionId: string): Promise<LockResult> {
-    throw new Error('Not implemented yet')
+  async claimSlot(
+    resourceId: string,
+    startAt: Date,
+    endAt: Date,
+    sessionId: string
+  ): Promise<LockResult> {
+    const { data } = await this.supabase.rpc('claim_slot', {
+      p_resource_id: resourceId,
+      p_start_at:    startAt.toISOString(),
+      p_end_at:      endAt.toISOString(),
+      p_session_id:  sessionId,
+    })
+
+    if (!data?.success) {
+      return {
+        success: false,
+        reason: (data?.reason as LockResult['reason']) ?? 'not_available',
+      }
+    }
+
+    return {
+      success:       true,
+      bookingId:     data.booking_id as string,
+      reservedUntil: new Date(data.reserved_until as string),
+    }
   }
 
-  async confirmBooking(_bookingId: string, _customerId: string, _metadata: BookingMetadata): Promise<string> {
-    throw new Error('Not implemented yet')
+  async confirmBooking(
+    bookingId: string,
+    customerId: string,
+    metadata: BookingMetadata
+  ): Promise<string> {
+    const { data, error } = await this.supabase
+      .from('bookings')
+      .update({
+        status:         'confirmed',
+        customer_id:    customerId,
+        metadata,
+        reserved_until: null,
+        session_id:     null,
+      })
+      .eq('id', bookingId)
+      .eq('status', 'reserved')
+      .select('id, start_at, end_at')
+      .single()
+
+    if (error || !data) {
+      throw new Error(
+        `confirmBooking: booking ${bookingId} not found or not in 'reserved' state`
+      )
+    }
+
+    const confirmed = data as { id: string; start_at: string; end_at: string }
+
+    // Google Calendar sync — stub in Phase 2, real implementation in Phase 5
+    await createEvent({
+      calendarId: 'primary',
+      summary:    'Reserva confirmada',
+      startAt:    new Date(confirmed.start_at),
+      endAt:      new Date(confirmed.end_at),
+      timezoneId: 'Europe/Madrid',
+    })
+
+    return confirmed.id
   }
 
-  async releaseSlot(_sessionId: string): Promise<void> {
-    throw new Error('Not implemented yet')
+  async releaseSlot(sessionId: string): Promise<void> {
+    await this.supabase.rpc('release_slot', { p_session_id: sessionId })
   }
 }
-
-// Suppress unused import warning — createEvent will be used in Task 6
-void createEvent
