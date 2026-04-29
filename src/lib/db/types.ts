@@ -12,6 +12,7 @@ export type BookingStatus =
   | 'completed'
   | 'no_show'
   | 'disputed'
+  | 'pending_ai_confirmation'
 
 // ─── Branding config (ADR-007) ───────────────────────────────────────────────
 export interface BusinessBranding {
