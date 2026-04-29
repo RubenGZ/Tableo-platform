@@ -5,7 +5,7 @@ export function generateCode(): string {
 }
 
 export async function upsertPresenceCode(businessId: string): Promise<string> {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   const code = generateCode()
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString()
 

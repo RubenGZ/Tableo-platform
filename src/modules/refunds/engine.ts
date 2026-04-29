@@ -10,7 +10,7 @@ interface ExecuteRefundInput {
 }
 
 export async function executeRefund(input: ExecuteRefundInput): Promise<void> {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
 
   const { data: booking } = await supabase
     .from('bookings')

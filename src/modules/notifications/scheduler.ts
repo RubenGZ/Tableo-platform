@@ -10,7 +10,7 @@ interface PendingBooking {
 }
 
 export async function processPendingNotifications(): Promise<void> {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
 
   const { data: bookings, error } = await supabase
     .from('bookings')

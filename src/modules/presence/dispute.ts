@@ -9,7 +9,7 @@ interface OpenDisputeInput {
 }
 
 export async function openDispute(input: OpenDisputeInput): Promise<void> {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
 
   const { error: disputeError } = await supabase.from('disputes').insert({
     booking_id: input.bookingId,
@@ -20,9 +20,7 @@ export async function openDispute(input: OpenDisputeInput): Promise<void> {
 
   if (disputeError) throw new Error(disputeError.message)
 
-  const bookingsQuery = supabase.from('bookings')
-  bookingsQuery.eq('id', input.bookingId)
-  await bookingsQuery.update({ status: 'disputed' })
+  await supabase.from('bookings').update({ status: 'disputed' }).eq('id', input.bookingId)
 
   await supabase.from('audit_logs').insert({
     entity_type: 'dispute',

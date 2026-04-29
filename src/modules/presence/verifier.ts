@@ -15,7 +15,7 @@ interface VerifyResult {
 }
 
 export async function verifyPresenceCode(input: VerifyInput): Promise<VerifyResult> {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
 
   const { data: booking } = await supabase
     .from('bookings')
@@ -64,7 +64,7 @@ export async function verifyPresenceCode(input: VerifyInput): Promise<VerifyResu
 }
 
 async function recordCheck(
-  supabase: ReturnType<typeof createServerClient>,
+  supabase: Awaited<ReturnType<typeof createServerClient>>,
   input: VerifyInput,
   valid: boolean,
 ): Promise<void> {

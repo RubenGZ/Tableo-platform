@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const mockInsert = vi.fn().mockResolvedValue({ data: [{ id: 'dispute-1' }], error: null })
-const mockUpdate = vi.fn().mockResolvedValue({ error: null })
-const mockEq = vi.fn().mockReturnThis()
+const mockEq = vi.fn().mockResolvedValue({ error: null })
+const mockUpdate = vi.fn(() => ({ eq: mockEq }))
 
 vi.mock('@/lib/supabase/server', () => ({
   createServerClient: vi.fn(() => ({
     from: vi.fn(function(table: string) {
       if (table === 'disputes') return { insert: mockInsert, select: vi.fn().mockReturnThis() }
-      if (table === 'bookings') return { update: mockUpdate, eq: mockEq }
+      if (table === 'bookings') return { update: mockUpdate }
       if (table === 'audit_logs') return { insert: vi.fn().mockResolvedValue({ error: null }) }
       return {}
     }),
