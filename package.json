@@ -25,6 +25,7 @@
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.105.1",
     "@whiskeysockets/baileys": "7.0.0-rc.9",
+    "chrono-node": "^2.9.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "next": "^15.5.15",
