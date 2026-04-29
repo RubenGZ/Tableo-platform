@@ -175,7 +175,7 @@ export async function POST(request: Request) {
   }
 
   // 8. Verificar duplicate booking
-  const { data: duplicate } = await supabase
+  const { data: duplicate, error: duplicateError } = await supabase
     .from('bookings')
     .select('id')
     .eq('customer_id', customerId)
@@ -184,6 +184,10 @@ export async function POST(request: Request) {
     .lt('start_at', endAt.toISOString())
     .gt('end_at', startAt.toISOString())
     .maybeSingle()
+
+  if (duplicateError) {
+    console.error('[AI API] Error checking duplicate booking:', duplicateError)
+  }
 
   if (duplicate) {
     return NextResponse.json(
