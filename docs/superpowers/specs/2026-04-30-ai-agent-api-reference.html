@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableo — AI Agent API · Referencia Técnica</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2128;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --accent: #7c6dff;
+    --accent2: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --orange: #e3ae4b;
+    --purple: #bc8cff;
+    --teal: #39d353;
+    --code-bg: #161b22;
+    --tag-bg: #21262d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  /* ── Layout ── */
+  .shell { display: flex; min-height: 100vh; }
+  nav {
+    width: 240px;
+    min-width: 240px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  nav .logo {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  nav .logo span { color: var(--accent); }
+  nav ul { list-style: none; }
+  nav ul li a {
+    display: block;
+    padding: 6px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color .15s, background .15s;
+    border-left: 2px solid transparent;
+  }
+  nav ul li a:hover { color: #fff; background: rgba(255,255,255,.04); }
+  nav ul li.section { padding: 12px 20px 4px; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+  nav ul li.active a { color: var(--accent2); border-left-color: var(--accent2); background: rgba(88,166,255,.06); }
+  main {
+    flex: 1;
+    padding: 48px 56px;
+    max-width: 900px;
+  }
+  /* ── Typography ── */
+  h1 { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  h2 { font-size: 20px; font-weight: 600; color: #fff; margin: 48px 0 16px; padding-top: 8px; border-top: 1px solid var(--border); }
+  h3 { font-size: 16px; font-weight: 600; color: #e6edf3; margin: 28px 0 12px; }
+  h4 { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 20px 0 8px; }
+  p { color: var(--text); margin-bottom: 12px; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  /* ── Code ── */
+  code {
+    background: var(--tag-bg);
+    color: #e6edf3;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 12px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 12px 0 20px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .kw  { color: #ff7b72; }   /* keywords */
+  .fn  { color: #d2a8ff; }   /* functions */
+  .str { color: #a5d6ff; }   /* strings */
+  .num { color: #79c0ff; }   /* numbers/types */
+  .cmt { color: #8b949e; font-style: italic; }   /* comments */
+  .key { color: #ffa657; }   /* object keys */
+  .val { color: #a5d6ff; }   /* values */
+  .met { color: #7ce38b; }   /* methods */
+  .typ { color: #79c0ff; }   /* types */
+  /* ── Badges ── */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .badge-post   { background: #1a3a2a; color: var(--green); border: 1px solid #2ea04330; }
+  .badge-201    { background: #1a3a2a; color: var(--green); }
+  .badge-401    { background: #3a1a1a; color: var(--red); }
+  .badge-404    { background: #3a2a1a; color: var(--orange); }
+  .badge-409    { background: #3a2a1a; color: var(--yellow); }
+  .badge-422    { background: #3a2a1a; color: var(--orange); }
+  .badge-500    { background: #3a1a1a; color: var(--red); }
+  .badge-req    { background: #1a2a3a; color: var(--accent2); }
+  .badge-opt    { background: #21262d; color: var(--muted); }
+  .badge-new    { background: #2d1f5e; color: var(--purple); }
+  /* ── Cards / Boxes ── */
+  .card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: rgba(124,109,255,.08);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .callout.warn {
+    border-left-color: var(--yellow);
+    background: rgba(210,153,34,.08);
+  }
+  .callout.tip {
+    border-left-color: var(--green);
+    background: rgba(63,185,80,.08);
+  }
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+  th { background: var(--surface2); color: var(--muted); font-weight: 600; text-align: left; padding: 8px 12px; border: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  td { padding: 8px 12px; border: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  /* ── Flow steps ── */
+  .flow { counter-reset: step; margin: 16px 0; }
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+    align-items: flex-start;
+  }
+  .step-num {
+    counter-increment: step;
+    min-width: 28px;
+    height: 28px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .step-body { flex: 1; padding-top: 4px; }
+  .step-body strong { color: #e6edf3; }
+  .step-body .ret { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  /* ── Error rows ── */
+  .error-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .error-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .error-card .ec { font-family: monospace; font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+  .error-card .ec.cap  { color: var(--yellow); }
+  .error-card .ec.mis  { color: var(--orange); }
+  .error-card .ec.inv  { color: var(--purple); }
+  .error-card .ec.dup  { color: var(--accent2); }
+  .error-card .ec.biz  { color: var(--teal); }
+  .error-card .ec.tok  { color: var(--red); }
+  .error-card p { font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+  .error-card .prompt { font-size: 12px; color: var(--text); font-style: italic; border-left: 2px solid var(--border); padding-left: 8px; }
+  /* ── File tree ── */
+  .tree { font-family: monospace; font-size: 13px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; line-height: 2; }
+  .tree .dir  { color: var(--accent2); }
+  .tree .file { color: #e6edf3; }
+  .tree .note { color: var(--muted); }
+  /* ── Divider ── */
+  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+  .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; font-size: 12px; color: var(--muted); }
+  .meta span { background: var(--tag-bg); padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ── Sidebar ── -->
+<nav>
+  <div class="logo">Tableo <span>AI API</span></div>
+  <ul>
+    <li class="section">Introducción</li>
+    <li><a href="#overview">¿Qué es?</a></li>
+    <li><a href="#architecture">Arquitectura</a></li>
+    <li><a href="#files">Estructura de ficheros</a></li>
+    <li class="section">Endpoint</li>
+    <li><a href="#endpoint">POST /api/ai/book</a></li>
+    <li><a href="#flow">Flujo de 10 pasos</a></li>
+    <li><a href="#request">Request body</a></li>
+    <li><a href="#responses">Responses</a></li>
+    <li class="section">Módulos</li>
+    <li><a href="#token-auth">validateAiToken()</a></li>
+    <li><a href="#date-normalizer">normalizeDateTime()</a></li>
+    <li><a href="#error-factory">buildError()</a></li>
+    <li class="section">Errores</li>
+    <li><a href="#error-codes">Códigos de error</a></li>
+    <li><a href="#error-design">Diseño conversacional</a></li>
+    <li class="section">Integración LLMs</li>
+    <li><a href="#gemini">Gemini / GPT</a></li>
+    <li><a href="#datetime-formats">Formatos de fecha</a></li>
+    <li class="section">Base de datos</li>
+    <li><a href="#migration">Migration 007</a></li>
+    <li><a href="#status">pending_ai_confirmation</a></li>
+    <li class="section">Tests</li>
+    <li><a href="#tests">Suite de tests</a></li>
+  </ul>
+</nav>
+
+<!-- ── Main content ── -->
+<main>
+
+  <h1>AI Agent API Layer</h1>
+  <p class="subtitle">Referencia técnica completa · Tableo v1.0</p>
+  <div class="meta">
+    <span>Fecha: 2026-04-30</span>
+    <span>Branch: master</span>
+    <span>76 tests passing</span>
+    <span>Next.js 15 App Router</span>
+    <span>TypeScript strict</span>
+  </div>
+
+  <!-- ────────────────────────────────── OVERVIEW ── -->
+  <h2 id="overview">¿Qué es?</h2>
+  <p>La AI Agent API Layer es una capa de integración que permite a cualquier LLM (Gemini, Claude, GPT, Siri, Google Assistant) crear reservas en Tableo usando lenguaje natural. El LLM llama a un único endpoint REST y recibe respuestas JSON diseñadas para ser interpretadas y retransmitidas directamente al usuario final.</p>
+
+  <div class="callout">
+    <strong>Principio de diseño clave:</strong> todos los errores incluyen dos campos:
+    <code>message_for_ai</code> (contexto técnico para el LLM) y <code>suggested_user_prompt</code>
+    (frase en español lista para decirle al usuario). El LLM nunca tiene que construir mensajes de error por su cuenta.
+  </div>
+
+  <p>Las reservas creadas por IA no se confirman automáticamente. Tienen el status <code>pending_ai_confirmation</code> y el dueño del negocio las aprueba desde el dashboard. Esto garantiza que el negocio siempre tiene el control.</p>
+
+  <!-- ────────────────────────────────── ARCHITECTURE ── -->
+  <h2 id="architecture">Arquitectura</h2>
+
+  <div class="card">
+    <strong style="color:#fff">Capas involucradas</strong>
+    <p style="margin-top:10px;font-size:13px;">La AI API no reimplementa nada — envuelve la lógica de negocio existente:</p>
+    <pre><code><span class="cmt">┌─────────────────────────────────────────────────┐</span>
+<span class="cmt">│  LLM (Gemini / Claude / GPT / Siri)             │</span>
+<span class="cmt">│  llama a book_appointment() con lenguaje natural│</span>
+<span class="cmt">└────────────────────┬────────────────────────────┘</span>
+                     │ HTTP POST  x-tableo-ai-token
+<span class="cmt">┌────────────────────▼────────────────────────────┐</span>
+<span class="cmt">│  POST /api/ai/book                              │</span>
+<span class="cmt">│  src/app/api/ai/book/route.ts                   │</span>
+<span class="cmt">│  ──────────────────────────────────────────     │</span>
+<span class="cmt">│  1. validateAiToken()    → 401 si falla         │</span>
+<span class="cmt">│  2. Validar campos       → 422 si faltan        │</span>
+<span class="cmt">│  3. Fetch business       → 404 si no existe     │</span>
+<span class="cmt">│  4. normalizeDateTime()  → 422 si no parsea     │</span>
+<span class="cmt">│  5. getAdapter().getSlots() → slots disponibles │</span>
+<span class="cmt">│  6. Verificar slot       → 409 + alternativas   │</span>
+<span class="cmt">│  7. Upsert customer                             │</span>
+<span class="cmt">│  8. Check duplicado      → 409 si existe        │</span>
+<span class="cmt">│  9. INSERT booking       → pending_ai_confirm.  │</span>
+<span class="cmt">│ 10. Return 201 + AiSuccessResponse              │</span>
+<span class="cmt">└────────────────────┬────────────────────────────┘</span>
+                     │ reutiliza
+<span class="cmt">┌────────────────────▼────────────────────────────┐</span>
+<span class="cmt">│  Phase 2: AvailabilityAdapter                   │</span>
+<span class="cmt">│  getAdapter(sector).getSlots(resourceId, date)  │</span>
+<span class="cmt">│  BeautyAdapter → queries Supabase               │</span>
+<span class="cmt">└─────────────────────────────────────────────────┘</span></code></pre>
+  </div>
+
+  <h3>Decisiones de diseño</h3>
+  <table>
+    <tr><th>Decisión</th><th>Elección</th><th>Razón</th></tr>
+    <tr><td>Auth</td><td>Token único <code>TABLEO_AI_TOKEN</code></td><td>V1 simple; per-negocio en Phase 4</td></tr>
+    <tr><td>Status reserva</td><td><code>pending_ai_confirmation</code></td><td>El negocio siempre aprueba antes de confirmar</td></tr>
+    <tr><td>Flujo de booking</td><td>INSERT directo (sin TTL)</td><td>No hay countdown en reservas por IA</td></tr>
+    <tr><td>Date parsing</td><td><code>chrono-node</code> inglés + español</td><td>Soporta ISO, relativo, objetos Siri/Google</td></tr>
+    <tr><td>Token comparison</td><td><code>crypto.timingSafeEqual</code></td><td>Previene timing oracle attacks</td></tr>
+    <tr><td>Errores</td><td>JSON con <code>suggested_user_prompt</code></td><td>LLMs necesitan texto listo para retransmitir</td></tr>
+  </table>
+
+  <!-- ────────────────────────────────── FILES ── -->
+  <h2 id="files">Estructura de ficheros</h2>
+  <div class="tree">
+    <span class="dir">src/</span><br>
+    &nbsp;&nbsp;<span class="dir">app/api/ai/book/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">route.ts</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="note">← POST handler principal (10 pasos)</span><br>
+    &nbsp;&nbsp;<span class="dir">lib/ai/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">types.ts</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="note">← AiBookingRequest, AiErrorCode, AiErrorResponse, AiSuccessResponse, ParseError</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">date-normalizer.ts</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="note">← normalizeDateTime() — acepta cualquier formato de fecha</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">token-auth.ts</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="note">← validateAiToken() — timing-safe comparison</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="file">error-factory.ts</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="note">← buildError() — 6 códigos con suggested_user_prompt</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">__tests__/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">date-normalizer.test.ts</span>&nbsp;<span class="note">← 9 tests TDD</span><br>
+    <span class="dir">docs/api/</span><br>
+    &nbsp;&nbsp;<span class="file">openapi.yaml</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="note">← OpenAPI 3.1 spec completo</span><br>
+    &nbsp;&nbsp;<span class="file">gemini-tool-definition.json</span>&nbsp;<span class="note">← Function Calling para Gemini/GPT/Claude API/Siri</span><br>
+    <span class="dir">supabase/migrations/</span><br>
+    &nbsp;&nbsp;<span class="file">007_ai_booking.sql</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="note">← pending_ai_confirmation + ai_source column + índice</span>
+  </div>
+
+  <!-- ────────────────────────────────── ENDPOINT ── -->
+  <h2 id="endpoint">POST /api/ai/book</h2>
+
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;">
+    <span class="badge badge-post">POST</span>
+    <code style="font-size:14px;">/api/ai/book</code>
+    <span style="color:var(--muted);font-size:13px;">— Crear reserva desde LLM</span>
+  </div>
+
+  <h4>Header requerido</h4>
+  <pre><code><span class="key">x-tableo-ai-token</span>: <span class="str">&lt;TABLEO_AI_TOKEN&gt;</span></code></pre>
+
+  <!-- ────────────────────────────────── FLOW ── -->
+  <h2 id="flow">Flujo de 10 pasos</h2>
+  <p>El handler ejecuta siempre los pasos en este orden. Cada paso puede devolver una respuesta de error que cortocircuita el resto.</p>
+
+  <div class="flow">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>validateAiToken(request)</strong>
+        <div class="ret">→ 401 + ERROR_INVALID_TOKEN si el header falta o no coincide con TABLEO_AI_TOKEN</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>request.json()</strong>
+        <div class="ret">→ 422 + ERROR_MISSING_DATA si el body no es JSON válido</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>Validar campos obligatorios</strong><br>
+        <span style="font-size:12px;color:var(--muted);">Verifica: <code>business_slug</code>, <code>resource_id</code>, <code>datetime</code>, <code>customer.name</code></span>
+        <div class="ret">→ 422 + ERROR_MISSING_DATA con array <code>missing[]</code> de campos ausentes</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <strong>Fetch business por slug</strong><br>
+        <span style="font-size:12px;color:var(--muted);">SELECT id, name, sector_type, timezone_id, config FROM businesses WHERE slug = ?</span>
+        <div class="ret">→ 404 + ERROR_BUSINESS_NOT_FOUND si no existe</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <strong>normalizeDateTime(body.datetime, business.timezone_id)</strong><br>
+        <span style="font-size:12px;color:var(--muted);">Convierte cualquier formato al Date UTC de startAt</span>
+        <div class="ret">→ 422 + ERROR_INVALID_DATETIME si no puede parsear</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <strong>getAdapter(sector).getSlots(resourceId, dateStr, timezoneId)</strong><br>
+        <span style="font-size:12px;color:var(--muted);">Obtiene slots disponibles y busca si el solicitado existe (tolerancia 1 minuto)</span>
+        <div class="ret">→ 409 + ERROR_CAPACITY_FULL con hasta 3 <code>alternative_slots</code> si el slot no está disponible</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <strong>Upsert customer</strong><br>
+        <span style="font-size:12px;color:var(--muted);">Busca cliente por <code>phone</code> OR <code>email</code> dentro del negocio. Si no existe, lo crea.</span>
+        <div class="ret">→ 422 si el insert falla</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">8</div>
+      <div class="step-body">
+        <strong>Verificar reserva duplicada</strong><br>
+        <span style="font-size:12px;color:var(--muted);">SELECT id FROM bookings WHERE customer_id = ? AND resource_id = ? AND overlap(startAt, endAt) AND status IN (reserved, confirmed, pending_ai_confirmation)</span>
+        <div class="ret">→ 409 + ERROR_DUPLICATE_BOOKING si existe solapamiento</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">9</div>
+      <div class="step-body">
+        <strong>INSERT booking</strong><br>
+        <span style="font-size:12px;color:var(--muted);">status: 'pending_ai_confirmation', ai_source: true, metadata: {service, notes, ai_requested_by}</span>
+        <div class="ret">→ 500 + ERROR_SERVER si el insert falla</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:var(--green);">✓</div>
+      <div class="step-body">
+        <strong>Return 201 + AiSuccessResponse</strong><br>
+        <span style="font-size:12px;color:var(--muted);">booking_id, status, start_at, end_at, message_for_ai, suggested_user_prompt</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────── REQUEST ── -->
+  <h2 id="request">Request body</h2>
+  <p>Tipo TypeScript: <code>AiBookingRequest</code> — definido en <code>src/lib/ai/types.ts</code></p>
+
+  <table>
+    <tr><th>Campo</th><th>Tipo</th><th>Req</th><th>Descripción</th></tr>
+    <tr><td><code>business_slug</code></td><td><code>string</code></td><td><span class="badge badge-req">req</span></td><td>Slug URL del negocio (ej. <code>"salon-luna"</code>)</td></tr>
+    <tr><td><code>resource_id</code></td><td><code>string (uuid)</code></td><td><span class="badge badge-req">req</span></td><td>UUID del profesional, mesa, etc.</td></tr>
+    <tr><td><code>datetime</code></td><td><code>string | {date, time}</code></td><td><span class="badge badge-req">req</span></td><td>Fecha/hora en cualquier formato. Ver <a href="#datetime-formats">formatos aceptados</a>.</td></tr>
+    <tr><td><code>customer.name</code></td><td><code>string</code></td><td><span class="badge badge-req">req</span></td><td>Nombre completo del cliente</td></tr>
+    <tr><td><code>customer.phone</code></td><td><code>string</code></td><td><span class="badge badge-opt">opt</span></td><td>E.164, ej. <code>"+34666555444"</code>. Recomendado para identificar clientes.</td></tr>
+    <tr><td><code>customer.email</code></td><td><code>string</code></td><td><span class="badge badge-opt">opt</span></td><td>Alternativa al teléfono para identificar al cliente.</td></tr>
+    <tr><td><code>service</code></td><td><code>string</code></td><td><span class="badge badge-opt">opt</span></td><td>Nombre del servicio (ej. <code>"Corte de pelo"</code>). Se guarda en metadata.</td></tr>
+    <tr><td><code>notes</code></td><td><code>string</code></td><td><span class="badge badge-opt">opt</span></td><td>Notas adicionales para el negocio. Se guarda en metadata.</td></tr>
+    <tr><td><code>duration_minutes</code></td><td><code>integer</code></td><td><span class="badge badge-opt">opt</span></td><td>Reservado para uso futuro (Phase 5). Actualmente ignorado.</td></tr>
+  </table>
+
+  <h4>Ejemplo de request</h4>
+  <pre><code><span class="kw">POST</span> /api/ai/book
+<span class="key">Content-Type</span>: application/json
+<span class="key">x-tableo-ai-token</span>: tableo_ai_xxxx
+
+{
+  <span class="key">"business_slug"</span>: <span class="str">"salon-luna"</span>,
+  <span class="key">"resource_id"</span>: <span class="str">"550e8400-e29b-41d4-a716-446655440000"</span>,
+  <span class="key">"datetime"</span>: <span class="str">"mañana a las 10 de la mañana"</span>,
+  <span class="key">"customer"</span>: {
+    <span class="key">"name"</span>: <span class="str">"María García"</span>,
+    <span class="key">"phone"</span>: <span class="str">"+34666555444"</span>
+  },
+  <span class="key">"service"</span>: <span class="str">"Corte de pelo"</span>
+}</code></pre>
+
+  <!-- ────────────────────────────────── RESPONSES ── -->
+  <h2 id="responses">Responses</h2>
+
+  <h3><span class="badge badge-201">201</span> &nbsp;Reserva creada</h3>
+  <p>Tipo TypeScript: <code>AiSuccessResponse</code></p>
+  <pre><code>{
+  <span class="key">"booking_id"</span>: <span class="str">"uuid"</span>,
+  <span class="key">"status"</span>: <span class="str">"pending_ai_confirmation"</span>,
+  <span class="key">"start_at"</span>: <span class="str">"2024-06-18T08:00:00.000Z"</span>,
+  <span class="key">"end_at"</span>: <span class="str">"2024-06-18T09:00:00.000Z"</span>,
+  <span class="key">"message_for_ai"</span>: <span class="str">"Booking created successfully with status pending_ai_confirmation. Business owner must confirm before it becomes active."</span>,
+  <span class="key">"suggested_user_prompt"</span>: <span class="str">"¡Perfecto! He solicitado tu cita en Salón Luna para las 10:00. El negocio la confirmará en breve y te avisaremos cuando esté lista. ¿Necesitas algo más?"</span>
+}</code></pre>
+
+  <h3><span class="badge badge-409">409</span> &nbsp;Slot no disponible — con alternativas</h3>
+  <pre><code>{
+  <span class="key">"code"</span>: <span class="str">"ERROR_CAPACITY_FULL"</span>,
+  <span class="key">"message_for_ai"</span>: <span class="str">"The requested slot 10:00 is not available. 3 alternative slots found."</span>,
+  <span class="key">"suggested_user_prompt"</span>: <span class="str">"Lo siento, a las 10:00 ya no hay disponibilidad en Salón Luna. ¿Te vendría bien a las 10:30, 11:00 o 11:30?"</span>,
+  <span class="key">"alternative_slots"</span>: [
+    { <span class="key">"start_at"</span>: <span class="str">"2024-06-18T08:30:00Z"</span>, <span class="key">"end_at"</span>: <span class="str">"2024-06-18T09:30:00Z"</span>, <span class="key">"formatted"</span>: <span class="str">"10:30"</span> },
+    { <span class="key">"start_at"</span>: <span class="str">"2024-06-18T09:00:00Z"</span>, <span class="key">"end_at"</span>: <span class="str">"2024-06-18T10:00:00Z"</span>, <span class="key">"formatted"</span>: <span class="str">"11:00"</span> },
+    { <span class="key">"start_at"</span>: <span class="str">"2024-06-18T09:30:00Z"</span>, <span class="key">"end_at"</span>: <span class="str">"2024-06-18T10:30:00Z"</span>, <span class="key">"formatted"</span>: <span class="str">"11:30"</span> }
+  ]
+}</code></pre>
+
+  <!-- ────────────────────────────────── MODULES ── -->
+  <h2 id="token-auth">Módulo: validateAiToken()</h2>
+  <p>Archivo: <code>src/lib/ai/token-auth.ts</code></p>
+
+  <table>
+    <tr><th>Parámetro</th><th>Tipo</th><th>Descripción</th></tr>
+    <tr><td><code>request</code></td><td><code>Request</code></td><td>Request HTTP de Next.js</td></tr>
+    <tr><th>Retorna</th><th colspan="2"><code>boolean</code> — true si el token es válido</th></tr>
+  </table>
+
+  <p><strong>Comportamiento:</strong></p>
+  <ul style="margin: 8px 0 16px 20px; color: var(--text); font-size: 13px; line-height: 2;">
+    <li>Lee el header <code>x-tableo-ai-token</code> del request</li>
+    <li>Compara con <code>process.env.TABLEO_AI_TOKEN</code> usando <code>crypto.timingSafeEqual</code> (previene timing attacks)</li>
+    <li>Si el env var no está configurado → loguea error y devuelve <code>false</code></li>
+    <li>Si el token falta en el header → devuelve <code>false</code> inmediatamente</li>
+  </ul>
+
+  <pre><code><span class="kw">import</span> { timingSafeEqual } <span class="kw">from</span> <span class="str">'crypto'</span>
+
+<span class="kw">export function</span> <span class="fn">validateAiToken</span>(request: <span class="typ">Request</span>): <span class="typ">boolean</span> {
+  <span class="kw">const</span> token    = request.headers.<span class="met">get</span>(<span class="str">'x-tableo-ai-token'</span>)
+  <span class="kw">const</span> expected = process.env.<span class="key">TABLEO_AI_TOKEN</span>
+
+  <span class="kw">if</span> (!expected) { console.<span class="met">error</span>(<span class="str">'[AI API] TABLEO_AI_TOKEN env var not set'</span>); <span class="kw">return false</span> }
+  <span class="kw">if</span> (!token) <span class="kw">return false</span>
+
+  <span class="kw">const</span> a = Buffer.<span class="met">from</span>(token)
+  <span class="kw">const</span> b = Buffer.<span class="met">from</span>(expected)
+  <span class="kw">return</span> a.byteLength === b.byteLength && <span class="fn">timingSafeEqual</span>(a, b)
+}</code></pre>
+
+  <!-- ── date-normalizer ── -->
+  <h2 id="date-normalizer">Módulo: normalizeDateTime()</h2>
+  <p>Archivo: <code>src/lib/ai/date-normalizer.ts</code> · Dependencias: <code>chrono-node</code>, <code>@date-fns/tz</code></p>
+
+  <table>
+    <tr><th>Parámetro</th><th>Tipo</th><th>Descripción</th></tr>
+    <tr><td><code>input</code></td><td><code>string | {date, time}</code></td><td>Input del LLM — cualquier formato</td></tr>
+    <tr><td><code>timezoneId</code></td><td><code>string</code></td><td>IANA timezone del negocio (ej. <code>"Europe/Madrid"</code>)</td></tr>
+    <tr><td><code>referenceDate</code></td><td><code>Date?</code></td><td>Fecha base para "mañana", "el viernes", etc. Default: <code>new Date()</code></td></tr>
+    <tr><th>Retorna</th><th colspan="2"><code>Date</code> en UTC · Lanza <code>ParseError</code> si no puede parsear o la fecha relativa está en el pasado</th></tr>
+  </table>
+
+  <h4>4 ramas de parseo (en orden)</h4>
+
+  <div class="card">
+    <strong style="color:var(--accent2)">Rama 1 — Objeto {date, time}</strong>
+    <p style="font-size:13px;margin-top:6px;">Formato de Siri y Google Assistant. Combina las partes en un ISO local y lo convierte a UTC usando el <code>TZDate</code> de <code>@date-fns/tz</code>.</p>
+    <pre style="margin-bottom:0"><code>{ <span class="key">date</span>: <span class="str">"2024-06-17"</span>, <span class="key">time</span>: <span class="str">"10:00"</span> }  <span class="cmt">// → new TZDate(2024, 5, 17, 10, 0, 0, 'Europe/Madrid') → 08:00 UTC</span>
+{ <span class="key">date</span>: <span class="str">"2024-06-17"</span>, <span class="key">time</span>: <span class="str">"15"</span> }     <span class="cmt">// time sin minutos → se normaliza a "15:00"</span></code></pre>
+  </div>
+
+  <div class="card">
+    <strong style="color:var(--accent2)">Rama 2 — ISO 8601 con timezone explícita</strong>
+    <p style="font-size:13px;margin-top:6px;">Termina en <code>Z</code>, <code>+HH:MM</code> o <code>-HH:MM</code>. Se pasa directamente a <code>new Date()</code> sin transformación.</p>
+    <pre style="margin-bottom:0"><code><span class="str">"2024-06-17T10:00:00Z"</span>         <span class="cmt">// UTC directo</span>
+<span class="str">"2024-06-17T10:00:00+02:00"</span>    <span class="cmt">// Madrid verano → 08:00 UTC</span></code></pre>
+  </div>
+
+  <div class="card">
+    <strong style="color:var(--accent2)">Rama 3 — ISO sin timezone</strong>
+    <p style="font-size:13px;margin-top:6px;">Se interpreta como hora local del negocio. Usa el constructor por partes de <code>TZDate</code> para evitar que el servidor lo interprete en su propia zona horaria.</p>
+    <pre style="margin-bottom:0"><code><span class="str">"2024-06-17T10:00:00"</span>  <span class="cmt">// → TZDate(2024, 5, 17, 10, 0, 0, business.timezone_id)</span></code></pre>
+  </div>
+
+  <div class="card">
+    <strong style="color:var(--accent2)">Rama 4 — Texto relativo (chrono-node)</strong>
+    <p style="font-size:13px;margin-top:6px;">Usa <code>chrono.parseDate</code> (inglés) primero, luego <code>chrono.es.parseDate</code> (español). Pasa el offset UTC de la timezone del negocio para que <em>mañana a las 10</em> se interprete en la hora del negocio, no del servidor.</p>
+    <pre style="margin-bottom:0"><code><span class="str">"mañana a las 10"</span>           <span class="cmt">// chrono.es — español</span>
+<span class="str">"tomorrow at 3pm"</span>           <span class="cmt">// chrono   — inglés</span>
+<span class="str">"el viernes a las 3 de la tarde"</span>   <span class="cmt">// próximo viernes 15:00 local</span></code></pre>
+    <div class="callout warn" style="margin-top:10px;margin-bottom:0">
+      <strong>Solo la rama 4 rechaza fechas pasadas.</strong> Los ISO explícitos se aceptan siempre — la validación de pasado es responsabilidad del caller.
+    </div>
+  </div>
+
+  <!-- ── error-factory ── -->
+  <h2 id="error-factory">Módulo: buildError()</h2>
+  <p>Archivo: <code>src/lib/ai/error-factory.ts</code></p>
+
+  <table>
+    <tr><th>Parámetro</th><th>Tipo</th><th>Descripción</th></tr>
+    <tr><td><code>code</code></td><td><code>AiErrorCode</code></td><td>Uno de los 6 códigos de error</td></tr>
+    <tr><td><code>context</code></td><td><code>ErrorContext?</code></td><td>Datos para rellenar las plantillas (missing, slot, business, name, slug, alternatives)</td></tr>
+    <tr><th>Retorna</th><th colspan="2"><code>AiErrorResponse</code> — { code, message_for_ai, suggested_user_prompt, alternative_slots? }</th></tr>
+  </table>
+
+  <div class="callout">
+    El switch es <strong>exhaustivo</strong>: TypeScript producirá un error de compilación si se añade un nuevo <code>AiErrorCode</code> sin su case correspondiente.
+  </div>
+
+  <!-- ────────────────────────────────── ERROR CODES ── -->
+  <h2 id="error-codes">Códigos de error</h2>
+
+  <div class="error-grid">
+    <div class="error-card">
+      <div class="ec cap">ERROR_CAPACITY_FULL</div>
+      <p>HTTP 409 · El slot solicitado no está disponible</p>
+      <div class="prompt">"Lo siento, a las 10:00 ya no hay disponibilidad en Salón Luna. ¿Te vendría bien a las 10:30, 11:00 o 11:30?"</div>
+    </div>
+    <div class="error-card">
+      <div class="ec mis">ERROR_MISSING_DATA</div>
+      <p>HTTP 422 · Faltan campos obligatorios</p>
+      <div class="prompt">"Para hacer la reserva necesito que me indiques: business_slug, customer.name."</div>
+    </div>
+    <div class="error-card">
+      <div class="ec inv">ERROR_INVALID_DATETIME</div>
+      <p>HTTP 422 · No se pudo parsear la fecha</p>
+      <div class="prompt">"No he entendido bien la fecha 'el día ese'. ¿Puedes decirme el día y la hora con más detalle?"</div>
+    </div>
+    <div class="error-card">
+      <div class="ec dup">ERROR_DUPLICATE_BOOKING</div>
+      <p>HTTP 409 · El cliente ya tiene cita en ese horario</p>
+      <div class="prompt">"Parece que María ya tiene una cita en Salón Luna a esa hora. ¿Quieres cambiarla o es para otra persona?"</div>
+    </div>
+    <div class="error-card">
+      <div class="ec biz">ERROR_BUSINESS_NOT_FOUND</div>
+      <p>HTTP 404 · El slug no corresponde a ningún negocio</p>
+      <div class="prompt">"No he encontrado el negocio 'salon-xyz'. ¿Puedes confirmar el nombre exacto?"</div>
+    </div>
+    <div class="error-card">
+      <div class="ec tok">ERROR_INVALID_TOKEN</div>
+      <p>HTTP 401 · Token ausente o incorrecto</p>
+      <div class="prompt">"No tengo autorización para hacer reservas. Por favor, contacta directamente con el negocio."</div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────── ERROR DESIGN ── -->
+  <h2 id="error-design">Diseño conversacional de errores</h2>
+  <p>Cada error tiene <strong>dos campos de texto</strong> con audiencias distintas:</p>
+
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <h4 style="margin-top:0;">message_for_ai</h4>
+        <p style="font-size:13px;">Técnico, para el LLM. Explica qué pasó para que el LLM pueda tomar decisiones.</p>
+        <pre style="font-size:11px;margin:0"><code><span class="str">"The requested slot 10:00 is not
+available for the requested resource.
+3 alternative slots found."</span></code></pre>
+      </div>
+      <div>
+        <h4 style="margin-top:0;">suggested_user_prompt</h4>
+        <p style="font-size:13px;">En español, para el usuario final. El LLM puede decirlo directamente.</p>
+        <pre style="font-size:11px;margin:0"><code><span class="str">"Lo siento, a las 10:00 ya no hay
+disponibilidad en Salón Luna.
+¿Te vendría bien a las 10:30?"</span></code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────── LLM INTEGRATION ── -->
+  <h2 id="gemini">Integración con LLMs</h2>
+
+  <h3>Gemini / GPT / Claude API (Function Calling)</h3>
+  <p>Archivo: <code>docs/api/gemini-tool-definition.json</code> — Compatible con Google AI Studio, OpenAI <code>function_calling</code>, Anthropic <code>tool_use</code> y Apple Siri Shortcuts.</p>
+
+  <pre><code>{
+  <span class="key">"name"</span>: <span class="str">"book_appointment"</span>,
+  <span class="key">"description"</span>: <span class="str">"Crea una reserva en Tableo. Úsalo cuando el usuario quiera hacer, pedir o solicitar una cita."</span>,
+  <span class="key">"parameters"</span>: {
+    <span class="key">"type"</span>: <span class="str">"object"</span>,
+    <span class="key">"required"</span>: [<span class="str">"business_slug"</span>, <span class="str">"resource_id"</span>, <span class="str">"datetime"</span>, <span class="str">"customer"</span>],
+    <span class="key">"properties"</span>: {
+      <span class="key">"business_slug"</span>:  { <span class="key">"type"</span>: <span class="str">"string"</span> },
+      <span class="key">"resource_id"</span>:   { <span class="key">"type"</span>: <span class="str">"string"</span> },
+      <span class="key">"datetime"</span>:     { <span class="key">"type"</span>: <span class="str">"string"</span>, <span class="key">"description"</span>: <span class="str">"ISO, relativo ES/EN, o texto tal como lo dijo el usuario"</span> },
+      <span class="key">"customer"</span>: {
+        <span class="key">"type"</span>: <span class="str">"object"</span>,
+        <span class="key">"properties"</span>: {
+          <span class="key">"name"</span>:  { <span class="key">"type"</span>: <span class="str">"string"</span> },
+          <span class="key">"phone"</span>: { <span class="key">"type"</span>: <span class="str">"string"</span> },
+          <span class="key">"email"</span>: { <span class="key">"type"</span>: <span class="str">"string"</span> }
+        }
+      }
+    }
+  }
+}</code></pre>
+
+  <div class="callout tip">
+    <strong>Importante:</strong> el campo <code>customer</code> es un <strong>objeto anidado</strong>, no campos planos. Un LLM que envíe <code>customer_name</code> en la raíz obtendrá ERROR_MISSING_DATA.
+  </div>
+
+  <h3>Ciclo completo de una conversación</h3>
+  <pre><code><span class="cmt">Usuario → LLM:  "Pídeme cita en el salón luna para mañana a las 10"</span>
+
+<span class="cmt">LLM → Tableo API:</span>
+POST /api/ai/book
+{ business_slug: <span class="str">"salon-luna"</span>, datetime: <span class="str">"mañana a las 10"</span>,
+  customer: { name: <span class="str">"María García"</span>, phone: <span class="str">"+34666555444"</span> }, ... }
+
+<span class="cmt">— Escenario A: slot disponible → 201</span>
+{ status: <span class="str">"pending_ai_confirmation"</span>, suggested_user_prompt: <span class="str">"¡Perfecto! He solicitado tu cita..."</span> }
+<span class="cmt">LLM → Usuario:  "¡Perfecto! He solicitado tu cita en Salón Luna para las 10:00..."</span>
+
+<span class="cmt">— Escenario B: slot ocupado → 409</span>
+{ code: <span class="str">"ERROR_CAPACITY_FULL"</span>, suggested_user_prompt: <span class="str">"Lo siento, a las 10:00 ya no hay..."</span>,
+  alternative_slots: [{formatted: <span class="str">"10:30"</span>}, ...] }
+<span class="cmt">LLM → Usuario:  "Lo siento, a las 10:00 ya no hay disponibilidad. ¿Te vendría bien a las 10:30?"</span>
+
+<span class="cmt">— Escenario C: fecha no entendida → 422</span>
+{ code: <span class="str">"ERROR_INVALID_DATETIME"</span>, suggested_user_prompt: <span class="str">"No he entendido bien la fecha..."</span> }
+<span class="cmt">LLM → Usuario:  "No he entendido bien la fecha. ¿Puedes decirme el día y la hora con más detalle?"</span></code></pre>
+
+  <!-- ────────────────────────────────── DATE FORMATS ── -->
+  <h2 id="datetime-formats">Formatos de fecha aceptados</h2>
+
+  <table>
+    <tr><th>Input</th><th>Tipo</th><th>Resultado (negocio en Madrid UTC+2)</th></tr>
+    <tr><td><code>"2024-06-17T10:00:00Z"</code></td><td>ISO UTC</td><td>10:00 UTC (pass-through)</td></tr>
+    <tr><td><code>"2024-06-17T10:00:00+02:00"</code></td><td>ISO con offset</td><td>08:00 UTC</td></tr>
+    <tr><td><code>"2024-06-17T10:00:00"</code></td><td>ISO sin tz</td><td>08:00 UTC (interpreta como Madrid)</td></tr>
+    <tr><td><code>{ date: "2024-06-17", time: "10:00" }</code></td><td>Objeto Siri/Google</td><td>08:00 UTC</td></tr>
+    <tr><td><code>{ date: "2024-06-17", time: "15" }</code></td><td>Objeto hora corta</td><td>13:00 UTC</td></tr>
+    <tr><td><code>"mañana a las 10"</code></td><td>Relativo ES</td><td>mañana 10:00 local → UTC</td></tr>
+    <tr><td><code>"el viernes a las 3 de la tarde"</code></td><td>Relativo ES</td><td>próximo viernes 15:00 local → UTC</td></tr>
+    <tr><td><code>"tomorrow at 3pm"</code></td><td>Relativo EN</td><td>mañana 15:00 local → UTC</td></tr>
+    <tr><td><code>"next friday at 10am"</code></td><td>Relativo EN</td><td>próximo viernes 10:00 local → UTC</td></tr>
+    <tr><td><code>"xyz abc foo"</code></td><td>Inválido</td><td>→ lanza <code>ParseError</code> → 422</td></tr>
+    <tr><td><code>"yesterday at 10am"</code></td><td>Relativo pasado</td><td>→ lanza <code>ParseError</code> → 422</td></tr>
+  </table>
+
+  <!-- ────────────────────────────────── MIGRATION ── -->
+  <h2 id="migration">Migration 007</h2>
+  <p>Archivo: <code>supabase/migrations/007_ai_booking.sql</code></p>
+
+  <pre><code><span class="cmt">-- 1. Ampliar CHECK de status</span>
+<span class="kw">ALTER TABLE</span> bookings <span class="kw">DROP CONSTRAINT IF EXISTS</span> bookings_status_check;
+<span class="kw">ALTER TABLE</span> bookings <span class="kw">ADD CONSTRAINT</span> bookings_status_check
+  <span class="kw">CHECK</span> (status <span class="kw">IN</span> (
+    <span class="str">'pending'</span>, <span class="str">'reserved'</span>, <span class="str">'confirmed'</span>, <span class="str">'cancelled'</span>,
+    <span class="str">'completed'</span>, <span class="str">'no_show'</span>, <span class="str">'disputed'</span>, <span class="str">'pending_ai_confirmation'</span>
+  ));
+
+<span class="cmt">-- 2. Columna de origen IA</span>
+<span class="kw">ALTER TABLE</span> bookings
+  <span class="kw">ADD COLUMN IF NOT EXISTS</span> ai_source <span class="kw">boolean NOT NULL DEFAULT false</span>;
+
+<span class="cmt">-- 3. Índice parcial para el dashboard</span>
+<span class="kw">CREATE INDEX IF NOT EXISTS</span> idx_bookings_ai_pending
+  <span class="kw">ON</span> bookings (ai_source, status)
+  <span class="kw">WHERE</span> ai_source = <span class="kw">true AND</span> status = <span class="str">'pending_ai_confirmation'</span>;</code></pre>
+
+  <!-- ────────────────────────────────── STATUS ── -->
+  <h2 id="status">Estado: pending_ai_confirmation</h2>
+
+  <div class="card">
+    <strong style="color:#fff">Diferencias con el flujo normal</strong>
+    <table style="margin-top:12px">
+      <tr><th></th><th>Reserva normal (UI)</th><th>Reserva por IA</th></tr>
+      <tr><td>Status inicial</td><td><code>reserved</code></td><td><code>pending_ai_confirmation</code></td></tr>
+      <tr><td>TTL / countdown</td><td>5 minutos</td><td>Sin TTL (no expira)</td></tr>
+      <tr><td>Función PG</td><td><code>claim_slot()</code></td><td>INSERT directo</td></tr>
+      <tr><td><code>ai_source</code></td><td><code>false</code></td><td><code>true</code></td></tr>
+      <tr><td>Aprobación</td><td>Automática al confirmar datos</td><td>Manual por el dueño del negocio</td></tr>
+      <tr><td>customer_id</td><td>Nullable hasta confirmación</td><td>Asignado en el insert</td></tr>
+    </table>
+  </div>
+
+  <h4>Ciclo de vida</h4>
+  <pre><code><span class="cmt">IA crea reserva</span>
+     │
+     ▼
+<span class="str">pending_ai_confirmation</span>  ← estado inicial
+     │
+     ├─ Dueño aprueba ──────→  <span class="str">confirmed</span>
+     │
+     └─ Dueño rechaza ──────→  <span class="str">cancelled</span></code></pre>
+
+  <!-- ────────────────────────────────── TESTS ── -->
+  <h2 id="tests">Suite de tests</h2>
+  <p>Archivo: <code>src/lib/ai/__tests__/date-normalizer.test.ts</code> · <strong>9 tests</strong> · Vitest 2</p>
+
+  <table>
+    <tr><th>#</th><th>Test</th><th>Input</th><th>Esperado</th></tr>
+    <tr><td>1</td><td>ISO UTC pass-through</td><td><code>"2024-06-17T10:00:00Z"</code></td><td><code>10:00 UTC</code></td></tr>
+    <tr><td>2</td><td>ISO sin tz → hora local negocio</td><td><code>"2024-06-17T10:00:00"</code> + Madrid</td><td><code>08:00 UTC</code></td></tr>
+    <tr><td>3</td><td>Objeto {date, time}</td><td><code>{ date:"2024-06-17", time:"10:00" }</code> + Madrid</td><td><code>08:00 UTC</code></td></tr>
+    <tr><td>4</td><td>Objeto hora corta sin minutos</td><td><code>{ date:"2024-06-17", time:"15" }</code> + UTC</td><td><code>15:00 UTC</code></td></tr>
+    <tr><td>5</td><td>Relativo inglés "tomorrow at 3pm"</td><td>ref: 2024-06-17 (lunes)</td><td>martes 15:00 UTC</td></tr>
+    <tr><td>6</td><td>Relativo español "mañana a las 10"</td><td>ref: 2024-06-17</td><td>martes 10:00 UTC</td></tr>
+    <tr><td>7</td><td>ISO con offset explícito +02:00</td><td><code>"2024-06-17T10:00:00+02:00"</code></td><td><code>08:00 UTC</code></td></tr>
+    <tr><td>8</td><td>Lanza ParseError — input inválido</td><td><code>"xyzzy foo bar"</code></td><td><code>throw ParseError</code></td></tr>
+    <tr><td>9</td><td>Lanza ParseError — relativo en pasado</td><td><code>"yesterday at 10am"</code> (ref 2024)</td><td><code>throw ParseError</code></td></tr>
+  </table>
+
+  <div class="callout tip">
+    Total del proyecto: <strong>76 tests</strong> pasando (16 ficheros de test).
+    Los tests de este módulo no necesitan Supabase real — se ejecutan en menos de 1 segundo.
+  </div>
+
+  <h4>Variable de entorno requerida</h4>
+  <pre><code><span class="cmt"># .env.local</span>
+<span class="key">TABLEO_AI_TOKEN</span>=<span class="str">tableo_ai_tu_token_secreto_aqui</span></code></pre>
+
+  <p style="color:var(--muted);font-size:12px;margin-top:48px;padding-top:16px;border-top:1px solid var(--border);">
+    Generado: 2026-04-30 · Tableo AI Agent API Layer · master
+  </p>
+
+</main>
+</div>
+</body>
+</html>
