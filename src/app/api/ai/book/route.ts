@@ -221,7 +221,11 @@ export async function POST(request: Request) {
   if (bookingError || !booking) {
     console.error('[AI API] Error inserting booking:', bookingError)
     return NextResponse.json(
-      buildError('ERROR_MISSING_DATA', { missing: ['booking insert failed — check server logs'] }),
+      {
+        code: 'ERROR_SERVER',
+        message_for_ai: 'Internal server error while creating booking. The slot may still be available — retry is safe.',
+        suggested_user_prompt: 'Ha habido un problema técnico al crear la cita. Por favor, inténtalo de nuevo en un momento.',
+      },
       { status: 500 }
     )
   }

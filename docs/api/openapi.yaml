@@ -91,6 +91,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiErrorResponse'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: ERROR_SERVER
+                  message_for_ai:
+                    type: string
+                  suggested_user_prompt:
+                    type: string
 
 components:
   securitySchemes:
@@ -130,7 +144,7 @@ components:
                   example: "10:00"
         duration_minutes:
           type: integer
-          description: Duración en minutos (opcional — si no se envía, se usa el default del recurso)
+          description: Duración en minutos. Actualmente reservado — si se envía, es ignorado por el sistema (el slot siempre usa la duración estándar del recurso). Será funcional en Phase 5.
           example: 60
         customer:
           type: object

@@ -4,7 +4,7 @@
   "description": "Crea una reserva en un negocio de Tableo (peluquería, restaurante, etc.) a través de la API. Usa esta función cuando el usuario quiera hacer, solicitar o pedir una cita o reserva. La reserva queda pendiente de confirmación por parte del negocio. Si el horario solicitado no está disponible, la respuesta incluirá hasta 3 alternativas.",
   "parameters": {
     "type": "object",
-    "required": ["business_slug", "resource_id", "datetime", "customer_name"],
+    "required": ["business_slug", "resource_id", "datetime", "customer"],
     "properties": {
       "business_slug": {
         "type": "string",
@@ -18,17 +18,24 @@
         "type": "string",
         "description": "Fecha y hora de la reserva. Puede ser: (1) ISO 8601 con timezone: '2024-06-17T10:00:00Z'. (2) ISO 8601 sin timezone: '2024-06-17T10:00:00' (se interpreta como hora local del negocio). (3) Texto relativo en español: 'mañana a las 10', 'el viernes a las 3 de la tarde', 'pasado mañana por la mañana'. (4) Texto relativo en inglés: 'tomorrow at 10am', 'next friday at 3pm'. IMPORTANTE: enviar el texto tal como lo dijo el usuario si no hay ambigüedad de zona horaria."
       },
-      "customer_name": {
-        "type": "string",
-        "description": "Nombre completo del cliente. Extraer del contexto de la conversación o preguntar si no se sabe."
-      },
-      "customer_phone": {
-        "type": "string",
-        "description": "Número de teléfono del cliente en formato E.164 (ej. '+34666555444'). Muy recomendable incluirlo para identificar clientes recurrentes. Preguntar si no se dispone de él."
-      },
-      "customer_email": {
-        "type": "string",
-        "description": "Email del cliente. Alternativa al teléfono para identificación. Incluir si está disponible."
+      "customer": {
+        "type": "object",
+        "description": "Datos del cliente que realiza la reserva.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre completo del cliente. Extraer del contexto de la conversación o preguntar si no se sabe."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Número de teléfono en formato E.164 (ej. '+34666555444'). Muy recomendable para identificar clientes recurrentes."
+          },
+          "email": {
+            "type": "string",
+            "description": "Email del cliente. Alternativa al teléfono para identificación."
+          }
+        },
+        "required": ["name"]
       },
       "service": {
         "type": "string",
@@ -40,7 +47,7 @@
       },
       "duration_minutes": {
         "type": "integer",
-        "description": "Duración del servicio en minutos. Solo incluir si el usuario especificó una duración concreta. Si no, omitir y el sistema usará el tiempo estándar del servicio."
+        "description": "Duración del servicio en minutos. NOTA: este campo es actualmente ignorado por el sistema — la duración siempre es la estándar del recurso. Se incluye para compatibilidad futura."
       }
     }
   },
@@ -51,8 +58,7 @@
         "business_slug": "salon-luna",
         "resource_id": "<uuid-laura>",
         "datetime": "mañana a las 10",
-        "customer_name": "María García",
-        "customer_phone": "+34666555444"
+        "customer": { "name": "María García", "phone": "+34666555444" }
       }
     },
     {
@@ -61,8 +67,7 @@
         "business_slug": "restaurante-casa-pepe",
         "resource_id": "<uuid-mesa-4>",
         "datetime": "el viernes a las 9 de la noche",
-        "customer_name": "Carlos Ruiz",
-        "customer_phone": "+34677888999",
+        "customer": { "name": "Carlos Ruiz", "phone": "+34677888999" },
         "service": "Mesa para 4 personas"
       }
     }
